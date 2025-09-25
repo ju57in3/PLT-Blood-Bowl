@@ -37,7 +37,7 @@ graph TD
     S -->|Oui| T[SCORE]
     S -->|Non| U[CHECK_TURNOVER]
     
-    T --> U
+    T --> D
     
     U --> V{TURNOVER?}
     V -->|Oui| W[END_TURN]
@@ -58,7 +58,8 @@ graph TD
 
 ```mermaid
 graph TD
-    E[PLAYER_TURN] --> F[START_TURN]
+    A[Init] --> E[PLAYER_TURN]
+    E --> F[START_TURN]
     F --> G[CHOOSE_ACTION]
 
     G --> H[MOVE]
@@ -85,7 +86,7 @@ graph TD
     S -->|Oui| T[SCORE]
     S -->|Non| U[CHECK_TURNOVER]
     
-    T --> U
+    T --> A
     
     U --> V{TURNOVER?}
     V -->|Oui| W[END_TURN]
