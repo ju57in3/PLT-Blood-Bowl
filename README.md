@@ -2,7 +2,7 @@
 
 [![Actions Status](https://github.com/cbares/plt/workflows/PLT%20build/badge.svg)](https://github.com/cbares/plt/actions)
 
-## Proposiiton de FSM:
+## Proposiiton de FSM v1:
 
 ```mermaid
 graph TD
@@ -54,56 +54,164 @@ graph TD
     Z --> E
 ```
 
+## Proposiiton de FSM v2:
+
+```mermaid
+graph TD
+    E[PLAYER_TURN] --> F[START_TURN]
+    F --> G[CHOOSE_ACTION]
+
+    G --> H[MOVE]
+    H --> I[CHECK_BLOCK]
+    I --> J[RESOLVE_BLOCK]
+    J --> K[CHECK_INJURY]
+    K --> L[CHECK_TOUCHDOWN]
+    
+    G --> M[PASS]
+    M --> N[RESOLVE_PASS]
+    N --> L
+    
+    G --> O[FOUL]
+    O --> P[RESOLVE_FOUL]
+    P --> L
+    
+    G --> Q[BLITZ]
+    Q --> H
+    
+    G --> R[HANDOFF]
+    R --> N
+    
+    L --> S{TOUCHDOWN?}
+    S -->|Oui| T[SCORE]
+    S -->|Non| U[CHECK_TURNOVER]
+    
+    T --> U
+    
+    U --> V{TURNOVER?}
+    V -->|Oui| W[END_TURN]
+    V -->|Non| G
+    
+    W --> X{HALF_TIME?}
+    X -->|Oui| Y[HALF_TIME]
+    X -->|Non| Z[SWITCH_TEAM]
+    
+    Y --> AA{GAME_END?}
+    AA -->|Non| Z
+    AA -->|Oui| AB[GAME_OVER]
+    
+    Z --> E
+```
+
 ## Proposition de diagramme de classe:
 
 ```mermaid
 classDiagram
-    %% Classes principales du jeu
-    class Game {
-        -currentState: GameState
+    %% Classe principale du jeu
+    class BloodBowlGame {
+        -currentState: GameState*
         -teams: Team[2]
         -board: Board
         -dice: Dice
-        -currentTeamIndex: int
+        -currentTeam: Team*
         -turnCounter: int
-        -half: int
-        +run(): void
-        +changeState(newState: GameState): void
+        +setState(state: GameState*): void
+        +getCurrentState(): GameState*
+        +processTurn(): void
         +checkTouchdown(): bool
         +checkTurnover(): bool
     }
 
+    %% Interface State de base
     class GameState {
-        <<enumeration>>
-        INIT
-        SETUP
-        COIN_TOSS
-        KICKOFF
-        PLAYER_TURN
-        START_TURN
-        CHOOSE_ACTION
-        MOVE
-        PASS
-        BLOCK
-        FOUL
-        HANDOFF
-        CHECK_TOUCHDOWN
-        CHECK_TURNOVER
-        SCORE
-        END_TURN
-        SWITCH_TEAM
-        HALF_TIME
-        GAME_OVER
+        <<abstract>>
+        +enter(game: BloodBowlGame*): void
+        +execute(game: BloodBowlGame*): void
+        +exit(game: BloodBowlGame*): void
+        +handleInput(game: BloodBowlGame*, input: UserInput): void
     }
 
+    %% États concrets de la FSM
+    class InitState {
+        +enter(game: BloodBowlGame*): void
+        +execute(game: BloodBowlGame*): void
+        +exit(game: BloodBowlGame*): void
+    }
+
+    class SetupState {
+        -formationPhase: bool
+        +execute(game: BloodBowlGame*): void
+        +handleFormation(team: Team*): void
+    }
+
+    class PlayerTurnState {
+        -actionsRemaining: int
+        -currentPlayer: Player*
+        +execute(game: BloodBowlGame*): void
+        +handleActionSelection(action: ActionType): void
+    }
+
+    class ActionState {
+        <<abstract>>
+        -player: Player*
+        -target: Vector2D
+        +validateAction(): bool
+        +resolveAction(): ActionResult
+    }
+
+    class MoveState {
+        -path: Square[]
+        -dodgeAttempts: int
+        +execute(game: BloodBowlGame*): void
+        +calculatePath(): Square[]
+        +checkTackleZones(): int
+    }
+
+    class BlockState {
+        -attacker: Player*
+        -defender: Player*
+        -diceResult: BlockResult
+        +execute(game: BloodBowlGame*): void
+        +rollBlockDice(): BlockResult
+        +resolveInjury(): void
+    }
+
+    class PassState {
+        -passer: Player*
+        -receiver: Player*
+        -interceptors: Player[]
+        +execute(game: BloodBowlGame*): void
+        +calculatePassRange(): PassRange
+        +checkInterceptions(): bool
+    }
+
+    class TouchdownState {
+        -scoringTeam: Team*
+        -scoringPlayer: Player*
+        +execute(game: BloodBowlGame*): void
+        +awardPoints(): void
+        +setupKickoff(): void
+    }
+
+    class TurnoverState {
+        -reason: TurnoverReason
+        +execute(game: BloodBowlGame*): void
+        +switchTeams(): void
+    }
+
+    class KickoffState {
+        -kickoffEvent: KickoffEvent
+        +execute(game: BloodBowlGame*): void
+        +resolveKickoffEvent(): void
+    }
+
+    %% Classes support
     class Team {
         -name: string
         -players: Player[]
         -rerolls: int
         -score: int
-        -coach: string
-        +setupFormation(): void
         +getActivePlayers(): Player[]
+        +setupFormation(formation: FormationType): void
     }
 
     class Player {
@@ -112,85 +220,19 @@ classDiagram
         -movement: int
         -strength: int
         -agility: int
-        -armor: int
         -skills: Skill[]
-        -currentSquare: Square
+        -currentSquare: Square*
         -hasBall: bool
         -status: PlayerStatus
-        +move(target: Square): bool
-        +block(target: Player): BlockResult
-        +pass(target: Square): bool
-        +pickUpBall(): bool
-    }
-
-    class PlayerStatus {
-        <<enumeration>>
-        ACTIVE
-        PRONE
-        STUNNED
-        INJURED
-        KO
-        DEAD
+        +moveTo(square: Square*): bool
+        +performBlock(target: Player*): BlockResult
     }
 
     class Board {
         -squares: Square[][]
-        -width: int
-        -height: int
         -ball: Ball
-        +getSquare(x: int, y: int): Square
-        +moveBall(newSquare: Square): void
-        +isInEndZone(square: Square, team: Team): bool
-    }
-
-    class Square {
-        -x: int
-        -y: int
-        -type: SquareType
-        -player: Player*
-        +isOccupied(): bool
-        +getAdjacentSquares(): Square[]
-    }
-
-    class SquareType {
-        <<enumeration>>
-        NORMAL
-        WIDE_ZONE
-        SCRIMMAGE_LINE
-        END_ZONE
-    }
-
-    class Ball {
-        -currentSquare: Square
-        -isCarried: bool
-        -carrier: Player*
-        +bounce(): void
-        +scatter(): void
-    }
-
-    class Action {
-        <<abstract>>
-        +execute(): ActionResult
-    }
-
-    class MoveAction {
-        -player: Player
-        -target: Square
-        +execute(): ActionResult
-    }
-
-    class BlockAction {
-        -attacker: Player
-        -defender: Player
-        -diceResults: DiceResult[]
-        +execute(): ActionResult
-    }
-
-    class PassAction {
-        -passer: Player
-        -target: Square
-        -range: PassRange
-        +execute(): ActionResult
+        +getSquare(x: int, y: int): Square*
+        +moveBall(square: Square*): void
     }
 
     class ActionResult {
@@ -200,55 +242,42 @@ classDiagram
         -message: string
     }
 
-    class Dice {
-        +rollD6(): int
-        +rollBlockDice(): BlockResult
-        +rollInjuryDice(): InjuryResult
-        +rollScatterDice(): Direction
-    }
+    %% Relations
+    BloodBowlGame "1" *-- "1" GameState : current
+    BloodBowlGame "1" *-- "2" Team
+    BloodBowlGame "1" *-- "1" Board
+    BloodBowlGame "1" *-- "1" Dice
 
-    class BlockResult {
-        <<enumeration>>
-        ATTACKER_DOWN
-        BOTH_DOWN
-        PUSH
-        DEFENDER_STUMBLES
-        DEFENDER_DOWN
-    }
+    GameState <|-- InitState
+    GameState <|-- SetupState
+    GameState <|-- PlayerTurnState
+    GameState <|-- ActionState
+    GameState <|-- MoveState
+    GameState <|-- BlockState
+    GameState <|-- PassState
+    GameState <|-- TouchdownState
+    GameState <|-- TurnoverState
+    GameState <|-- KickoffState
 
-    class Skill {
-        -name: string
-        -description: string
-        +applyEffect(action: Action): void
-    }
+    ActionState <|-- MoveState
+    ActionState <|-- BlockState
+    ActionState <|-- PassState
 
-    %% Relations entre classes
-    Game --> GameState
-    Game "1" *-- "2" Team
-    Game "1" *-- "1" Board
-    Game "1" *-- "1" Dice
-    
     Team "1" *-- "11..16" Player
-    Player --> PlayerStatus
-    Player "1" *-- "*" Skill
-    Player --> Square
-    
     Board "1" *-- "*" Square
-    Board "1" *-- "1" Ball
-    Square --> SquareType
-    
-    Action <|-- MoveAction
-    Action <|-- BlockAction
-    Action <|-- PassAction
-    Action --> ActionResult
-    
-    BlockAction --> BlockResult
-    BlockAction --> Player
+    Player --> Square
 
-    %% Relations d'association
-    Game ..> Action : uses
-    Player ..> Action : performs
-    Square ..> Player : contains
-    Ball ..> Player : carried by
-    Ball ..> Square : located in
+    %% Transitions entre états
+    InitState --> SetupState : transition
+    SetupState --> KickoffState : transition
+    KickoffState --> PlayerTurnState : transition
+    PlayerTurnState --> MoveState : action selected
+    PlayerTurnState --> BlockState : action selected
+    PlayerTurnState --> PassState : action selected
+    MoveState --> PlayerTurnState : action completed
+    BlockState --> TouchdownState : touchdown
+    BlockState --> TurnoverState : turnover
+    PassState --> TouchdownState : touchdown
+    TouchdownState --> KickoffState : reset
+    TurnoverState --> PlayerTurnState : switch teams
 ```
