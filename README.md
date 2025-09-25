@@ -79,9 +79,6 @@ graph TD
     G --> Q[BLITZ]
     Q --> H
     
-    G --> R[HANDOFF]
-    R --> N
-    
     L --> S{TOUCHDOWN?}
     S -->|Oui| T[SCORE]
     S -->|Non| U[CHECK_TURNOVER]
