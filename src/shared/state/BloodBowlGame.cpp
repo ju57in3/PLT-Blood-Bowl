@@ -2,8 +2,8 @@
 
 namespace state {
 
-    void BloodBowlGame_init() {
-
+    BloodBowlGame::BloodBowlGame() {
+        
     }
 
 
