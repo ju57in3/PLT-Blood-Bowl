@@ -2,8 +2,5 @@
 
 namespace state {
 
-    Square::Square() {
-        
-    }
 
 }

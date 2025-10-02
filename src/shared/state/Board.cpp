@@ -1,9 +1,5 @@
 #include "Board.h"
 
-namespace state
-{
-    Board::Board(){
-        
-    }
+namespace state{
 
 }

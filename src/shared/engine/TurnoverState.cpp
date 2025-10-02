@@ -2,8 +2,4 @@
 
 namespace engine {
 
-    TurnoverState::TurnoverState() {
-
-    }
-
 }

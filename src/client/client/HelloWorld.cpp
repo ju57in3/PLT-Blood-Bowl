@@ -4,11 +4,15 @@
 
 namespace client {
 
-    void setQUOI(std::string FEUR) : QUOI(FEUR) {}
+    void HelloWorld::setQUOI(std::string FEUR) {
+        this->QUOI = FEUR;
+    }
 
-    void setCOMBIEN(int UNPEU) : COMBIEN(UNPEU) {}
+    void HelloWorld::setCOMBIEN(int UNPEU) {
+        this->COMBIEN = UNPEU;
+    }
 
-    std::string getQUOI() { return QUOI; }
+    std::string HelloWorld::getQUOI() { return QUOI; }
 
-    int getCOMBIEN() { return COMBIEN; }
+    int HelloWorld::getCOMBIEN() { return COMBIEN; }
 }

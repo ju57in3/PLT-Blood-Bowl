@@ -2,8 +2,4 @@
 
 namespace state {
 
-    Dice::Dice() {
-        
-    }
-
 }

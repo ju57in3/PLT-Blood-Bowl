@@ -2,7 +2,4 @@
 
 namespace engine {
 
-    GameState::GameState() {
-        
-    }
 }
