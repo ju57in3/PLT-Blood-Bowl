@@ -8,19 +8,20 @@ void testSFML() {
 }
 // end of test SFML
 
-#include <state.h>
+#include <client.h>
 
 using namespace std;
-using namespace state;
+using namespace client;
 
 int main(int argc,char* argv[])
 {
-    Example example;
-    ExampleA exampleA;
-    exampleA.setX(53);
-    example.setA(exampleA);
+    HelloWorld hello;
+    hello.setCOMBIEN(3);
+    hello.setQUOI("Hello World !");
 
-    cout << "It works !" << endl;
+    for (int i =0; i < hello.getCOMBIEN(); i++) {
+        cout << hello.getQUOI() << endl;
+    }
 
     return 0;
 }
