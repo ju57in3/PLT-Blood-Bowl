@@ -882,7 +882,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#currentTeam#</dia:string>
+            <dia:string>#teams [2]#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>#Team#</dia:string>
