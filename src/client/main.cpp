@@ -19,9 +19,8 @@ int main(int argc,char* argv[])
     hello.setCOMBIEN(3);
     hello.setQUOI("Hello World !");
 
-    for (int i =0; i < hello.getCOMBIEN(); i++) {
-        cout << hello.getQUOI() << endl;
-    }
+    cout << hello << endl;
+
 
     return 0;
 }
