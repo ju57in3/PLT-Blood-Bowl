@@ -2,7 +2,7 @@
 
 ---
 
-#### Tom Compagnon  Matteo Doffe  Guilhem Boularan  Justine Hazan
+#### Tom Compagnon,  Matteo Doffe,  Guilhem Boularan,  Justine Hazan
 
 ---
 
