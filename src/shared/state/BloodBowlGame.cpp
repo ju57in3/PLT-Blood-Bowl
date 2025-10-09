@@ -1,7 +1,7 @@
 #include "BloodBowlGame.h"
 
 namespace  state {
-    BloodBowlGame::BloodBowlGame (const Board &board, Team* teams, const int turnCounter) :
+    BloodBowlGame::BloodBowlGame (const Board &board, std::vector<Team> teams, const int turnCounter) :
     board(board), teams(teams), turnCounter(turnCounter) {
         this->currentState = nullptr;
     }
@@ -17,16 +17,8 @@ namespace  state {
         return currentState;
     }
 
-    Team BloodBowlGame::coinToss() {
-        int toss = rand() % 2;
-        if (toss == 0) {
-            return this->teams[0];
-        } else {
-            return this->teams[1];
-        }
+    std::vector<Team> BloodBowlGame::getTeams() {
+        return this->teams;
     }
-
-
-
 
 }

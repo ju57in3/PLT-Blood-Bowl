@@ -2,8 +2,8 @@
 
 #include "Square.h"
 #include "Team.h"
-#include "Ball.h"
-
+#include "BloodBowlGame.h"
+#include "PlayerTurn.h"
 
 
 namespace state {
@@ -11,9 +11,17 @@ namespace state {
 
     void Kickoff::update()
     {
+        int teamIndex = rand() % 2;
 
+        int targetX = rand() % (game->getBoard().getWidth() / 2) + (teamIndex == 0 ? game->getBoard().getWidth() / 2 : 0);
+        int targetY = rand() % game->getBoard().getHeight();
+        Square targetSquare = Square(targetX, targetY);
+
+        kickBall(targetSquare);
+
+        game->setCurrentState(new state::PlayerTurn(game));
     }
-    void Kickoff::kickBall(Square* initTarget, Ball ball)
+    void Kickoff::kickBall(Square initTarget)
     {
         int direction=rand()%8;
         int rebounds=rand()%6;
@@ -21,47 +29,46 @@ namespace state {
         {
         case 0: //South
             {
-                Square* sSquare = new Square(initTarget->getX(),initTarget->getY()-rebounds);
-                ball.setPosition(sSquare);
+                Square sSquare = Square(initTarget.getX(),initTarget.getY()-rebounds);
+                game->getBoard().setBallPosition(sSquare);
             }
         case 1: //South-East
             {
-                Square* seSquare = new Square(initTarget->getX()+rebounds,initTarget->getY()-rebounds);
-                ball.setPosition(seSquare);
+                Square seSquare = Square(initTarget.getX()+rebounds,initTarget.getY()-rebounds);
+                game->getBoard().setBallPosition(seSquare);
             }
         case 2: //East
             {
-                Square* eSquare = new Square(initTarget->getX()+rebounds,initTarget->getY());
-                ball.setPosition(eSquare);
+                Square eSquare = Square(initTarget.getX()+rebounds,initTarget.getY());
+                game->getBoard().setBallPosition(eSquare);
             }
         case 3:  //North-East
             {
-                Square* neSquare = new Square(initTarget->getX()+rebounds,initTarget->getY()+rebounds);
-                ball.setPosition(neSquare);
+                Square neSquare = Square(initTarget.getX()+rebounds,initTarget.getY()+rebounds);
+                game->getBoard().setBallPosition(neSquare);
             }
         case 4: //North
             {
-                Square* nSquare = new Square(initTarget->getX(),initTarget->getY()+rebounds);
-                ball.setPosition(nSquare);
+                Square nSquare = Square(initTarget.getX(),initTarget.getY()+rebounds);
+                game->getBoard().setBallPosition(nSquare);
             }
         case 5: //North-West
             {
-                Square* nwSquare = new Square(initTarget->getX()-rebounds,initTarget->getY()+rebounds);
-                ball.setPosition(nwSquare);
+                Square nwSquare = Square(initTarget.getX()-rebounds,initTarget.getY()+rebounds);
+                game->getBoard().setBallPosition(nwSquare);
             }
         case 6: //West
             {
-                Square* wSquare = new Square(initTarget->getX()-rebounds,initTarget->getY());
-                ball.setPosition(wSquare);
+                Square wSquare = Square(initTarget.getX()-rebounds,initTarget.getY());
+                game->getBoard().setBallPosition(wSquare);
             }
         case 7: //South-West
             {
-                Square* swSquare = new Square(initTarget->getX()-rebounds,initTarget->getY()-rebounds);
-                ball.setPosition(swSquare);
+                Square swSquare = Square(initTarget.getX()-rebounds,initTarget.getY()-rebounds);
+                game->getBoard().setBallPosition(swSquare);
             }
         default: ;
         }
-        ball.isHold = false;
     }
 
 }

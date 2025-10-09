@@ -14,5 +14,9 @@ namespace state {
         return currentSquare;
     }
 
+    void Character::setStatus(CharacterStatus newStatus) {
+        this->status = status;
+    }
+
 
 }
