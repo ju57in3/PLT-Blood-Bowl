@@ -17,6 +17,15 @@ namespace  state {
         return currentState;
     }
 
+    Team BloodBowlGame::coinToss() {
+        int toss = rand() % 2;
+        if (toss == 0) {
+            return this->teams[0];
+        } else {
+            return this->teams[1];
+        }
+    }
+
 
 
 

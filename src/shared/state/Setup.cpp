@@ -1,5 +1,11 @@
 #include "Setup.h"
 
+
+#include "Square.h"
+#include "Kickoff.h"
+#include "BloodBowlGame.h"
+
+
 namespace state {
     Setup::Setup(BloodBowlGame *game) : AbstractState(game) {
     }
@@ -55,5 +61,17 @@ namespace state {
         }
         return count;
     }
+
+    bool Setup::isValidSetup(Team team) {
+        return nbPieceOnBoard(team) <= 11 && nbPieceOnLine(team) >= 3 && nbPieceOnLeft(team) <= 2 && nbPieceOnRight(team) <= 2;
+    }
+
+    void Setup::update() {
+        if (setupEnded) {
+            game->setCurrentState(new Kickoff(game));
+        }
+    }
+
+
 
 }
