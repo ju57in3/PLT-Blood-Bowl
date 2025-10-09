@@ -33,8 +33,27 @@ namespace state {
         return count;
     }
 
-    int Setup::nbPieceOnBoard(Team team) {
 
+    int Setup::nbPieceOnLeft(Team team) {
+        int count = 0;
+        for (Piece piece : team.getPieces()) {
+            Square* square = piece.getSquare();
+            if (square != nullptr && square->getX() >= 0 && square->getX() <= 3) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    int Setup::nbPieceOnRight(Team team) {
+        int count = 0;
+        for (Piece piece : team.getPieces()) {
+            Square* square = piece.getSquare();
+            if (square != nullptr && square->getX() >= 11) {
+                count++;
+            }
+        }
+        return count;
     }
 
 }
