@@ -2,12 +2,8 @@
 
 namespace state{
 
-    Square Board::getSquare(int x, int y){
-        return this->squares[x][y];
-    }
-
-    void Board::moveBall(Square *square) {
-        ball.currentSquare = square;
+    void Board::moveBall(Square* square) {
+        ball.setPosition(square);
     }
 
 }
