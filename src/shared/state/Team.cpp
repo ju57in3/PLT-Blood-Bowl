@@ -1,18 +1,18 @@
 #include "Team.h"
-#include "Piece.h"
+#include "Character.h"
 
 namespace state {
-    std::vector<Piece> Team::getPieces() {
-        return pieces;
+    std::vector<Character> Team::getCharacters() {
+        return characters;
     }
 
     int Team::getScore(){
         return score;
     }
 
-    std::vector<Piece> Team::getPlayablePiece()
+    std::vector<Character> Team::getPlayableCharacter()
     {
-        std::vector<Piece> pieces;
+        std::vector<Character> pieces;
         for (int i = 0; i < pieces.size(); i++)
         {
             if (pieces[i].getStatus() == playable)

@@ -10,9 +10,9 @@ namespace state {
     Setup::Setup(BloodBowlGame *game) : AbstractState(game) {
     }
 
-    int Setup::nbPieceOnBoard(Team team) {
+    int Setup::nbCharacterOnBoard(Team team) {
         int count = 0;
-        for (Piece piece : team.getPieces()) {
+        for (Character piece : team.getCharacters()) {
             if (piece.getSquare() != nullptr) {
                 count++;
             }
@@ -20,7 +20,7 @@ namespace state {
         return count;
     }
 
-    int Setup::nbPieceOnLine(Team team) {
+    int Setup::nbCharacterOnLine(Team team) {
         std::vector<Square> linesSquares;
         // Example coordinates for the 7 squares
         std::vector<std::pair<int, int>> fixedCoords = {
@@ -31,7 +31,7 @@ namespace state {
             linesSquares.push_back(Square(coord.first, coord.second));
         }
         int count = 0;
-        for (Piece piece : team.getPieces()) {
+        for (Character piece : team.getCharacters()) {
             if (piece.getSquare() != nullptr && piece.getSquare()->isIn(linesSquares)) {
                 count++;
             }
@@ -40,9 +40,9 @@ namespace state {
     }
 
 
-    int Setup::nbPieceOnLeft(Team team) {
+    int Setup::nbCharacterOnLeft(Team team) {
         int count = 0;
-        for (Piece piece : team.getPieces()) {
+        for (Character piece : team.getCharacters()) {
             Square* square = piece.getSquare();
             if (square != nullptr && square->getX() >= 0 && square->getX() <= 3) {
                 count++;
@@ -51,9 +51,9 @@ namespace state {
         return count;
     }
 
-    int Setup::nbPieceOnRight(Team team) {
+    int Setup::nbCharacterOnRight(Team team) {
         int count = 0;
-        for (Piece piece : team.getPieces()) {
+        for (Character piece : team.getCharacters()) {
             Square* square = piece.getSquare();
             if (square != nullptr && square->getX() >= 11) {
                 count++;
@@ -63,7 +63,7 @@ namespace state {
     }
 
     bool Setup::isValidSetup(Team team) {
-        return nbPieceOnBoard(team) <= 11 && nbPieceOnLine(team) >= 3 && nbPieceOnLeft(team) <= 2 && nbPieceOnRight(team) <= 2;
+        return nbCharacterOnBoard(team) <= 11 && nbCharacterOnLine(team) >= 3 && nbCharacterOnLeft(team) <= 2 && nbCharacterOnRight(team) <= 2;
     }
 
     void Setup::update() {

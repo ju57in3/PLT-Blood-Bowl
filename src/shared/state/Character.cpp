@@ -1,16 +1,16 @@
-#include "Piece.h"
+#include "Character.h"
 
 namespace state {
-    bool Piece::moveTo(Square* square) {
+    bool Character::moveTo(Square* square) {
         currentSquare = square;
         return true;
     }
 
-    PieceStatus Piece::getStatus(){
+    CharacterStatus Character::getStatus(){
         return status;
     }
 
-    Square* Piece::getSquare(){
+    Square* Character::getSquare(){
         return currentSquare;
     }
 

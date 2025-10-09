@@ -10,9 +10,10 @@ namespace state {
         return this->x;
     }
 
-    int Square::getY()
-    {
+    int Square::getY() {
         return this->y;
+    }
+
     bool Square::isIn(std::vector<Square> list) {
         if (list.size() == 0) {
             return false;

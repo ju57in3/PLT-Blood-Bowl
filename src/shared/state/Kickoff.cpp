@@ -2,6 +2,7 @@
 
 #include "Square.h"
 #include "Team.h"
+#include "Ball.h"
 
 
 
@@ -12,7 +13,7 @@ namespace state {
     {
 
     }
-    void Kickoff::kickBall(Square* initTarget, Ball ball)         //Ball ball en argument?!
+    void Kickoff::kickBall(Square* initTarget, Ball ball)
     {
         int direction=rand()%8;
         int rebounds=rand()%6;
