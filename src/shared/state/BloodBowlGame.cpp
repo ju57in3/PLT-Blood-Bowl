@@ -1,10 +1,19 @@
 #include "BloodBowlGame.h"
 
 namespace  state {
-    BloodBowlGame::BloodBowlGame (const Board &board, std::vector<Team> teams, const int turnCounter) :
-    board(board), teams(teams), turnCounter(turnCounter) {
-        this->currentState = nullptr;
+    BloodBowlGame::BloodBowlGame(const Board &board, Team teamA, Team teamB, const int turnCounter, Team currentTeam)
+        : board(board),
+    teamA(teamA),
+    teamB(teamB),
+    currentTeam(coinToss()),
+    turnCounter(turnCounter){
+        currentState = nullptr;
     }
+
+    AbstractState BloodBowlGame::getCurrentState() {
+        return currentState;
+    }
+
 
     void BloodBowlGame::setCurrentState(AbstractState *state) {
         if (currentState != nullptr) {
@@ -17,8 +26,25 @@ namespace  state {
         return currentState;
     }
 
-    std::vector<Team> BloodBowlGame::getTeams() {
-        return this->teams;
+    Team BloodBowlGame::coinToss() {
+        int toss = rand() % 2;
+        if (toss == 0) {
+            return this->teamA;
+        } else {
+            return this->teamB;
+        }
     }
+
+    Team BloodBowlGame::getTeamA() {
+        return teamA;
+    }
+    Team BloodBowlGame::getTeamB() {
+        return teamB;
+    }
+
+    Board BloodBowlGame::getBoard() {
+        return board;
+    }
+
 
 }

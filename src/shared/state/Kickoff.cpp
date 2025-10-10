@@ -11,9 +11,7 @@ namespace state {
 
     void Kickoff::update()
     {
-        int teamIndex = rand() % 2;
-
-        int targetX = rand() % (game->getBoard().getWidth() / 2) + (teamIndex == 0 ? game->getBoard().getWidth() / 2 : 0);
+        int targetX = rand() % (game->getBoard().getWidth() / 2) + (game->getCurrentTeam() == game->getTeamA() ? game->getBoard().getWidth() / 2 : 0);
         int targetY = rand() % game->getBoard().getHeight();
         Square targetSquare = Square(targetX, targetY);
 
