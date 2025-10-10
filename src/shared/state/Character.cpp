@@ -1,7 +1,7 @@
 #include "Character.h"
 
 namespace state {
-    bool Character::moveTo(int position) {
+    bool Character::moveTo(std::pair<int,int> position) {
         currentPosition = position;
         return true;
     }
@@ -10,12 +10,12 @@ namespace state {
         return status;
     }
 
-    int Character::getPosition(){
+    std::pair<int,int> Character::getPosition(){
         return currentPosition;
     }
 
     void Character::setStatus(CharacterStatus newStatus) {
-        this->status = status;
+        this->status = newStatus;
     }
 
 
