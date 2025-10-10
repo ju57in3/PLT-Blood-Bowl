@@ -1,13 +1,15 @@
 #include "BloodBowlGame.h"
+#include "Board.h"
+#include "Setup.h"
 
 namespace  state {
-    BloodBowlGame::BloodBowlGame(const Board &board, Team teamA, Team teamB, const int turnCounter, Team currentTeam)
-        : board(board),
+    BloodBowlGame::BloodBowlGame(Team teamA, Team teamB)
+        : board(Board()),
     teamA(teamA),
     teamB(teamB),
     currentTeam(coinToss()),
-    turnCounter(turnCounter){
-        currentState = nullptr;
+    turnCounter(0){
+        currentState = new Setup(this);
     }
 
     void BloodBowlGame::setCurrentState(AbstractState *state) {
