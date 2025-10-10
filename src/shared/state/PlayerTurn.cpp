@@ -82,15 +82,15 @@ namespace state {
 
     void PlayerTurn::restoreCharactersStatus() {
         std::vector<Character> characters = game->getCurrentTeam().getCharacters();
-        for (int i = 0; i < characters.size(); i++)
+        for (Character & character : characters)
         {
-            if (characters[i].getStatus() == played)
+            if (character.getStatus() == played)
             {
-                characters[i].setStatus(playable);
+                character.setStatus(playable);
             }
-            else if (characters[i].getStatus() == stunned)
+            else if (character.getStatus() == stunned)
             {
-                characters[i].setStatus(knockedDown);
+                character.setStatus(knockedDown);
             }
         }
     }

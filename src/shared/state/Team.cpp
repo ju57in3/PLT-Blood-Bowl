@@ -3,6 +3,10 @@
 #include <iostream>
 
 namespace state {
+    Team::Team(int teamId, std::string name, int rerolls)
+        : teamId(teamId), name(name), rerolls(rerolls), score(0) {
+    }
+
     std::vector<Character> Team::getCharacters() {
         return characters;
     }
@@ -30,6 +34,10 @@ namespace state {
 
     void Team::setScore(int score) {
         this->score = score;
+    }
+
+    void Team::addCharacter(Character character) {
+        characters.push_back(character);
     }
 
     std::ostream& operator<<(std::ostream& os, Team& team) {
