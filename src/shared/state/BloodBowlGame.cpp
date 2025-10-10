@@ -1,12 +1,12 @@
 #include "BloodBowlGame.h"
 
 namespace  state {
-    BloodBowlGame::BloodBowlGame(const Board &board, Team teamA, Team teamB, const int turnCounter, Team currentTeam)
-        : board(board),
+    BloodBowlGame::BloodBowlGame(Team teamA, Team teamB)
+        :
     teamA(teamA),
     teamB(teamB),
     currentTeam(coinToss()),
-    turnCounter(turnCounter){
+    turnCounter(0){
         currentState = nullptr;
     }
 
