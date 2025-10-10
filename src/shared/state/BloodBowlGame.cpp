@@ -10,11 +10,6 @@ namespace  state {
         currentState = nullptr;
     }
 
-    AbstractState BloodBowlGame::getCurrentState() {
-        return currentState;
-    }
-
-
     void BloodBowlGame::setCurrentState(AbstractState *state) {
         if (currentState != nullptr) {
             delete currentState;
@@ -44,6 +39,10 @@ namespace  state {
 
     Board BloodBowlGame::getBoard() {
         return board;
+    }
+
+    int BloodBowlGame::getTurnCounter() {
+        return turnCounter;
     }
 
 

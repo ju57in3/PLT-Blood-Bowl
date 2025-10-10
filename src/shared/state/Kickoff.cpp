@@ -11,7 +11,14 @@ namespace state {
 
     void Kickoff::update()
     {
-        int targetX = rand() % (game->getBoard().getWidth() / 2) + (game->getCurrentTeam() == game->getTeamA() ? game->getBoard().getWidth() / 2 : 0);
+        int side;
+        if (game->getCurrentTeam().getTeamId() == game->getTeamA().getTeamId()) {
+            side = game->getBoard().getWidth()/2;
+        }else {
+            side = 0;
+        }
+
+        int targetX = rand() % (game->getBoard().getWidth() / 2) + (side);
         int targetY = rand() % game->getBoard().getHeight();
         Square targetSquare = Square(targetX, targetY);
 
@@ -19,6 +26,8 @@ namespace state {
 
         game->setCurrentState(new state::PlayerTurn(game));
     }
+
+
     void Kickoff::kickBall(Square initTarget)
     {
         int direction=rand()%8;

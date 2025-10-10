@@ -22,4 +22,8 @@ namespace state {
         }
         return characters;
     }
+
+    int Team::getTeamId() {
+        return teamId;
+    }
 }

@@ -9,13 +9,16 @@ namespace state {
         isBlitzAvailable = true;
         isTurnOver = false;
         isTouchDown = false;
-        if (game->turnCounter %2 == 0) {
-            teamId = game->team1.getId();
-            availableCharacter = game->team1.getActivePlayers();
-        } else {
-            teamId = game->team2.getId();
-            availableCharacter = game->team2.getActivePlayers();
-        }
+        teamId = game->getCurrentTeam().getTeamId();
+
+        availableCharacters = game->getCurrentTeam().getPlayableCharacter();
     }
 
+    void update() {
+        // To be implemented
+    }
+
+    void restoreCharactersStatus() {
+
+    }
 }
