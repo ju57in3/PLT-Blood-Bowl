@@ -15,10 +15,21 @@ namespace state {
     }
 
     void update() {
-        // To be implemented
+
     }
 
-    void restoreCharactersStatus() {
-
+    void PlayerTurn::restoreCharacterStatus() {
+        std::vector<Character> characters = game->getCurrentTeam().getCharacters();
+        for (int i = 0; i < characters.size(); i++)
+        {
+            if (characters[i].getStatus() == played)
+            {
+                characters[i].setStatus(playable);
+            }
+            else if (characters[i].getStatus() == stunned)
+            {
+                characters[i].setStatus(knockedDown);
+            }
+        }
     }
 }

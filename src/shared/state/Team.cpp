@@ -12,15 +12,15 @@ namespace state {
 
     std::vector<Character> Team::getPlayableCharacter()
     {
-        std::vector<Character> characters;
+        std::vector<Character> playableCharacters;
         for (int i = 0; i < characters.size(); i++)
         {
             if (characters[i].getStatus() == playable)
             {
-                characters.push_back(characters[i]);
+                playableCharacters.push_back(characters[i]);
             }
         }
-        return characters;
+        return playableCharacters;
     }
 
     int Team::getTeamId() {
