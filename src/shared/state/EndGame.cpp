@@ -18,7 +18,7 @@ namespace state {
             {
                 character.setStatus(bench);
             }
-            game->setCurrentState(new BloodBowlGame(game->getTeamA(), game->getTeamB()));
+            new BloodBowlGame(game->getTeamA(), game->getTeamB());
         }
     }
 

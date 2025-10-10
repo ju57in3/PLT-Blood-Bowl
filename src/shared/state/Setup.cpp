@@ -1,10 +1,10 @@
 #include "Setup.h"
 
 
-#include "Square.h"
 #include "Kickoff.h"
 #include "BloodBowlGame.h"
 
+constexpr std::pair<int, int> HORS_TABLEAU = {-1, -1};
 
 namespace state {
     Setup::Setup(BloodBowlGame *game) : AbstractState(game) {
@@ -12,8 +12,9 @@ namespace state {
 
     int Setup::nbCharacterOnBoard(Team team) {
         int count = 0;
+
         for (Character piece : team.getCharacters()) {
-            if (piece.getPosition() != -1) {
+            if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU) {
                 count++;
             }
         }
@@ -32,30 +33,37 @@ namespace state {
         }
         int count = 0;
         for (Character piece : team.getCharacters()) {
-            if (piece.getPosition() != -1 && piece.getPosition()) {
-                count++;
+            std::pair<int, int> pos = piece.getPosition();
+            if (pos != HORS_TABLEAU) {
+                for (const auto& coord : fixedCoords) {
+                    if (pos == coord) {
+                        count++;
+                        break;
+                    }
+                }
             }
         }
         return count;
     }
 
 
-    int Setup::nbCharacterOnLeft(Team team) {
+    int Setup::nbCharacterOnTop(Team team) {
         int count = 0;
         for (Character piece : team.getCharacters()) {
-            Square* square = piece.getSquare();
-            if (square != nullptr && square->getX() >= 0 && square->getX() <= 3) {
+            std::pair<int,int> position = piece.getPosition();
+            if (position.first != -1 && position.first >= 11) {
                 count++;
             }
         }
         return count;
     }
 
-    int Setup::nbCharacterOnRight(Team team) {
+    int Setup::nbCharacterOnBottom(Team team) {
         int count = 0;
         for (Character piece : team.getCharacters()) {
-            Square* square = piece.getSquare();
-            if (square != nullptr && square->getX() >= 11) {
+            std::pair<int,int> position = piece.getPosition();
+
+            if (position.first != -1 && position.first <= 4) {
                 count++;
             }
         }
@@ -63,7 +71,7 @@ namespace state {
     }
 
     bool Setup::isValidSetup(Team team) {
-        return nbCharacterOnBoard(team) <= 11 && nbCharacterOnLine(team) >= 3 && nbCharacterOnLeft(team) <= 2 && nbCharacterOnRight(team) <= 2;
+        return nbCharacterOnBoard(team) <= 11 && nbCharacterOnLine(team) >= 3 && nbCharacterOnTop(team) <= 2 && nbCharacterOnBottom(team) <= 2;
     }
 
     void Setup::update() {

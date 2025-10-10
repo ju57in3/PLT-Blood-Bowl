@@ -37,10 +37,6 @@ namespace  state {
         return teamB;
     }
 
-    Board BloodBowlGame::getBoard() {
-        return board;
-    }
-
     int BloodBowlGame::getTurnCounter() {
         return turnCounter;
     }
