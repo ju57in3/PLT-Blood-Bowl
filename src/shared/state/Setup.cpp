@@ -13,7 +13,7 @@ namespace state {
     int Setup::nbCharacterOnBoard(Team team) {
         int count = 0;
         for (Character piece : team.getCharacters()) {
-            if (piece.getSquare() != nullptr) {
+            if (piece.getPosition() != -1) {
                 count++;
             }
         }
@@ -21,18 +21,18 @@ namespace state {
     }
 
     int Setup::nbCharacterOnLine(Team team) {
-        std::vector<Square> linesSquares;
+        std::vector<int> linesSquares;
         // Example coordinates for the 7 squares
         std::vector<std::pair<int, int>> fixedCoords = {
             {13, 4}, {13, 5}, {13, 6}, {13, 7}, {13, 8}, {13, 9}, {13, 10}
         };
 
         for (const auto& coord : fixedCoords) {
-            linesSquares.push_back(Square(coord.first, coord.second));
+            linesSquares.push_back(coord.first * coord.second);
         }
         int count = 0;
         for (Character piece : team.getCharacters()) {
-            if (piece.getSquare() != nullptr && piece.getSquare()->isIn(linesSquares)) {
+            if (piece.getPosition() != -1 && piece.getPosition()) {
                 count++;
             }
         }

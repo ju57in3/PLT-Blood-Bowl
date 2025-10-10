@@ -28,7 +28,7 @@ namespace state {
     }
 
 
-    void Kickoff::kickBall(Square initTarget)
+    void Kickoff::kickBall(int initTarget)
     {
         int direction=rand()%8;
         int rebounds=rand()%6;

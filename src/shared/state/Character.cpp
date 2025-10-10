@@ -1,8 +1,8 @@
 #include "Character.h"
 
 namespace state {
-    bool Character::moveTo(Square* square) {
-        currentSquare = square;
+    bool Character::moveTo(int position) {
+        currentPosition = position;
         return true;
     }
 
@@ -10,8 +10,8 @@ namespace state {
         return status;
     }
 
-    Square* Character::getSquare(){
-        return currentSquare;
+    int Character::getPosition(){
+        return currentPosition;
     }
 
     void Character::setStatus(CharacterStatus newStatus) {
