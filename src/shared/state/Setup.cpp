@@ -76,7 +76,7 @@ namespace state {
 
     void Setup::update() {
         if (setupEnded) {
-            game->setCurrentState(new state::Kickoff(game));
+            game->setCurrentState(&game->getStateList().at(KICKOFF));
         }
     }
 

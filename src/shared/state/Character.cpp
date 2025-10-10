@@ -1,4 +1,5 @@
 #include "Character.h"
+#include <iostream>
 
 namespace state {
     bool Character::moveTo(std::pair<int,int> position) {
@@ -18,5 +19,10 @@ namespace state {
         this->status = newStatus;
     }
 
+    std::ostream& operator<<(std::ostream& os, Character& character) {
+        os << "Position: (" << character.getPosition().first << ", " << character.getPosition().second << ")";
+        os << " | Status: " << static_cast<int>(character.getStatus());
+        return os;
+    }
 
 }

@@ -1,4 +1,10 @@
 #include "BloodBowlGame.h"
+#include "Setup.h"
+#include "Kickoff.h"
+#include "PlayerTurn.h"
+#include "HalfTime.h"
+#include "EndGame.h"
+
 
 namespace  state {
     BloodBowlGame::BloodBowlGame(Team teamA, Team teamB)
@@ -7,7 +13,12 @@ namespace  state {
     teamB(teamB),
     currentTeam(coinToss()),
     turnCounter(0){
-        currentState = nullptr;
+        statelist.push_back(Setup(this));
+        statelist.push_back(Kickoff(this));
+        statelist.push_back(PlayerTurn(this));
+        statelist.push_back(HalfTime(this));
+        statelist.push_back(EndGame(this));
+        currentState =  &statelist.at(SETUP);
     }
 
     void BloodBowlGame::setCurrentState(AbstractState *state) {

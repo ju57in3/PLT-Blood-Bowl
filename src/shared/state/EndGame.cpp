@@ -10,12 +10,10 @@ namespace state {
     {
         if (restart == true)
         {
-            for (auto character : game->getTeamA().getCharacters())
-            {
+            for (auto character : game->getTeamA().getCharacters()){
                 character.setStatus(bench);
             }
-            for (auto character : game->getTeamB().getCharacters())
-            {
+            for (auto character : game->getTeamB().getCharacters()){
                 character.setStatus(bench);
             }
             new BloodBowlGame(game->getTeamA(), game->getTeamB());

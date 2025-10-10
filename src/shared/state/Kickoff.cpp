@@ -24,7 +24,7 @@ namespace state {
         targetSquare.second = targetY;
 
         kickBall(targetSquare);
-        game->setCurrentState(new state::PlayerTurn(game));
+        game->setCurrentState(&game->getStateList().at(PLAYERTURN));
     }
 
 
