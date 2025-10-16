@@ -18,7 +18,7 @@ namespace state {
     }
 
     Character::Character(std::string name, std::string type, int movement, int strength, int agility, int armor)
-        : name(name), type(type), movement(movement), strength(strength), agility(agility), armor(armor)
+        : name(std::move(name)), type(std::move(type)), movement(movement), strength(strength), agility(agility), armor(armor)
         {
             
             this->currentPosition = std::make_pair(-1,-1);
@@ -31,11 +31,11 @@ namespace state {
         return true;
     }
 
-    CharacterStatus Character::getStatus(){
+    CharacterStatus Character::getStatus() const {
         return status;
     }
 
-    std::pair<int,int> Character::getPosition(){
+    std::pair<int,int> Character::getPosition() const {
         return currentPosition;
     }
 
@@ -47,7 +47,7 @@ namespace state {
         this->status = newStatus;
     }
 
-    std::ostream& operator<<(std::ostream& os, Character& character) {
+    std::ostream& operator<<(std::ostream& os, const Character& character) {
         os << "Position: (" << character.getPosition().first << ", " << character.getPosition().second << ")";
         os << " | Status: " << statusToString(character.getStatus());
         return os;

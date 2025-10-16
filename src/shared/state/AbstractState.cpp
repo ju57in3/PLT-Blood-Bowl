@@ -2,8 +2,12 @@
 
 namespace state {
 
-AbstractState::AbstractState(BloodBowlGame* game) : game(game) {}
+    AbstractState::AbstractState(BloodBowlGame* game) : game(game) {}
 
-void AbstractState::update() {}
+    void AbstractState::update() {}
+
+    AbstractState::~AbstractState() {}
+
+
 
 } // namespace state
