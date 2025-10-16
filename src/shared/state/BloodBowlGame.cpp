@@ -7,11 +7,12 @@
 
 #include <iostream>
 #include <iomanip>
+#include <random>
 
 namespace  state {
 
-static void placeFromTeam(Team team, char mark, std::vector<std::string> &grid, int w, int h) {
-    for (Character &p : team.getCharacters()) {
+static void placeFromTeam(const Team& team, char mark, std::vector<std::string> &grid, int w, int h) {
+    for (const Character &p : team.getCharacters()) {
         auto pos = p.getPosition(); // expected: pair<int,int>
         if (pos.first >= 0 && pos.first < w && pos.second >= 0 && pos.second < h) {
             char &cell = grid[pos.second][pos.first];
@@ -21,7 +22,7 @@ static void placeFromTeam(Team team, char mark, std::vector<std::string> &grid, 
     }
 }
 
-static void renderBoardAscii(std::ostream &os, BloodBowlGame &game) {
+static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
     int w = game.getWidth();
     int h = game.getHeight();
     if (w <= 0 || h <= 0) {
@@ -56,34 +57,38 @@ static void renderBoardAscii(std::ostream &os, BloodBowlGame &game) {
 }
 
     BloodBowlGame::BloodBowlGame(Team teamA, Team teamB)
-        :
-    teamA(teamA),
-    teamB(teamB),
-    currentTeam(coinToss()),
-    turnCounter(0){
-        statelist.push_back(new Setup(this));
-        statelist.push_back(new Kickoff(this));
-        statelist.push_back(new PlayerTurn(this));
-        statelist.push_back(new HalfTime(this));
-        statelist.push_back(new EndGame(this));
-        currentState = statelist.at(SETUP);
-
+        : teamA(std::move(teamA)),
+          teamB(std::move(teamB)),
+          currentTeam(this->coinToss()),
+          turnCounter(0) {
+        stateList.push_back(std::make_unique<Setup>(this));
+        stateList.push_back(std::make_unique<Kickoff>(this));
+        stateList.push_back(std::make_unique<PlayerTurn>(this));
+        stateList.push_back(std::make_unique<HalfTime>(this));
+        stateList.push_back(std::make_unique<EndGame>(this));
+        currentState = stateList.at(SETUP).get(); // initial state
         width = 26;
         height = 15;
         ballIsHold = false;
-
     }
 
-    void BloodBowlGame::setCurrentState(AbstractState *state) {
+    void BloodBowlGame::setCurrentState(AbstractState* state) {
         currentState = state;
     }
 
-    AbstractState *BloodBowlGame::getCurrentState() {
+    AbstractState* BloodBowlGame::getCurrentState() const {
         return currentState;
     }
 
+    const std::vector<std::unique_ptr<AbstractState>>& BloodBowlGame::getStateList() const {
+        return stateList;
+    }
+
     Team BloodBowlGame::coinToss() {
-        int toss = rand() % 2;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, 1);
+        int toss = dis(gen);
         if (toss == 0) {
             return this->teamA;
         } else {
@@ -91,14 +96,14 @@ static void renderBoardAscii(std::ostream &os, BloodBowlGame &game) {
         }
     }
 
-    Team BloodBowlGame::getTeamA() {
+    Team BloodBowlGame::getTeamA() const{
         return teamA;
     }
-    Team BloodBowlGame::getTeamB() {
+    Team BloodBowlGame::getTeamB() const {
         return teamB;
     }
 
-    Team BloodBowlGame::getCurrentTeam() {
+    Team BloodBowlGame::getCurrentTeam() const {
         return currentTeam;
     }
 
@@ -107,18 +112,18 @@ static void renderBoardAscii(std::ostream &os, BloodBowlGame &game) {
     }
 
     void BloodBowlGame::setCurrentTeam(Team team) {
-        currentTeam = team;
+        currentTeam = std::move(team);
     }
 
-    std::pair<int,int> BloodBowlGame::getBallPosition() {
+    std::pair<int,int> BloodBowlGame::getBallPosition() const {
         return ballPosition;
     }
 
-    int BloodBowlGame::getWidth() {
+    int BloodBowlGame::getWidth() const {
         return width;
     }
 
-    int BloodBowlGame::getHeight() {
+    int BloodBowlGame::getHeight() const{
         return height;
     }
 
@@ -126,25 +131,18 @@ static void renderBoardAscii(std::ostream &os, BloodBowlGame &game) {
         ballPosition = position;
     }
 
-    std::vector<AbstractState*> BloodBowlGame::getStateList() {
-        return statelist;
-    }
-
-    int BloodBowlGame::getTurnCounter() {
+    int BloodBowlGame::getTurnCounter() const {
         return turnCounter;
     }
 
-    std::ostream& operator<<(std::ostream& os, BloodBowlGame& game) {
+    std::ostream& operator<<(std::ostream& os, const BloodBowlGame& game) {
         os << "\n=== GAME STATE ===\n";
-        os << "Current State: " << game.getCurrentState() << "\n";
+        os << "Current State: " << (game.getCurrentState() ? typeid(*game.getCurrentState()).name() : "None") << "\n";
         os << "Turn Counter: " << game.getTurnCounter() << "\n";
         os << "Current Team: " << game.getCurrentTeam().getTeamId() << "\n";
         os << "Score - Team A: " << game.getTeamA().getScore() << " | Team B: " << game.getTeamB().getScore() << "\n";
-        
         renderBoardAscii(os, game);
-
         os << "==================\n";
-
         return os;
     }
 }

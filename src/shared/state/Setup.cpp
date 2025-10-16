@@ -88,7 +88,7 @@ namespace state {
 
     void Setup::update() {
         if (setupEnded) {
-            game->setCurrentState(game->getStateList().at(KICKOFF));
+            game->setCurrentState(game->getStateList().at(KICKOFF).get());
         }
     }
 

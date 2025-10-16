@@ -4,19 +4,18 @@
 
 namespace state {
     Team::Team(int teamId, std::string name, int rerolls)
-        : teamId(teamId), name(name), rerolls(rerolls), score(0) {
+        : teamId(teamId), name(std::move(name)), rerolls(rerolls), score(0) {
     }
 
-    std::vector<Character> Team::getCharacters() {
+    std::vector<Character> Team::getCharacters() const {
         return characters;
     }
 
-    int Team::getScore(){
+    int Team::getScore() const {
         return score;
     }
 
-    std::vector<Character> Team::getPlayableCharacter()
-    {
+    std::vector<Character> Team::getPlayableCharacter() const {
         std::vector<Character> playableCharacters;
         for (auto & character : characters)
         {
@@ -28,7 +27,7 @@ namespace state {
         return playableCharacters;
     }
 
-    int Team::getTeamId() {
+    int Team::getTeamId() const {
         return teamId;
     }
 
@@ -36,15 +35,15 @@ namespace state {
         this->score = score;
     }
 
-    void Team::addCharacter(Character character) {
+    void Team::addCharacter(const Character& character) {
         characters.push_back(character);
     }
 
-    std::ostream& operator<<(std::ostream& os, Team& team) {
+    std::ostream& operator<<(std::ostream& os, const Team& team) {
         os << "Team ID: " << team.getTeamId() << "\n";
         os << "Score: " << team.getScore() << "\n";
         os << "Characters:\n";
-        for (auto& character : team.getCharacters()) {
+        for (const auto& character : team.getCharacters()) {
             os << character << "\n";
         }
         return os;
