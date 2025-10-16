@@ -74,7 +74,7 @@ namespace state {
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(PLAYERTURN));
+                game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
 
                 game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
             }

@@ -110,13 +110,13 @@ int main(int argc, char* argv[]) {
             // Simulate different outcomes based on round
             if (round <= 3) {
                 cout << "Simulating normal turn end for team " << game.getCurrentTeam().getTeamId() << "\n";
-                playerTurnState->simulateEndTurn();
+                playerTurnState->setEndTurn(true);
             } else if (round == 4) {
                 cout << "Simulating TOUCHDOWN for team " << game.getCurrentTeam().getTeamId() << "!\n";
-                playerTurnState->simulateTouchdown();
+                playerTurnState->setTouchDown(true);
             } else {
                 cout << "Simulating turn end for team " << game.getCurrentTeam().getTeamId() << "\n";
-                playerTurnState->simulateEndTurn();
+                playerTurnState->setEndTurn(true);
             }
         }
         else if (currentState == game.getStateList().at(HALFTIME).get()) {
