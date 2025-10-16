@@ -44,12 +44,12 @@ namespace state {
 
     int Setup::nbCharacterOnTop(Team team) {
         int height = game->getHeight();
-        int limitTopRow = height - 3;
+        int limitTopRow = height - 4; // (height-1) - 4 => les 4 lignes du haut du terrain  (Attention height est le nombre de lignes!!)
 
         int count = 0;
         for (Character piece : team.getCharacters()) {
             auto pos = piece.getPosition();
-            if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.first > limitTopRow) {
+            if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.second >= limitTopRow) { //Attention .second ! On souhaite comparer des ordonnées!
                 count++;
             }
         }
@@ -62,7 +62,7 @@ namespace state {
         int count = 0;
         for (Character piece : team.getCharacters()) {
             auto pos = piece.getPosition();
-            if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.first < limitBottomRow) {
+            if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.second <= limitBottomRow) { //Idem
                 count++;
             }
         }

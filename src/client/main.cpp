@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < 11; i++) {
         Character orc("Orc" + to_string(i+1), "Orc", 5, 3, 2, 9);
         if (i < 3) {
-            orc.setPosition({13, 4+i});
+            orc.setPosition({13, 2+i});
             orc.setStatus(playable);
         } else if (i < 9) {
             orc.setPosition({15, 3+i});
