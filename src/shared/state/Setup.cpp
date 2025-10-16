@@ -26,9 +26,9 @@ namespace state {
         bool isTeamA = (team.getTeamId() == game->getTeamA().getTeamId());
         int frontlineCol;
         if (isTeamA) {
-            frontlineCol = 13;
+            frontlineCol = 12;
         } else {
-            frontlineCol = 14;
+            frontlineCol = 13;
         }
 
         int count = 0;

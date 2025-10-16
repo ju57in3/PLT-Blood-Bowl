@@ -1,10 +1,11 @@
 #include "EndGame.h"
 #include "Team.h"
 #include "BloodBowlGame.h"
-#include "Setup.h"
 
 namespace state {
-    EndGame::EndGame(BloodBowlGame* game):AbstractState(game){}
+    EndGame::EndGame(BloodBowlGame* game):AbstractState(game) {
+        restart = false;
+    }
 
     void EndGame::update()
     {

@@ -19,40 +19,37 @@ using namespace state;
 int main(int argc, char* argv[]) {
     cout << "=== BLOOD BOWL GAME TEST ===\n\n";
 
-    // Create teams with more characters for realistic testing
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
-    // Team A - Humans (valid Blood Bowl setup)
     for (int i = 0; i < 11; i++) {
         Character human("Player" + to_string(i+1), "Human", 6, 3, 3, 8);
         if (i < 3) {
-            human.setPosition({13, 4+i}); // Line of scrimmage (3 players minimum)
+            human.setPosition({12, 4+i}); 
             human.setStatus(playable);
         } else if (i < 5) {
-            human.setPosition({12, 4+i}); // High zone (max 2 players, x >= 11)
+            human.setPosition({11, 4+i});
             human.setStatus(playable);
         } else if (i < 9) {
-            human.setPosition({8, 3+i}); // Mid-field, safe zone
+            human.setPosition({8, 3+i});
             human.setStatus(playable);
         } else {
-            human.setPosition({-1, -1}); // Bench (2 players)
+            human.setPosition({-1, -1});
             human.setStatus(bench);
         }
         teamA.addCharacter(human);
     }
 
-    // Team B - Orcs (valid Blood Bowl setup)
     for (int i = 0; i < 11; i++) {
         Character orc("Orc" + to_string(i+1), "Orc", 5, 3, 2, 9);
         if (i < 3) {
-            orc.setPosition({2, 4+i}); // Opposite line (low zone, x <= 4, max 2)
+            orc.setPosition({13, 4+i});
             orc.setStatus(playable);
         } else if (i < 9) {
-            orc.setPosition({7, 3+i}); // Mid-field, safe zone
+            orc.setPosition({15, 3+i});
             orc.setStatus(playable);
         } else {
-            orc.setPosition({-1, -1}); // Bench (2 players)
+            orc.setPosition({-1, -1});
             orc.setStatus(bench);
         }
         teamB.addCharacter(orc);

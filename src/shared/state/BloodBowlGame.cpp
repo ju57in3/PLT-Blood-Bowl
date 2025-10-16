@@ -41,7 +41,7 @@ static void renderBoardAscii(std::ostream &os, BloodBowlGame &game) {
 
     // print column indices
     os << "\nBoard (" << w << "x" << h << "):\n";
-    os << "   ";
+    os << "     ";
     for (int x = 0; x < w; ++x) os << (x % 10) << ' ';
     os << '\n';
 
