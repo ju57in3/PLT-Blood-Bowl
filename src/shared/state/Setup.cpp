@@ -96,6 +96,18 @@ namespace state {
         setupEnded = true;
     }
 
+    bool Setup::getSetupEnded()
+    {
+        return setupEnded;
+    }
+
+    void Setup::setSetupEnded(bool setupStatus)
+    {
+        this->setupEnded = setupStatus;
+    }
+
+
+
 
 
 }
