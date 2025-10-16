@@ -18,7 +18,7 @@ namespace client {
 
     std::ostream& operator<<(std::ostream& os, const HelloWorld& hello) {
         for (int i =0; i < hello.COMBIEN; i++) {
-            std::cout << hello.QUOI << std::endl;
+            os << hello.QUOI << std::endl;
         }
         return os;
     }
