@@ -1,1 +1,3 @@
 diapdf/*.pdf
+CMakeFiles/
+cmake_install.cmake

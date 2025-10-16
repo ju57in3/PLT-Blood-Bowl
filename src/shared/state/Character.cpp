@@ -3,6 +3,20 @@
 #include <string>
 
 namespace state {
+    
+    const char* statusToString(CharacterStatus status) {
+        switch (status) {
+            case knockedDown: return "knockedDown";
+            case stunned:     return "stunned";
+            case ko:          return "ko";
+            case injured:     return "injured";
+            case playable:    return "playable";
+            case played:      return "played";
+            case bench:       return "bench";
+            default:          return "unknown";
+        }
+    }
+
     Character::Character(std::string name, std::string type, int movement, int strength, int agility, int armor)
         : name(name), type(type), movement(movement), strength(strength), agility(agility), armor(armor)
         {
@@ -35,8 +49,7 @@ namespace state {
 
     std::ostream& operator<<(std::ostream& os, Character& character) {
         os << "Position: (" << character.getPosition().first << ", " << character.getPosition().second << ")";
-        os << " | Status: " << static_cast<int>(character.getStatus());
+        os << " | Status: " << statusToString(character.getStatus());
         return os;
     }
-
 }

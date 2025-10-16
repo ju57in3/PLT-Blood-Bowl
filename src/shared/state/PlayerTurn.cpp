@@ -23,58 +23,58 @@ namespace state {
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(&game->getStateList().at(HALFTIME));
+                game->setCurrentState(game->getStateList().at(HALFTIME));
             }
             if (isTouchDown) {
                 game->getCurrentTeam().setScore(game->getCurrentTeam().getScore() + 1);
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(&game->getStateList().at(HALFTIME));
+                game->setCurrentState(game->getStateList().at(HALFTIME));
             }
             if (endTurn) {
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(&game->getStateList().at(HALFTIME));
+                game->setCurrentState(game->getStateList().at(HALFTIME));
             }
         } else if (game->getTurnCounter() == 32) {
             if (isTurnOver) {
                 restoreCharactersStatus();
                 switchTeam();
-                game->setCurrentState(&game->getStateList().at(ENDGAME));
+                game->setCurrentState(game->getStateList().at(ENDGAME));
             }
             if (isTouchDown) {
                 game->getCurrentTeam().setScore(game->getCurrentTeam().getScore() + 1);
                 restoreCharactersStatus();
                 switchTeam();
-                game->setCurrentState(&game->getStateList().at(ENDGAME));
+                game->setCurrentState(game->getStateList().at(ENDGAME));
             }
             if (endTurn) {
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(&game->getStateList().at(ENDGAME));
+                game->setCurrentState(game->getStateList().at(ENDGAME));
             }
         } else {
             if (isTurnOver) {
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(&game->getStateList().at(PLAYERTURN));
+                game->setCurrentState(game->getStateList().at(PLAYERTURN));
             }
             if (isTouchDown) {
                 game->getCurrentTeam().setScore(game->getCurrentTeam().getScore() + 1);
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(&game->getStateList().at(PLAYERTURN));
+                game->setCurrentState(game->getStateList().at(PLAYERTURN));
             }
             if (endTurn) {
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(&game->getStateList().at(PLAYERTURN));
+                game->setCurrentState(game->getStateList().at(PLAYERTURN));
             }
         }
 
@@ -102,5 +102,13 @@ namespace state {
         } else {
             game->setCurrentTeam(game->getTeamA());
         }
+    }
+
+    void PlayerTurn::simulateEndTurn() {
+        endTurn = true;
+    }
+
+    void PlayerTurn::simulateTouchdown() {
+        isTouchDown = true;
     }
 }

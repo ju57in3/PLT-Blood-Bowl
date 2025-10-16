@@ -3,6 +3,7 @@
 
 #include "Kickoff.h"
 #include "BloodBowlGame.h"
+#include <set>
 
 constexpr std::pair<int, int> HORS_TABLEAU = {-1, -1};
 
@@ -12,7 +13,6 @@ namespace state {
 
     int Setup::nbCharacterOnBoard(Team team) {
         int count = 0;
-
         for (Character piece : team.getCharacters()) {
             if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU) {
                 count++;
@@ -22,36 +22,34 @@ namespace state {
     }
 
     int Setup::nbCharacterOnLine(Team team) {
-        std::vector<int> linesSquares;
-        // Example coordinates for the 7 squares
-        std::vector<std::pair<int, int>> fixedCoords = {
-            {13, 4}, {13, 5}, {13, 6}, {13, 7}, {13, 8}, {13, 9}, {13, 10}
-        };
 
-        for (const auto& coord : fixedCoords) {
-            linesSquares.push_back(coord.first * coord.second);
+        bool isTeamA = (team.getTeamId() == game->getTeamA().getTeamId());
+        int frontlineCol;
+        if (isTeamA) {
+            frontlineCol = 13;
+        } else {
+            frontlineCol = 14;
         }
+
         int count = 0;
         for (Character piece : team.getCharacters()) {
-            std::pair<int, int> pos = piece.getPosition();
-            if (pos != HORS_TABLEAU) {
-                for (const auto& coord : fixedCoords) {
-                    if (pos == coord) {
-                        count++;
-                        break;
-                    }
-                }
-            }
+            if (piece.getStatus() != playable) continue;
+            auto pos = piece.getPosition();
+            if (pos == HORS_TABLEAU) continue;
+            // pos.first is row
+            if (pos.first == frontlineCol) count++;
         }
         return count;
     }
 
-
     int Setup::nbCharacterOnTop(Team team) {
+        int height = game->getHeight();
+        int limitTopRow = height - 3;
+
         int count = 0;
         for (Character piece : team.getCharacters()) {
-            std::pair<int,int> position = piece.getPosition();
-            if (position.first != -1 && position.first >= 11) {
+            auto pos = piece.getPosition();
+            if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.first > limitTopRow) {
                 count++;
             }
         }
@@ -59,25 +57,43 @@ namespace state {
     }
 
     int Setup::nbCharacterOnBottom(Team team) {
+        int limitBottomRow = 3;
+
         int count = 0;
         for (Character piece : team.getCharacters()) {
-            std::pair<int,int> position = piece.getPosition();
-
-            if (position.first != -1 && position.first <= 4) {
+            auto pos = piece.getPosition();
+            if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.first < limitBottomRow) {
                 count++;
             }
         }
         return count;
     }
 
+
     bool Setup::isValidSetup(Team team) {
-        return nbCharacterOnBoard(team) <= 11 && nbCharacterOnLine(team) >= 3 && nbCharacterOnTop(team) <= 2 && nbCharacterOnBottom(team) <= 2;
+        int onBoard = nbCharacterOnBoard(team);
+        if (onBoard > 11) return false;
+
+        int onLine = nbCharacterOnLine(team);
+        if (onLine < 3) return false;
+
+        int onTop = nbCharacterOnTop(team);
+        if (onTop > 2) return false;
+
+        int onBottom = nbCharacterOnBottom(team);
+        if (onBottom > 2) return false;
+
+        return true;
     }
 
     void Setup::update() {
         if (setupEnded) {
-            game->setCurrentState(&game->getStateList().at(KICKOFF));
+            game->setCurrentState(game->getStateList().at(KICKOFF));
         }
+    }
+
+    void Setup::endSetup() {
+        setupEnded = true;
     }
 
 
