@@ -12,4 +12,3 @@ BOOST_AUTO_TEST_CASE(TestCharacter)
 }
 
 /* vim: set sw=2 sts=2 et : */
-CMakeFiles
