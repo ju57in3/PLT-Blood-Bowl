@@ -22,6 +22,10 @@ int main(int argc, char* argv[]) {
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
+    //Test fonctionnement des méthodes score
+    teamB.setScore(45);
+    cout << "L'équipe B à un avantage initial de " << teamB.getScore() << " points." << endl;
+
     for (int i = 0; i < 11; i++) {
         Character human("Player" + to_string(i+1), "Human", 6, 3, 3, 8);
         if (i < 3) {

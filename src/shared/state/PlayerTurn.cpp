@@ -1,5 +1,5 @@
+#include <iostream>
 #include "PlayerTurn.h"
-
 #include "BloodBowlGame.h"
 #include "EndGame.h"
 #include "HalfTime.h"
@@ -65,18 +65,20 @@ namespace state {
             }
             if (isTouchDown) {
                 game->getCurrentTeam().setScore(game->getCurrentTeam().getScore() + 1);
-                restoreCharactersStatus();
-                switchTeam();
-                game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(PLAYERTURN));
+                std::cout << "Le score de l'équipe " << game->getCurrentTeam().getTeamId() << " devrait etre de " << game->getCurrentTeam().getScore() + 1 << std::endl;
+                endTurn = true;
             }
             if (endTurn) {
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
                 game->setCurrentState(game->getStateList().at(PLAYERTURN));
+
             }
         }
+        isTurnOver = false;
+        isTouchDown = false;
+        endTurn = false;
 
     }
 
@@ -110,5 +112,30 @@ namespace state {
 
     void PlayerTurn::simulateTouchdown() {
         isTouchDown = true;
+    }
+
+    bool PlayerTurn::getTurnOver ()
+    {
+        return isTurnOver;
+    }
+    void PlayerTurn::setTurnOver (bool turnOver)
+    {
+        isTurnOver = turnOver;
+    }
+    bool PlayerTurn::getTouchDown (bool touchDown)
+    {
+        return isTouchDown;
+    }
+    void PlayerTurn::setTouchDown (bool touchDown)
+    {
+        isTouchDown = touchDown;
+    }
+    bool PlayerTurn::getEndTurn ()
+    {
+        return endTurn;
+    }
+    void PlayerTurn::setEndTurn (bool turnEnded)
+    {
+        endTurn = turnEnded;
     }
 }
