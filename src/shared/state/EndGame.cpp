@@ -21,4 +21,6 @@ namespace state {
         }
     }
 
+    EndGame::~EndGame() {
+    }
 }

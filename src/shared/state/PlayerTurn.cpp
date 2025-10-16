@@ -110,4 +110,9 @@ namespace state {
     void PlayerTurn::simulateTouchdown() {
         isTouchDown = true;
     }
+
+    PlayerTurn::~PlayerTurn() {
+
+    }
+
 }

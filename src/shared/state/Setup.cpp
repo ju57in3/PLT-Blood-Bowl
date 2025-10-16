@@ -96,6 +96,10 @@ namespace state {
         setupEnded = true;
     }
 
+    Setup::~Setup() {
+
+    }
+
 
 
 }
