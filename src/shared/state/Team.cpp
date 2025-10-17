@@ -49,14 +49,14 @@ namespace state {
         return os;
     }
 
-    std::string Team::getTeamName() const
+    std::string Team::getName() const
     {
         return name;
     }
 
-    void Team::setTeamName(std::string name)
+    void Team::setName(std::string teamName)
     {
-        this->name = name;
+        this->name = teamName;
     }
 
     int Team::getRerolls() const
@@ -64,8 +64,8 @@ namespace state {
         return rerolls;
     }
 
-    void Team::setRerolls(int rerolls)
+    void Team::setRerolls(int rerollsValue)
     {
-        this->rerolls = rerolls;
+        this->rerolls = rerollsValue;
     }
 }

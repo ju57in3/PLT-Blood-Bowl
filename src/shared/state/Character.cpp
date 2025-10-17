@@ -26,47 +26,47 @@ namespace state {
             this->status = bench;
         }
 
-    std::string Character::getCharacterName() const
+    std::string Character::getName() const
     {
         return name;
     }
 
-    void Character::setCharacterName(std::string nameValue)
+    void Character::setName(std::string nameValue)
     {
         this->name = nameValue;
     }
 
-    std::string Character::getCharacterType() const
+    std::string Character::getType() const
     {
         return type;
     }
 
-    void Character::setCharacterType(std::string typeValue)
+    void Character::setType(std::string typeValue)
     {
         this->type = typeValue;
     }
 
-    int Character::getMovementPoints() const
+    int Character::getMovement() const
     {
         return movement;
     }
 
-    void Character::setMovementPoints(int movementValue)
+    void Character::setMovement(int movementValue)
     {
         this->movement = movementValue;
     }
 
-    int Character::getStrengthPoints() const
+    int Character::getStrength() const
     {
         return strength;
     }
 
-    void Character::setStrengthPoints(int strengthValue)
+    void Character::setStrength(int strengthValue)
     {
         this->strength = strengthValue;
     }
 
-    int Character::getAgilityPoints() const {
+    int Character::getAgility() const {
         return agility;
     }
 
@@ -74,19 +74,19 @@ namespace state {
         return status;
     }
 
-    void Character::setAgilityPoints(int agilityValue)
+    void Character::setAgility(int agilityValue)
     {
         this->agility = agilityValue;
     }
 
-    int Character::getArmorPoints() const
+    int Character::getArmor() const
     {
         return armor;
     }
 
-    void Character::setArmorPoints(int armor)
+    void Character::setArmor(int armorValue)
     {
-        this->armor = armor;
+        this->armor = armorValue;
     }
 
     std::pair<int,int> Character::getPosition() const {
