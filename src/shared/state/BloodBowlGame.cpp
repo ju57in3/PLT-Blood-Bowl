@@ -103,6 +103,13 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         return teamB;
     }
 
+    Team& BloodBowlGame::getTeamA() {
+        return teamA;
+    }
+    Team& BloodBowlGame::getTeamB() {
+        return teamB;
+    }
+
     Team* BloodBowlGame::getCurrentTeam() const {
         return currentTeam;
     }
@@ -112,6 +119,7 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
     }
 
     void BloodBowlGame::setCurrentTeam(Team* team) {
+        // allow nullptr to clear current team if needed
         currentTeam = team;
     }
 
