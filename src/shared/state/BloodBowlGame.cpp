@@ -70,6 +70,8 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         height = 15;
         ballIsHold = false;
         currentTeam = &this->teamA; // Par défaut, pointer sur teamA
+        nb_repetition = 0;
+        nb_repetition_max = 3;
     }
 
     void BloodBowlGame::setCurrentState(AbstractState* state) {
