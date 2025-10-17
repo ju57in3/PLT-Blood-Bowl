@@ -96,17 +96,12 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         }
     }
 
+    // Const-qualified getters
     const Team& BloodBowlGame::getTeamA() const {
         return teamA;
     }
-    const Team& BloodBowlGame::getTeamB() const {
-        return teamB;
-    }
 
-    Team& BloodBowlGame::getTeamA() {
-        return teamA;
-    }
-    Team& BloodBowlGame::getTeamB() {
+    const Team& BloodBowlGame::getTeamB() const {
         return teamB;
     }
 
@@ -119,7 +114,6 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
     }
 
     void BloodBowlGame::setCurrentTeam(Team* team) {
-        // allow nullptr to clear current team if needed
         currentTeam = team;
     }
 

@@ -33,49 +33,49 @@ namespace state {
         int direction=rand()%8;
         int rebounds=rand()%6;
         std::pair<int,int> newTarget;
-        switch (direction)
-        {
-        case 0: //South
-            {
+        switch (direction){
+            case 0: //South
                 newTarget.first = targetSquare.first;
                 newTarget.second = targetSquare.second - rebounds;
-            }
-        case 1: //South-East
-            {
+                break;
+
+            case 1: //South-East
                 newTarget.first = targetSquare.first + rebounds;
                 newTarget.second = targetSquare.second - rebounds;
-            }
-        case 2: //East
-            {
+                break;
+
+            case 2: //East
+
                 newTarget.first = targetSquare.first + rebounds;
                 newTarget.second = targetSquare.second;
-            }
-        case 3:  //North-East
-            {
+                break;
+
+            case 3:  //North-East
                 newTarget.first = targetSquare.first + rebounds;
                 newTarget.second = targetSquare.second + rebounds;
-            }
-        case 4: //North
-            {
+                break;
+
+            case 4: //North
                 newTarget.first = targetSquare.first;
                 newTarget.second = targetSquare.second + rebounds;
-            }
-        case 5: //North-West
-            {
+                break;
+
+            case 5: //North-West
                 newTarget.first = targetSquare.first - rebounds;
                 newTarget.second = targetSquare.second + rebounds;
-            }
-        case 6: //West
-            {
+                break;
+
+            case 6: //West
                 newTarget.first = targetSquare.first - rebounds;
                 newTarget.second = targetSquare.second;
-            }
-        case 7: //South-West
-            {
+
+            case 7: //South-West
                 newTarget.first = targetSquare.first - rebounds;
                 newTarget.second = targetSquare.second - rebounds;
-            }
-        default: ;
+                break;
+
+            default:
+                break;
         }
         game->setBallPosition(newTarget);
     }

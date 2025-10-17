@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerTurn)
     BOOST_CHECK(playerTurn.isTouchDown);
 
     // Vérifie que le score augmente
-    int oldScore = game.getCurrentTeam().getScore();
+    int oldScore = game.getCurrentTeam()->getScore();
     playerTurn.update();
-    BOOST_CHECK(game.getCurrentTeam().getScore() >= oldScore);
+    BOOST_CHECK(game.getCurrentTeam()->getScore() >= oldScore);
 }
