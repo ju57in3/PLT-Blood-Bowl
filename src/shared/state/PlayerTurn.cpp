@@ -65,7 +65,8 @@ namespace state {
             }
             if (isTouchDown) {
                 game->getCurrentTeam().setScore(game->getCurrentTeam().getScore() + 1);
-                std::cout << "Le score de l'équipe " << game->getCurrentTeam().getTeamId() << " devrait etre de " << game->getCurrentTeam().getScore() + 1 << std::endl;
+                std::cout << "Le score de l'équipe " << game->getCurrentTeam().getTeamId() << " devrait etre de 1." << std::endl;
+                std::cout << "Le score de l'équipe " << game->getCurrentTeam().getTeamId() << " est de " << game->getCurrentTeam().getScore() << " points" << std::endl;
                 endTurn = true;
             }
             if (endTurn) {
