@@ -129,8 +129,47 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         return height;
     }
 
-    void BloodBowlGame::setBallPosition(std::pair<int,int> position) {
-        ballPosition = position;
+    void BloodBowlGame::setBallPosition(std::pair<int,int> position)
+    {
+        if (position.first>=0 && position.first<=25 && position.second>=0 && position.second<=14)
+        {
+            ballPosition = position;
+        }
+        else
+        {
+            if (currentState==stateList.at(PLAYERTURN).get())
+            {
+                std::pair<int,int> newPosition;
+                if (position.first>width || position.second>height)
+                {
+                    newPosition.first = position.first - std::max((width-1) - position.first, (height-1) - position.second );
+                    newPosition.second = position.second - std::max((width-1) - position.first, (height-1) - position.second );
+                }
+                else if (position.first < 0 || position.second < 0)
+                {
+                    newPosition.first = position.first + std::max(-position.first, -position.second);
+                    newPosition.second = position.second + std::max(-position.first, -position.second);
+                }
+                setBallPosition(newPosition);
+            }
+            if (currentState==stateList.at(KICKOFF).get())
+            {
+                if (currentTeam == &this->teamA)
+                {
+                    currentTeam = &this->teamB;
+                }
+                else
+                {
+                    currentTeam = &this->teamA;
+                }
+                unsigned long teamSize = getCurrentTeam()->getPlayableCharacter().size();  //PlayableCharacters pour éviter de donner le ballon à un jour sur le banc
+                unsigned long i = rand()%teamSize;
+
+                ballPosition = getCurrentTeam()->getPlayableCharacter()[i].getPosition();
+                ballIsHold = true;
+                getCurrentTeam()->getPlayableCharacter()[i].setHasBall(true);
+            }
+        }
     }
 
     int BloodBowlGame::getTurnCounter() const {
