@@ -9,11 +9,17 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     Team teamA(1, "Humans", 3);
     BOOST_CHECK_EQUAL(teamA.teamId,1);
     BOOST_CHECK_EQUAL(teamA.getScore(),0);
-    BOOST_CHECK_EQUAL(teamA.getRerolls, 3);
-    BOOST_CHECK_EQUAL(teamA.getName,"Humans");
+    BOOST_CHECK_EQUAL(teamA.getRerolls(), 3);
+    BOOST_CHECK_EQUAL(teamA.getName(),"Humans");
 
     teamA.setScore(1);
     BOOST_CHECK_EQUAL(teamA.getScore(),1);
+
+    teamA.setRerolls(2);
+    BOOST_CHECK_EQUAL(teamA.getRerolls(),2);
+
+    teamA.setName("Humans Team");
+    BOOST_CHECK_EQUAL(teamA.getName(),"Humans Team");
 
     Character human1("Player 1", "human", 6, 3, 3, 8);
     human1.setPosition({1,1});
