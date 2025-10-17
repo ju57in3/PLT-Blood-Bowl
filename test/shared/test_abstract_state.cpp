@@ -7,7 +7,7 @@
 
 using namespace state;
 
-BOOST_AUTO_TEST_CASE(TestAbstractStatePolymorphism)
+BOOST_AUTO_TEST_CASE(TestAbstractState)
 {
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);

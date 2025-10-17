@@ -11,6 +11,17 @@ BOOST_AUTO_TEST_CASE(TestPlayerTurn)
 {
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
+
+    Character h1("H1", "Human", 6, 3, 3, 8);
+    h1.setStatus(playable);
+    h1.setPosition({5,5});
+    teamA.addCharacter(h1);
+
+    Character o1("O1", "Orc", 5, 4, 2, 9);
+    o1.setStatus(playable);
+    o1.setPosition({10,5});
+    teamB.addCharacter(o1);
+
     BloodBowlGame game(teamA, teamB);
 
     PlayerTurn playerTurn(&game);
@@ -27,7 +38,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerTurn)
     BOOST_CHECK(playerTurn.getTouchDown());
 
     // Check that the score increases
-    int oldScore = game.getCurrentTeam().getScore();
+    int oldScore = game.getCurrentTeam()->getScore();
     playerTurn.update();
-    BOOST_CHECK(game.getCurrentTeam().getScore() >= oldScore);
+    BOOST_CHECK(game.getCurrentTeam()->getScore() >= oldScore);
 }
