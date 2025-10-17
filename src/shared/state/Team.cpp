@@ -27,7 +27,7 @@ namespace state {
         return playableCharacters;
     }
 
-    int Team::getTeamId() const {
+    int Team::getTeamId() const{
         return teamId;
     }
 
@@ -48,4 +48,37 @@ namespace state {
         }
         return os;
     }
+
+    int Team::getTeamId() {
+        return teamId;
+    }
+
+    std::string Team::getTeamName()
+    {
+        return name;
+    }
+
+    void Team::setTeamName(std::string name)
+    {
+        this->name = name;
+    }
+
+    int Team::getRerolls()
+    {
+        return rerolls;
+    }
+
+    void Team::setRerolls(int rerolls)
+    {
+        this->rerolls = rerolls;
+    }
+
+    int Team::getScore(){
+        return score;
+    }
+
+    void Team::setScore(int score) {
+        this->score = score;
+    }
+
 }
