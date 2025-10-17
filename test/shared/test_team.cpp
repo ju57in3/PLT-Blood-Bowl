@@ -9,8 +9,8 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     Team teamA(1, "Humans", 3);
     BOOST_CHECK_EQUAL(teamA.teamId,1);
     BOOST_CHECK_EQUAL(teamA.getScore(),0);
-    //Tester rerolls
-    //Tester name
+    BOOST_CHECK_EQUAL(teamA.getRerolls, 3);
+    BOOST_CHECK_EQUAL(teamA.getName,"Humans");
 
     teamA.setScore(1);
     BOOST_CHECK_EQUAL(teamA.getScore(),1);
