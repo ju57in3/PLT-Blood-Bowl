@@ -12,9 +12,9 @@ namespace state {
         isTurnOver = false;
         isTouchDown = false;
         endTurn = false;
-        teamId = game->getCurrentTeam().getTeamId();
+        teamId = game->getCurrentTeam()->getTeamId();
 
-        availableCharacters = game->getCurrentTeam().getPlayableCharacter();
+        availableCharacters = game->getCurrentTeam()->getPlayableCharacter();
     }
 
     void PlayerTurn::update() {
@@ -26,7 +26,7 @@ namespace state {
                 game->setCurrentState(game->getStateList().at(HALFTIME).get());
             }
             if (isTouchDown) {
-                game->getCurrentTeam().setScore(game->getCurrentTeam().getScore() + 1);
+                game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
@@ -45,7 +45,7 @@ namespace state {
                 game->setCurrentState(game->getStateList().at(ENDGAME).get());
             }
             if (isTouchDown) {
-                game->getCurrentTeam().setScore(game->getCurrentTeam().getScore() + 1);
+                game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
                 restoreCharactersStatus();
                 switchTeam();
                 game->setCurrentState(game->getStateList().at(ENDGAME).get());
@@ -64,7 +64,7 @@ namespace state {
                 game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
             }
             if (isTouchDown) {
-                game->getCurrentTeam().setScore(game->getCurrentTeam().getScore() + 1);
+                game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
                 restoreCharactersStatus();
                 switchTeam();
                 game->setTurnCounter(game->getTurnCounter() + 1);
@@ -86,7 +86,7 @@ namespace state {
     }
 
     void PlayerTurn::restoreCharactersStatus() {
-        std::vector<Character> characters = game->getCurrentTeam().getCharacters();
+        std::vector<Character> characters = game->getCurrentTeam()->getCharacters();
         for (Character & character : characters)
         {
             if (character.getStatus() == played)
@@ -102,10 +102,10 @@ namespace state {
 
 
     void PlayerTurn::switchTeam() {
-        if (game->getCurrentTeam().getTeamId() == game->getTeamA().getTeamId()) {
-            game->setCurrentTeam(game->getTeamB());
+        if (game->getCurrentTeam()->getTeamId() == game->getTeamA().getTeamId()) {
+            game->setCurrentTeam(const_cast<Team*>(&game->getTeamB()));
         } else {
-            game->setCurrentTeam(game->getTeamA());
+            game->setCurrentTeam(const_cast<Team*>(&game->getTeamA()));
         }
     }
 
@@ -117,7 +117,7 @@ namespace state {
     {
         isTurnOver = turnOver;
     }
-    bool PlayerTurn::getTouchDown (bool touchDown)
+    bool PlayerTurn::getTouchDown ()
     {
         return isTouchDown;
     }

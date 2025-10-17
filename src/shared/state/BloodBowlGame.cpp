@@ -59,7 +59,6 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
     BloodBowlGame::BloodBowlGame(Team teamA, Team teamB)
         : teamA(std::move(teamA)),
           teamB(std::move(teamB)),
-          currentTeam(this->coinToss()),
           turnCounter(0) {
         stateList.push_back(std::make_unique<Setup>(this));
         stateList.push_back(std::make_unique<Kickoff>(this));
@@ -70,6 +69,7 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         width = 26;
         height = 15;
         ballIsHold = false;
+        currentTeam = &this->teamA; // Par défaut, pointer sur teamA
     }
 
     void BloodBowlGame::setCurrentState(AbstractState* state) {
@@ -84,26 +84,28 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         return stateList;
     }
 
-    Team BloodBowlGame::coinToss() {
+    Team* BloodBowlGame::coinToss() {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(0, 1);
         int toss = dis(gen);
         if (toss == 0) {
-            return this->teamA;
+            return &this->teamA;
         } else {
-            return this->teamB;
+            return &this->teamB;
         }
     }
 
-    Team BloodBowlGame::getTeamA() const{
+    // Const-qualified getters
+    const Team& BloodBowlGame::getTeamA() const {
         return teamA;
     }
-    Team BloodBowlGame::getTeamB() const {
+
+    const Team& BloodBowlGame::getTeamB() const {
         return teamB;
     }
 
-    Team BloodBowlGame::getCurrentTeam() const {
+    Team* BloodBowlGame::getCurrentTeam() const {
         return currentTeam;
     }
 
@@ -111,8 +113,8 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         turnCounter = newTurnCount;
     }
 
-    void BloodBowlGame::setCurrentTeam(Team team) {
-        currentTeam = std::move(team);
+    void BloodBowlGame::setCurrentTeam(Team* team) {
+        currentTeam = team;
     }
 
     std::pair<int,int> BloodBowlGame::getBallPosition() const {
@@ -127,8 +129,47 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         return height;
     }
 
-    void BloodBowlGame::setBallPosition(std::pair<int,int> position) {
-        ballPosition = position;
+    void BloodBowlGame::setBallPosition(std::pair<int,int> position)
+    {
+        if (position.first>=0 && position.first<=25 && position.second>=0 && position.second<=14)
+        {
+            ballPosition = position;
+        }
+        else
+        {
+            if (currentState==stateList.at(PLAYERTURN).get())
+            {
+                std::pair<int,int> newPosition;
+                if (position.first>width || position.second>height)
+                {
+                    newPosition.first = position.first - std::max((width-1) - position.first, (height-1) - position.second );
+                    newPosition.second = position.second - std::max((width-1) - position.first, (height-1) - position.second );
+                }
+                else if (position.first < 0 || position.second < 0)
+                {
+                    newPosition.first = position.first + std::max(-position.first, -position.second);
+                    newPosition.second = position.second + std::max(-position.first, -position.second);
+                }
+                setBallPosition(newPosition);
+            }
+            if (currentState==stateList.at(KICKOFF).get())
+            {
+                if (currentTeam == &this->teamA)
+                {
+                    currentTeam = &this->teamB;
+                }
+                else
+                {
+                    currentTeam = &this->teamA;
+                }
+                unsigned long teamSize = getCurrentTeam()->getPlayableCharacter().size();  //PlayableCharacters pour éviter de donner le ballon à un jour sur le banc
+                unsigned long i = rand()%teamSize;
+
+                ballPosition = getCurrentTeam()->getPlayableCharacter()[i].getPosition();
+                ballIsHold = true;
+                getCurrentTeam()->getPlayableCharacter()[i].setHasBall(true);
+            }
+        }
     }
 
     int BloodBowlGame::getTurnCounter() const {
@@ -139,7 +180,12 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         os << "\n=== GAME STATE ===\n";
         os << "Current State: " << (game.getCurrentState() ? typeid(*game.getCurrentState()).name() : "None") << "\n";
         os << "Turn Counter: " << game.getTurnCounter() << "\n";
-        os << "Current Team: " << game.getCurrentTeam().getTeamId() << "\n";
+        os << "Current Team: ";
+        if (game.getCurrentTeam())
+            os << game.getCurrentTeam()->getTeamId();
+        else
+            os << "None";
+        os << "\n";
         os << "Score - Team A: " << game.getTeamA().getScore() << " | Team B: " << game.getTeamB().getScore() << "\n";
         renderBoardAscii(os, game);
         os << "==================\n";
