@@ -15,18 +15,18 @@ BOOST_AUTO_TEST_CASE(TestPlayerTurn)
 
     PlayerTurn playerTurn(&game);
 
-    BOOST_CHECK_EQUAL(playerTurn.isTurnOver, false);
-    BOOST_CHECK_EQUAL(playerTurn.isTouchDown, false);
+    BOOST_CHECK_EQUAL(playerTurn.getTurnOver(), false);
+    BOOST_CHECK_EQUAL(playerTurn.getTouchDown(), false);
 
-    // Simule un tour normal
-    playerTurn.simulateEndTurn();
-    BOOST_CHECK(playerTurn.isTurnOver);
+    // Simulates a normal ride
+    playerTurn.setTurnOver(true);
+    BOOST_CHECK(playerTurn.getTurnOver());
 
-    // Simule un touchdown
-    playerTurn.simulateTouchdown();
-    BOOST_CHECK(playerTurn.isTouchDown);
+    // Simulate a touchdown
+    playerTurn.setTouchDown(true);
+    BOOST_CHECK(playerTurn.getTouchDown());
 
-    // Vérifie que le score augmente
+    // Check that the score increases
     int oldScore = game.getCurrentTeam().getScore();
     playerTurn.update();
     BOOST_CHECK(game.getCurrentTeam().getScore() >= oldScore);
