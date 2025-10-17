@@ -26,13 +26,67 @@ namespace state {
             this->status = bench;
         }
 
-    bool Character::moveTo(std::pair<int,int> position) {
-        currentPosition = position;
-        return true;
+    std::string Character::getName() const
+    {
+        return name;
+    }
+
+    void Character::setName(std::string nameValue)
+    {
+        this->name = nameValue;
+    }
+
+    std::string Character::getType() const
+    {
+        return type;
+    }
+
+    void Character::setType(std::string typeValue)
+    {
+        this->type = typeValue;
+    }
+
+    int Character::getMovement() const
+    {
+        return movement;
+    }
+
+    void Character::setMovement(int movementValue)
+    {
+        this->movement = movementValue;
+    }
+
+    int Character::getStrength() const
+    {
+        return strength;
+    }
+
+    void Character::setStrength(int strengthValue)
+    {
+        this->strength = strengthValue;
+    }
+
+    int Character::getAgility() const {
+        return agility;
     }
 
     CharacterStatus Character::getStatus() const {
         return status;
+    }
+
+    void Character::setAgility(int agilityValue)
+    {
+        this->agility = agilityValue;
+    }
+
+    int Character::getArmor() const
+    {
+        return armor;
+    }
+
+    void Character::setArmor(int armorValue)
+    {
+        this->armor = armorValue;
     }
 
     std::pair<int,int> Character::getPosition() const {
@@ -41,6 +95,16 @@ namespace state {
 
     void Character::setPosition(std::pair<int,int> position) {
         this->currentPosition = position;
+    }
+
+    bool Character::getHasBall() const
+    {
+        return hasBall;
+    }
+
+    void Character::setHasBall(bool hasBallValue)
+    {
+        this->hasBall = hasBallValue;
     }
 
     void Character::setStatus(CharacterStatus newStatus) {

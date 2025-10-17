@@ -11,7 +11,7 @@ namespace state {
     void Kickoff::update()
     {
         int side;
-        if (game->getCurrentTeam().getTeamId() == game->getTeamA().getTeamId()) {
+        if (game->getCurrentTeam()->getTeamId() == game->getTeamA().getTeamId()) {
             side = game->getWidth()/2;
         }else {
             side = 0;
