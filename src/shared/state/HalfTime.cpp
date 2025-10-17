@@ -9,7 +9,7 @@ namespace state {
 
     void HalfTime::update() {
         checkKO(game);
-        game->setCurrentState(game->getStateList().at(SETUP));
+        game->setCurrentState(game->getStateList().at(SETUP).get());
     }
 
     void HalfTime::checkKO (BloodBowlGame* game) {
@@ -29,6 +29,9 @@ namespace state {
                 }
             }
         }
+    }
+
+    HalfTime::~HalfTime() {
     }
 
 }

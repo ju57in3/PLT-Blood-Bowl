@@ -21,4 +21,16 @@ namespace state {
         }
     }
 
+    EndGame::~EndGame() {
+    }
+
+    bool EndGame::getRestart() const {
+        return restart;
+    }
+
+    void EndGame::setRestart(bool restartValue) {
+        this->restart = restartValue;
+    }
+
+
 }
