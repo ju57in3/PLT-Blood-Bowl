@@ -22,6 +22,10 @@ int main(int argc, char* argv[]) {
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
+    //Test fonctionnement des méthodes score
+    teamB.setScore(45);
+    cout << "L'équipe B à un avantage initial de " << teamB.getScore() << " points." << endl;
+
     for (int i = 0; i < 11; i++) {
         Character human("Player" + to_string(i+1), "Human", 6, 3, 3, 8);
         if (i < 3) {
@@ -106,13 +110,13 @@ int main(int argc, char* argv[]) {
             // Simulate different outcomes based on round
             if (round <= 3) {
                 cout << "Simulating normal turn end for team " << game.getCurrentTeam().getTeamId() << "\n";
-                playerTurnState->simulateEndTurn();
+                playerTurnState->setEndTurn(true);
             } else if (round == 4) {
                 cout << "Simulating TOUCHDOWN for team " << game.getCurrentTeam().getTeamId() << "!\n";
-                playerTurnState->simulateTouchdown();
+                playerTurnState->setTouchDown(true);
             } else {
                 cout << "Simulating turn end for team " << game.getCurrentTeam().getTeamId() << "\n";
-                playerTurnState->simulateEndTurn();
+                playerTurnState->setEndTurn(true);
             }
         }
         else if (currentState == game.getStateList().at(HALFTIME).get()) {
