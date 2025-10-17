@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
     cout << "Team A (Humans):\n" << teamA << "\n";
     cout << "Team B (Orcs):\n" << teamB << "\n";
 
-    cout << "Coin toss winner: Team " << game.getCurrentTeam().getTeamId() << "\n";
+    cout << "Coin toss winner: Team " << game.getCurrentTeam()->getTeamId() << "\n";
 
     cout << "\n=== INITIAL GAME STATE ===\n";
     cout << game << endl;
@@ -109,13 +109,13 @@ int main(int argc, char* argv[]) {
             PlayerTurn* playerTurnState = static_cast<PlayerTurn*>(currentState);
             // Simulate different outcomes based on round
             if (round <= 3) {
-                cout << "Simulating normal turn end for team " << game.getCurrentTeam().getTeamId() << "\n";
+                cout << "Simulating normal turn end for team " << game.getCurrentTeam()->getTeamId() << "\n";
                 playerTurnState->setEndTurn(true);
             } else if (round == 4) {
-                cout << "Simulating TOUCHDOWN for team " << game.getCurrentTeam().getTeamId() << "!\n";
+                cout << "Simulating TOUCHDOWN for team " << game.getCurrentTeam()->getTeamId() << "!\n";
                 playerTurnState->setTouchDown(true);
             } else {
-                cout << "Simulating turn end for team " << game.getCurrentTeam().getTeamId() << "\n";
+                cout << "Simulating turn end for team " << game.getCurrentTeam()->getTeamId() << "\n";
                 playerTurnState->setEndTurn(true);
             }
         }
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
     cout << "\n=== TESTING SCORING ===\n";
     cout << "Before scoring:\n" << game << "\n";
     
-    game.getCurrentTeam().setScore(game.getCurrentTeam().getScore() + 1);
+    game.getCurrentTeam()->setScore(game.getCurrentTeam()->getScore() + 1);
     cout << "After touchdown:\n" << game << "\n";
 
     // Test character status changes

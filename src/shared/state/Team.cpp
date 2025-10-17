@@ -49,11 +49,7 @@ namespace state {
         return os;
     }
 
-    int Team::getTeamId() {
-        return teamId;
-    }
-
-    std::string Team::getTeamName()
+    std::string Team::getTeamName() const
     {
         return name;
     }
@@ -63,7 +59,7 @@ namespace state {
         this->name = name;
     }
 
-    int Team::getRerolls()
+    int Team::getRerolls() const
     {
         return rerolls;
     }
@@ -72,13 +68,4 @@ namespace state {
     {
         this->rerolls = rerolls;
     }
-
-    int Team::getScore(){
-        return score;
-    }
-
-    void Team::setScore(int score) {
-        this->score = score;
-    }
-
 }

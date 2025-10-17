@@ -26,59 +26,60 @@ namespace state {
             this->status = bench;
         }
 
-    std::string Character::getCharacterName()
+    std::string Character::getCharacterName() const
     {
         return name;
     }
 
-    void Character::setCharacterName(std::string name)
+    void Character::setCharacterName(std::string nameValue)
     {
-        this->name = name;
+        this->name = nameValue;
     }
 
-    std::string Character::getCharacterType()
+    std::string Character::getCharacterType() const
     {
         return type;
     }
 
-    void Character::setCharacterType(std::string type)
+    void Character::setCharacterType(std::string typeValue)
     {
-        this->type = type;
+        this->type = typeValue;
     }
 
-    int Character::getMovementPoints()
+    int Character::getMovementPoints() const
     {
         return movement;
     }
 
-    void Character::setMovementPoints(int movement)
+    void Character::setMovementPoints(int movementValue)
     {
-        this->movement = movement;
+        this->movement = movementValue;
     }
 
-    int Character::getStrengthPoints()
+    int Character::getStrengthPoints() const
     {
         return strength;
     }
 
-    void Character::setStrengthPoints(int strength)
+    void Character::setStrengthPoints(int strengthValue)
     {
-        this->strength = strength;
+        this->strength = strengthValue;
     }
 
-    int Character::getAgilityPoints()
-    {
+    int Character::getAgilityPoints() const {
         return agility;
     }
 
     CharacterStatus Character::getStatus() const {
         return status;
-    void Character::setAgilityPoints(int agility)
-    {
-        this->agility = agility;
     }
 
-    int Character::getArmorPoints()
+    void Character::setAgilityPoints(int agilityValue)
+    {
+        this->agility = agilityValue;
+    }
+
+    int Character::getArmorPoints() const
     {
         return armor;
     }
@@ -96,18 +97,14 @@ namespace state {
         this->currentPosition = position;
     }
 
-    bool Character::getHasBall()
+    bool Character::getHasBall() const
     {
         return hasBall;
     }
 
-    void Character::setHasBall(bool hasBall)
+    void Character::setHasBall(bool hasBallValue)
     {
-        this->hasBall = hasBall;
-    }
-
-    CharacterStatus Character::getStatus(){
-        return status;
+        this->hasBall = hasBallValue;
     }
 
     void Character::setStatus(CharacterStatus newStatus) {
