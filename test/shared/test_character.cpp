@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(TestCharacter)
     BOOST_CHECK_EQUAL(human.getArmor(),9);
 
     human.setType("orc");
-    BOOST_CHECK_EQUAL(human.getName(),"orc");
+    BOOST_CHECK_EQUAL(human.getType(),"orc");
 
     human.setHasBall(true);
     BOOST_CHECK(human.getHasBall());
