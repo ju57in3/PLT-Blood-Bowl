@@ -847,7 +847,7 @@
                 <dia:string>#team#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#Team*#</dia:string>
+                <dia:string>#const Team*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
