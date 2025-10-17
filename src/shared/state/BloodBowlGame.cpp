@@ -134,25 +134,11 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         if (position.first>=0 && position.first<=25 && position.second>=0 && position.second<=14)
         {
             ballPosition = position;
+            setNbRepetition(getNbRepetition() + 1);
         }
         else
         {
-            if (currentState==stateList.at(PLAYERTURN).get())
-            {
-                std::pair<int,int> newPosition;
-                if (position.first>width || position.second>height)
-                {
-                    newPosition.first = position.first - std::max((width-1) - position.first, (height-1) - position.second );
-                    newPosition.second = position.second - std::max((width-1) - position.first, (height-1) - position.second );
-                }
-                else if (position.first < 0 || position.second < 0)
-                {
-                    newPosition.first = position.first + std::max(-position.first, -position.second);
-                    newPosition.second = position.second + std::max(-position.first, -position.second);
-                }
-                setBallPosition(newPosition);
-            }
-            if (currentState==stateList.at(KICKOFF).get())
+            if (currentState==stateList.at(KICKOFF).get() || (currentState==stateList.at(PLAYERTURN).get() && getNbRepetition()==getNbRepetitionMax()))
             {
                 if (currentTeam == &this->teamA)
                 {
@@ -169,12 +155,129 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
                 ballIsHold = true;
                 getCurrentTeam()->getPlayableCharacter()[i].setHasBall(true);
             }
+
+            else if (currentState==stateList.at(PLAYERTURN).get())
+            {
+                std::pair<int,int> newPosition;
+                if (position.second>=height)
+                {
+                    newPosition.second = height -1;
+                }
+                if (position.second < 0)
+                {
+                    newPosition.second = 0;
+                }
+                if (position.first>=width)
+                {
+                    newPosition.first = width -1;
+                }
+                if (position.first < 0)
+                {
+                    newPosition.first = 0;
+                }
+
+                int direction = rand()%3;
+                int rebounds = rand()%6 + rand()%6;
+                if (newPosition.second == 0)
+                {
+                    switch (direction)
+                    {
+                        case 0: //North-West
+                            newPosition.first -= rebounds;
+                            newPosition.second += rebounds;
+                            break;
+                        case 1: // North
+                            newPosition.second += rebounds;
+                            break;
+                        case 2: //North-East
+                            newPosition.first += rebounds;
+                            newPosition.second += rebounds;
+                            break;
+                        default: ;
+                    }
+                }
+                else if (newPosition.first == 0)
+                {
+                    switch (direction)
+                    {
+                        case 0: // North-East
+                            newPosition.first += rebounds;
+                            newPosition.second += rebounds;
+                            break;
+                        case 1: // East
+                            newPosition.first += rebounds;
+                            break;
+                        case 2: // South-East
+                            newPosition.first += rebounds;
+                            newPosition.second -= rebounds;
+                            break;
+                        default: ;
+                    }
+                }
+                else if (newPosition.first == 14)
+                {
+                    switch (direction)
+                    {
+                        case 0: // South-East
+                            newPosition.first += rebounds;
+                            newPosition.second -= rebounds;
+                            break;
+                        case 1: // South
+                            newPosition.second += rebounds;
+                            break;
+                        case 2: // South-West
+                            newPosition.first -= rebounds;
+                            newPosition.second -= rebounds;
+                            break;
+                    default: ;
+                        newPosition.first -= rebounds;
+                    }
+                }
+                else if (newPosition.first == 25)
+                {
+                    switch (direction)
+                    {
+                        case 0: // South-West
+                            newPosition.first -= rebounds;
+                            newPosition.second -= rebounds;
+                            break;
+                        case 1: // West
+                            newPosition.first -= rebounds;
+                            break;
+                        case 2: // North-West
+                            newPosition.first -= rebounds;
+                            newPosition.second += rebounds;
+                            break;
+                    default: ;
+                    }
+                }
+                nb_repetition += 1;
+                setBallPosition(newPosition);
+            }
         }
     }
 
     int BloodBowlGame::getTurnCounter() const {
         return turnCounter;
     }
+
+    int BloodBowlGame::getNbRepetition() const
+    {
+        return nb_repetition;
+    }
+
+    int BloodBowlGame::getNbRepetitionMax() const
+    {
+        return nb_repetition_max;
+    }
+
+    void BloodBowlGame::setNbRepetition(int nb_repetitionValue)
+    {
+        nb_repetition = nb_repetitionValue;
+    }
+
+
+
 
     std::ostream& operator<<(std::ostream& os, const BloodBowlGame& game) {
         os << "\n=== GAME STATE ===\n";
