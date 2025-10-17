@@ -103,9 +103,9 @@ namespace state {
 
     void PlayerTurn::switchTeam() {
         if (game->getCurrentTeam()->getTeamId() == game->getTeamA().getTeamId()) {
-            game->setCurrentTeam(&game->getTeamB());
+            game->setCurrentTeam(const_cast<Team*>(&game->getTeamB()));
         } else {
-            game->setCurrentTeam(&game->getTeamA());
+            game->setCurrentTeam(const_cast<Team*>(&game->getTeamA()));
         }
     }
 
