@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(TestSetup)
         Character c("H" + std::to_string(i+1), "Human", 6, 3, 3, 8);
         c.setStatus(playable);
         if (i < 3) c.setPosition({13, 4+i});      // Line
-        else if (i < 5) c.setPosition({12, 4+i}); // Up
+        else if (i < 5) c.setPosition({12, 2+i}); // Top
         else c.setPosition({8, 4+i});             // Middle
         teamA.addCharacter(c);
     }

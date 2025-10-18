@@ -20,5 +20,5 @@ BOOST_AUTO_TEST_CASE(TestHalfTime)
 
     // Update = transition to SETUP
     halfTime.update();
-    BOOST_CHECK(game.getCurrentState() == game.getStateList()[SETUP]);
+    BOOST_CHECK(game.getCurrentState() == game.getStateList()[SETUP].get());
 }

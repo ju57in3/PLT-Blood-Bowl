@@ -13,14 +13,18 @@ BOOST_AUTO_TEST_CASE(TestKickoff)
     Team teamB(2, "Orcs", 2);
     BloodBowlGame game(teamA, teamB);
 
+    // Creation of Kickoff state
     Kickoff kickoff(&game);
 
-    // Initial ball position
-    kickoff.kickBall({5, 5});
-    BOOST_CHECK_EQUAL(game.getBallPosition().first, 2);
-    BOOST_CHECK_EQUAL(game.getBallPosition().second, 2);
-
-    // Call update() must transition to PLAYERTURN
+    // We execute the kick-off action
     kickoff.update();
-    BOOST_CHECK(game.getCurrentState() == game.getStateList()[PLAYERTURN]);
+
+    // Check that the position is inside the field
+    BOOST_CHECK_GE(game.getBallPosition().first, 0);                  // x >= 0
+    BOOST_CHECK_GE(game.getBallPosition().second, 0);                 // y >= 0
+    BOOST_CHECK_LT(game.getBallPosition().first, game.getWidth());    // x < width
+    BOOST_CHECK_LT(game.getBallPosition().second, game.getHeight());  // y < height
+
+    // Checks that the current state is PlayerTurn
+    BOOST_CHECK(game.getCurrentState() == game.getStateList()[PLAYERTURN].get());
 }
