@@ -107,6 +107,16 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         return teamB;
     }
 
+    Team &BloodBowlGame::getTeamA() {
+        return teamA;
+    }
+
+    Team &BloodBowlGame::getTeamB() {
+        return teamB;
+    }
+
+
+
     Team* BloodBowlGame::getCurrentTeam() const {
         return currentTeam;
     }
@@ -153,9 +163,9 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
                 unsigned long teamSize = getCurrentTeam()->getPlayableCharacter().size();  //PlayableCharacters pour éviter de donner le ballon à un jour sur le banc
                 unsigned long i = rand()%teamSize;
 
-                ballPosition = getCurrentTeam()->getPlayableCharacter()[i].getPosition();
+                ballPosition = getCurrentTeam()->getPlayableCharacter()[i]->getPosition();
                 ballIsHold = true;
-                getCurrentTeam()->getPlayableCharacter()[i].setHasBall(true);
+                getCurrentTeam()->getPlayableCharacter()[i]->setHasBall(true);
             }
 
             else if (currentState==stateList.at(PLAYERTURN).get())

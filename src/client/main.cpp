@@ -145,8 +145,8 @@ int main(int argc, char* argv[]) {
 
     // Test character status changes
     cout << "\n=== TESTING CHARACTER STATUS CHANGES ===\n";
-    auto characters = teamA.getCharacters();
-    if (characters.size() > 0) {
+    auto& characters = teamA.getCharacters();
+    if (!characters.empty()) {
         cout << "Character example: " << characters[0] << "\n";
         // This shows the improved status display you implemented
     }

@@ -7,7 +7,13 @@ namespace state {
         : teamId(teamId), name(std::move(name)), rerolls(rerolls), score(0) {
     }
 
-    std::vector<Character> Team::getCharacters() const {
+    // Return a non-const reference so callers can modify characters in-place
+    std::vector<Character>& Team::getCharacters() {
+        return characters;
+    }
+
+    // Const overload for read-only access
+    const std::vector<Character>& Team::getCharacters() const {
         return characters;
     }
 
@@ -15,16 +21,28 @@ namespace state {
         return score;
     }
 
-    std::vector<Character> Team::getPlayableCharacter() const {
-        std::vector<Character> playableCharacters;
+    std::vector<Character*> Team::getPlayableCharacter() {
+        std::vector<Character*> playableChars;
         for (auto & character : characters)
         {
             if (character.getStatus() == playable)
             {
-                playableCharacters.push_back(character);
+                playableChars.push_back(&character);
             }
         }
-        return playableCharacters;
+        return playableChars;
+    }
+
+    std::vector<const Character*> Team::getPlayableCharacter() const {
+        std::vector<const Character*> playableChars;
+        for (const auto & character : characters)
+        {
+            if (character.getStatus() == playable)
+            {
+                playableChars.push_back(&character);
+            }
+        }
+        return playableChars;
     }
 
     int Team::getTeamId() const{

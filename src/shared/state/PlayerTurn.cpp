@@ -14,7 +14,6 @@ namespace state {
         endTurn = false;
         teamId = game->getCurrentTeam()->getTeamId();
 
-        availableCharacters = game->getCurrentTeam()->getPlayableCharacter();
     }
 
     void PlayerTurn::update() {
@@ -86,7 +85,8 @@ namespace state {
     }
 
     void PlayerTurn::restoreCharactersStatus() {
-        std::vector<Character> characters = game->getCurrentTeam()->getCharacters();
+        // Get a reference to the team's characters to avoid copying
+        std::vector<Character>& characters = game->getCurrentTeam()->getCharacters();
         for (Character & character : characters)
         {
             if (character.getStatus() == played)
@@ -103,9 +103,9 @@ namespace state {
 
     void PlayerTurn::switchTeam() {
         if (game->getCurrentTeam()->getTeamId() == game->getTeamA().getTeamId()) {
-            game->setCurrentTeam(const_cast<Team*>(&game->getTeamB()));
+            game->setCurrentTeam(&game->getTeamB());
         } else {
-            game->setCurrentTeam(const_cast<Team*>(&game->getTeamA()));
+            game->setCurrentTeam(&game->getTeamA());
         }
     }
 
