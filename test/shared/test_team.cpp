@@ -24,18 +24,17 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     BOOST_CHECK_EQUAL(size(teamA.getCharacters()), 0);
     Character human("Player 1", "human", 6, 3, 3, 8);
     human.setPosition({1,1});
-    teamA.addCharacter(human);
+    teamA.addCharacter(std::make_unique<Character>(human));
     BOOST_CHECK_EQUAL(size(teamA.getCharacters()), 1);
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0].getName(),"Player 1");
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0].getType(),"human");
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0].getMovement(),6);
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0].getStrength(),3);
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0].getAgility(),3);
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0].getArmor(),8);
+    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getName(),"Player 1");
+    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getType(),"human");
+    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getMovement(),6);
+    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getStrength(),3);
+    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getAgility(),3);
+    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getArmor(),8);
 
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),0);
-    teamA.getCharacters()[0].setStatus(playable);
-    human.setStatus(playable);
+    teamA.getCharacters().back()->setStatus(playable);
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),1);
 
     std::ostringstream oss;
