@@ -1,4 +1,7 @@
 #include "BloodBowlGame.h"
+
+#include <filesystem>
+
 #include "Setup.h"
 #include "Kickoff.h"
 #include "PlayerTurn.h"
@@ -11,55 +14,75 @@
 
 namespace  state {
 
-static void placeFromTeam(const Team& team, char mark, std::vector<std::string> &grid, int w, int h) {
-    for (const Character &p : team.getCharacters()) {
-        auto pos = p.getPosition(); // expected: pair<int,int>
-        if (pos.first >= 0 && pos.first < w && pos.second >= 0 && pos.second < h) {
-            char &cell = grid[pos.second][pos.first];
-            if (cell == '.' || cell == 'O') cell = mark;
-            else cell = '*'; // conflict marker
+    const char* stateToString(const BloodBowlGame& game)  {
+        if (game.getCurrentState() == game.getStateList().at(SETUP).get()) {
+            return "Setup";
+        } else if (game.getCurrentState() == game.getStateList().at(KICKOFF).get()) {
+            return "Kickoff";
+        } else if (game.getCurrentState() == game.getStateList().at(PLAYERTURN).get()) {
+            return "PlayerTurn";
+        } else if (game.getCurrentState() == game.getStateList().at(HALFTIME).get()) {
+            return "HalfTime";
+        } else if (game.getCurrentState() == game.getStateList().at(ENDGAME).get()) {
+            return "EndGame";
+        } else {
+            return "Unknown State";
         }
     }
-}
 
-static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
-    int w = game.getWidth();
-    int h = game.getHeight();
-    if (w <= 0 || h <= 0) {
-        os << "(board not initialized)\n";
-        return;
-    }
-
-    std::vector<std::string> grid(h, std::string(w, '.'));
-
-    auto ball = game.getBallPosition();
-    if (ball.first >= 0 && ball.first < w && ball.second >= 0 && ball.second < h) {
-        grid[ball.second][ball.first] = 'O';
-    }
-
-    placeFromTeam(game.getTeamA(), 'A', grid, w, h);
-    placeFromTeam(game.getTeamB(), 'B', grid, w, h);
-
-    // print column indices
-    os << "\nBoard (" << w << "x" << h << "):\n";
-    os << "     ";
-    for (int x = 0; x < w; ++x) os << (x % 10) << ' ';
-    os << '\n';
-
-    for (int y = h - 1; y >= 0; --y) {
-        os << std::setw(2) << y << " | ";
-        for (int x = 0; x < w; ++x) {
-            os << grid[y][x];
-            if (x < w - 1) os << ' ';
+    static void placeFromTeam(const Team& team, char mark, std::vector<std::string> &grid, int w, int h) {
+        for (const auto& pptr : team.getCharacters()) {
+            if (pptr != nullptr) {
+                const Character& p = *pptr;
+                auto pos = p.getPosition(); // expected: pair<int,int>
+                if (pos.first >= 0 && pos.first < w && pos.second >= 0 && pos.second < h) {
+                    char &cell = grid[pos.second][pos.first];
+                    if (cell == '.' || cell == 'O') cell = mark;
+                    else cell = '*'; // conflict marker
+                }
+            }
         }
-        os << " |\n";
     }
-}
 
-    BloodBowlGame::BloodBowlGame(Team teamA, Team teamB)
-        : teamA(std::move(teamA)),
-          teamB(std::move(teamB)),
-          turnCounter(0) {
+    static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
+        int w = game.getWidth();
+        int h = game.getHeight();
+        if (w <= 0 || h <= 0) {
+            os << "(board not initialized)\n";
+            return;
+        }
+
+        std::vector<std::string> grid(h, std::string(w, '.'));
+
+        auto ball = game.getBallPosition();
+        if (ball.first >= 0 && ball.first < w && ball.second >= 0 && ball.second < h) {
+            grid[ball.second][ball.first] = 'O';
+        }
+
+        placeFromTeam(game.getTeamA(), 'A', grid, w, h);
+        placeFromTeam(game.getTeamB(), 'B', grid, w, h);
+
+        // print column indices
+        os << "\nBoard (" << w << "x" << h << "):\n";
+        os << "     ";
+        for (int x = 0; x < w; ++x) os << (x % 10) << ' ';
+        os << '\n';
+
+        for (int y = h - 1; y >= 0; --y) {
+            os << std::setw(2) << y << " | ";
+            for (int x = 0; x < w; ++x) {
+                os << grid[y][x];
+                if (x < w - 1) os << ' ';
+            }
+            os << " |\n";
+        }
+    }
+
+    BloodBowlGame::BloodBowlGame(Team& teamA, Team& teamB)
+        : teamA(teamA),
+          teamB(teamB),
+    currentTeam(&teamA),
+    turnCounter(0) { // Initialize currentTeam with a const reference
         stateList.push_back(std::make_unique<Setup>(this));
         stateList.push_back(std::make_unique<Kickoff>(this));
         stateList.push_back(std::make_unique<PlayerTurn>(this));
@@ -69,7 +92,6 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         width = 26;
         height = 15;
         ballIsHold = false;
-        currentTeam = &this->teamA; // Par défaut, pointer sur teamA
         nb_repetition = 0;
         nb_repetition_max = 3;
     }
@@ -86,51 +108,28 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         return stateList;
     }
 
-    Team* BloodBowlGame::coinToss() {
+    Team* BloodBowlGame::coinToss() const {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(0, 1);
         int toss = dis(gen);
-        if (toss == 0) {
-            return &this->teamA;
-        } else {
-            return &this->teamB;
-        }
+        return (toss == 0) ? &teamA : &teamB;
     }
 
-    // Const-qualified getters
-    const Team& BloodBowlGame::getTeamA() const {
+    Team& BloodBowlGame::getTeamA() const {
         return teamA;
     }
 
-    const Team& BloodBowlGame::getTeamB() const {
+    Team& BloodBowlGame::getTeamB() const {
         return teamB;
     }
-
-    Team &BloodBowlGame::getTeamA() {
-        return teamA;
-    }
-
-    Team &BloodBowlGame::getTeamB() {
-        return teamB;
-    }
-
-
 
     Team* BloodBowlGame::getCurrentTeam() const {
         return currentTeam;
     }
 
-    void BloodBowlGame::setTurnCounter(int newTurnCount) {
-        turnCounter = newTurnCount;
-    }
-
     void BloodBowlGame::setCurrentTeam(Team* team) {
         currentTeam = team;
-    }
-
-    std::pair<int,int> BloodBowlGame::getBallPosition() const {
-        return ballPosition;
     }
 
     int BloodBowlGame::getWidth() const {
@@ -141,136 +140,31 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         return height;
     }
 
-    void BloodBowlGame::setBallPosition(std::pair<int,int> position)
-    {
-        if (position.first>=0 && position.first<=25 && position.second>=0 && position.second<=14)
-        {
+    void BloodBowlGame::setBallPosition(std::pair<int, int> position) {
+        if (position.first >= 0 && position.first <= 25 && position.second >= 0 && position.second <= 14) {
             ballPosition = position;
-            setNbRepetition(getNbRepetition() + 1);
-        }
-        else
-        {
-            if (currentState==stateList.at(KICKOFF).get() || (currentState==stateList.at(PLAYERTURN).get() && getNbRepetition()==getNbRepetitionMax()))
-            {
-                if (currentTeam == &this->teamA)
-                {
-                    currentTeam = &this->teamB;
-                }
-                else
-                {
-                    currentTeam = &this->teamA;
-                }
-                unsigned long teamSize = getCurrentTeam()->getPlayableCharacter().size();  //PlayableCharacters pour éviter de donner le ballon à un jour sur le banc
-                unsigned long i = rand()%teamSize;
+        } else {
+            if (currentState == stateList.at(KICKOFF).get() || (currentState == stateList.at(PLAYERTURN).get() && getNbRepetition() == getNbRepetitionMax())) {
+                currentTeam = (currentTeam == &teamA) ? &teamB : &teamA;
+                unsigned long teamSize = getCurrentTeam()->getPlayableCharacter().size();
+                std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_int_distribution<unsigned long> dis(0, teamSize - 1);
+                unsigned long i = dis(gen);
 
                 ballPosition = getCurrentTeam()->getPlayableCharacter()[i]->getPosition();
                 ballIsHold = true;
                 getCurrentTeam()->getPlayableCharacter()[i]->setHasBall(true);
-            }
-
-            else if (currentState==stateList.at(PLAYERTURN).get())
-            {
-                std::pair<int,int> newPosition;
-                if (position.second>=height)
-                {
-                    newPosition.second = height -1;
-                }
-                if (position.second < 0)
-                {
-                    newPosition.second = 0;
-                }
-                if (position.first>=width)
-                {
-                    newPosition.first = width -1;
-                }
-                if (position.first < 0)
-                {
-                    newPosition.first = 0;
-                }
-
-                int direction = rand()%3;
-                int rebounds = rand()%6 + rand()%6;
-                if (newPosition.second == 0)
-                {
-                    switch (direction)
-                    {
-                        case 0: //North-West
-                            newPosition.first -= rebounds;
-                            newPosition.second += rebounds;
-                            break;
-                        case 1: // North
-                            newPosition.second += rebounds;
-                            break;
-                        case 2: //North-East
-                            newPosition.first += rebounds;
-                            newPosition.second += rebounds;
-                            break;
-                        default: ;
-                    }
-                }
-                else if (newPosition.first == 0)
-                {
-                    switch (direction)
-                    {
-                        case 0: // North-East
-                            newPosition.first += rebounds;
-                            newPosition.second += rebounds;
-                            break;
-                        case 1: // East
-                            newPosition.first += rebounds;
-                            break;
-                        case 2: // South-East
-                            newPosition.first += rebounds;
-                            newPosition.second -= rebounds;
-                            break;
-                        default: ;
-                    }
-                }
-                else if (newPosition.first == 14)
-                {
-                    switch (direction)
-                    {
-                        case 0: // South-East
-                            newPosition.first += rebounds;
-                            newPosition.second -= rebounds;
-                            break;
-                        case 1: // South
-                            newPosition.second += rebounds;
-                            break;
-                        case 2: // South-West
-                            newPosition.first -= rebounds;
-                            newPosition.second -= rebounds;
-                            break;
-                    default: ;
-                        newPosition.first -= rebounds;
-                    }
-                }
-                else if (newPosition.first == 25)
-                {
-                    switch (direction)
-                    {
-                        case 0: // South-West
-                            newPosition.first -= rebounds;
-                            newPosition.second -= rebounds;
-                            break;
-                        case 1: // West
-                            newPosition.first -= rebounds;
-                            break;
-                        case 2: // North-West
-                            newPosition.first -= rebounds;
-                            newPosition.second += rebounds;
-                            break;
-                    default: ;
-                    }
-                }
-                nb_repetition += 1;
-                setBallPosition(newPosition);
             }
         }
     }
 
     int BloodBowlGame::getTurnCounter() const {
         return turnCounter;
+    }
+
+    void BloodBowlGame::setTurnCounter(int newTurnCount) {
+        turnCounter = newTurnCount;
     }
 
     int BloodBowlGame::getNbRepetition() const
@@ -288,12 +182,13 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
         nb_repetition = nb_repetitionValue;
     }
 
-
-
+    std::pair<int, int> BloodBowlGame::getBallPosition() const {
+        return ballPosition;
+    }
 
     std::ostream& operator<<(std::ostream& os, const BloodBowlGame& game) {
         os << "\n=== GAME STATE ===\n";
-        os << "Current State: " << (game.getCurrentState() ? typeid(*game.getCurrentState()).name() : "None") << "\n";
+        os << "Current State: " << stateToString(game)<< "\n";
         os << "Turn Counter: " << game.getTurnCounter() << "\n";
         os << "Current Team: ";
         if (game.getCurrentTeam())

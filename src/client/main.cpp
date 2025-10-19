@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <memory>
 
 // The following lines are here to check that SFML is installed and working
 #include <SFML/Graphics.hpp>
@@ -22,41 +23,78 @@ int main(int argc, char* argv[]) {
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
-    //Test fonctionnement des méthodes score
-    teamB.setScore(45);
-    cout << "L'équipe B à un avantage initial de " << teamB.getScore() << " points." << endl;
+    teamA.addCharacter(std::make_unique<Character>("Ligne1", "Human", 6, 3, 3, 8));
+    teamA.getCharacters().back()->setPosition({12, 6});
+    teamA.getCharacters().back()->setStatus(playable);
 
-    for (int i = 0; i < 11; i++) {
-        Character human("Player" + to_string(i+1), "Human", 6, 3, 3, 8);
-        if (i < 3) {
-            human.setPosition({12, 4+i}); 
-            human.setStatus(playable);
-        } else if (i < 5) {
-            human.setPosition({11, 4+i});
-            human.setStatus(playable);
-        } else if (i < 9) {
-            human.setPosition({8, 3+i});
-            human.setStatus(playable);
-        } else {
-            human.setPosition({-1, -1});
-            human.setStatus(bench);
+    teamA.addCharacter(std::make_unique<Character>("Ligne2", "Human", 6, 3, 3, 8));
+    teamA.getCharacters().back()->setPosition({12, 7});
+    teamA.getCharacters().back()->setStatus(playable);
+
+    teamA.addCharacter(std::make_unique<Character>("Ligne3", "Human", 6, 3, 3, 8));
+    teamA.getCharacters().back()->setPosition({12, 8});
+    teamA.getCharacters().back()->setStatus(playable);
+
+    teamA.addCharacter(std::make_unique<Character>("Bottom1", "Human", 6, 3, 3, 8));
+    teamA.getCharacters().back()->setPosition({10, 2});
+    teamA.getCharacters().back()->setStatus(playable);
+
+    teamA.addCharacter(std::make_unique<Character>("Bottom2", "Human", 6, 3, 3, 8));
+    teamA.getCharacters().back()->setPosition({10, 3});
+    teamA.getCharacters().back()->setStatus(playable);
+
+    teamA.addCharacter(std::make_unique<Character>("Top1", "Human", 6, 3, 3, 8));
+    teamA.getCharacters().back()->setPosition({10, 12});
+    teamA.getCharacters().back()->setStatus(playable);
+
+    teamA.addCharacter(std::make_unique<Character>("Top2", "Human", 6, 3, 3, 8));
+    teamA.getCharacters().back()->setPosition({10, 13});
+    teamA.getCharacters().back()->setStatus(playable);
+
+    for (int i = 0; i < 5; i++) {
+        if (i != 2) {
+            teamA.addCharacter(std::make_unique<Character>("Behind", "Human", 6, 3, 3, 8));
+            teamA.getCharacters().back()->setPosition({5, 5+i});
+            teamA.getCharacters().back()->setStatus(playable);
         }
-        teamA.addCharacter(human);
+
     }
 
-    for (int i = 0; i < 11; i++) {
-        Character orc("Orc" + to_string(i+1), "Orc", 5, 3, 2, 9);
-        if (i < 3) {
-            orc.setPosition({13, 2+i});
-            orc.setStatus(playable);
-        } else if (i < 9) {
-            orc.setPosition({15, 3+i});
-            orc.setStatus(playable);
-        } else {
-            orc.setPosition({-1, -1});
-            orc.setStatus(bench);
+
+    teamB.addCharacter(std::make_unique<Character>("Ligne1", "orc", 6, 3, 3, 8));
+    teamB.getCharacters().back()->setPosition({13, 6});
+    teamB.getCharacters().back()->setStatus(playable);
+
+    teamB.addCharacter(std::make_unique<Character>("Ligne2", "orc", 6, 3, 3, 8));
+    teamB.getCharacters().back()->setPosition({13, 7});
+    teamB.getCharacters().back()->setStatus(playable);
+
+    teamB.addCharacter(std::make_unique<Character>("Ligne3", "orc", 6, 3, 3, 8));
+    teamB.getCharacters().back()->setPosition({13, 8});
+    teamB.getCharacters().back()->setStatus(playable);
+
+    teamB.addCharacter(std::make_unique<Character>("Bottom1", "orc", 6, 3, 3, 8));
+    teamB.getCharacters().back()->setPosition({13, 2});
+    teamB.getCharacters().back()->setStatus(playable);
+
+    teamB.addCharacter(std::make_unique<Character>("Bottom2", "orc", 6, 3, 3, 8));
+    teamB.getCharacters().back()->setPosition({13, 3});
+    teamB.getCharacters().back()->setStatus(playable);
+
+    teamB.addCharacter(std::make_unique<Character>("Top1", "orc", 6, 3, 3, 8));
+    teamB.getCharacters().back()->setPosition({15, 12});
+    teamB.getCharacters().back()->setStatus(playable);
+
+    teamB.addCharacter(std::make_unique<Character>("Top2", "orc", 6, 3, 3, 8));
+    teamB.getCharacters().back()->setPosition({15, 13});
+    teamB.getCharacters().back()->setStatus(playable);
+
+    for (int i = 0; i < 5; i++) {
+        if (i != 2) {
+            teamB.addCharacter(std::make_unique<Character>("Behind", "orc", 6, 3, 3, 8));
+            teamB.getCharacters().back()->setPosition({20, 5+i});
+            teamB.getCharacters().back()->setStatus(playable);
         }
-        teamB.addCharacter(orc);
     }
 
     // Initialize game
@@ -115,8 +153,8 @@ int main(int argc, char* argv[]) {
                 cout << "Simulating TOUCHDOWN for team " << game.getCurrentTeam()->getTeamId() << "!\n";
                 playerTurnState->setTouchDown(true);
             } else {
-                cout << "Simulating turn end for team " << game.getCurrentTeam()->getTeamId() << "\n";
-                playerTurnState->setEndTurn(true);
+                cout << "Simulating TurnOver for team " << game.getCurrentTeam()->getTeamId() << "\n";
+                playerTurnState->setTurnOver(true);
             }
         }
         else if (currentState == game.getStateList().at(HALFTIME).get()) {
@@ -147,7 +185,7 @@ int main(int argc, char* argv[]) {
     cout << "\n=== TESTING CHARACTER STATUS CHANGES ===\n";
     auto& characters = teamA.getCharacters();
     if (!characters.empty()) {
-        cout << "Character example: " << characters[0] << "\n";
+        cout << "Character example: " << *characters[0] << "\n";
         // This shows the improved status display you implemented
     }
 
