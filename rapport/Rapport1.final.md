@@ -58,9 +58,6 @@ Elle stocke également :
 - Une liste de tous les états disponibles (stateList).
 
 BloodBowlGame gère les transitions entre états grâce à la méthode setCurrentState(). Elle agit donc comme le cœur du patron de conception State : au lieu d’utiliser de longs blocs de conditions, elle délègue le comportement à l’état actuellement actif. Chaque appel à update() ou apply() est transmis à currentState, ce qui rend le système flexible, extensible et conforme aux principes de l’orientation objet.
-### 2.3 Conception logicielle: extension pour le rendu
 
-### 2.4 Conception logicielle: extension pour le moteur de jeu
-
-### 2.5 Ressources
+### 2.3 Ressources
 ![Diagramme des états](res/diaState.png)
