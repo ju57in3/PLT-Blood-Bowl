@@ -13,6 +13,17 @@ BOOST_AUTO_TEST_CASE(TestKickoff)
     Team teamB(2, "Orcs", 2);
     BloodBowlGame game(teamA, teamB);
 
+    // Adding characters for each team
+    Character cA("H1", "Human", 6, 3, 3, 8);
+    cA.setStatus(playable);
+    cA.setPosition({5,5});
+    teamA.addCharacter(cA);
+
+    Character cB("O1", "Orc", 5, 4, 2, 9);
+    cB.setStatus(playable);
+    cB.setPosition({20,5});
+    teamB.addCharacter(cB);
+
     // Creation of Kickoff state
     Kickoff kickoff(&game);
 
