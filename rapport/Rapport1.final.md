@@ -37,6 +37,7 @@ Il marque une pause entre deux mi-temps et réinitialise certains paramètres (s
 Il signale la fin du match et affiche le score final. Il peut également proposer de relancer une partie.
 
 ### 2.2 Conception logicielle
+
 	
 ### 2.3 Conception logicielle: extension pour le rendu
 

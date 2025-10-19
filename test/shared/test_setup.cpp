@@ -21,6 +21,7 @@ BOOST_AUTO_TEST_CASE(TestSetup)
         teamA.addCharacter(c);
     }
 
+    // Initializing game with two different teams
     BloodBowlGame game(teamA, teamB);
     Setup setup(&game);
 
