@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(TestSetup)
     BOOST_CHECK(setup.isValidSetup(teamA));
     BOOST_CHECK_EQUAL(setup.nbCharacterOnBoard(teamA), 11);
     BOOST_CHECK_EQUAL(setup.nbCharacterOnLine(teamA), 3);
-    BOOST_CHECK_EQUAL(setup.nbCharacterOnTop(teamA), 4);
+    BOOST_CHECK_EQUAL(setup.nbCharacterOnTop(teamA), 2);
     BOOST_CHECK_EQUAL(setup.nbCharacterOnBottom(teamA), 0);
 
     setup.endSetup();
