@@ -61,3 +61,4 @@ BloodBowlGame gère les transitions entre états grâce à la méthode setCurren
 
 ### 2.3 Ressources
 ![Diagramme des états](res/diaState.png)
+Le diagramme des états "diaState.png) se trouve dans le dossier "res" dans la branche "StateMachine".
