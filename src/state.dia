@@ -4026,16 +4026,16 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O9">
       <dia:attribute name="obj_pos">
-        <dia:point val="-47.1634,-42.5043"/>
+        <dia:point val="-50.8277,-42.7599"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-47.2134,-42.5543;-30.0584,-31.0543"/>
+        <dia:rectangle val="-50.8777,-42.8099;-31.4127,-31.3099"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-47.1634,-42.5043"/>
+        <dia:point val="-50.8277,-42.7599"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="17.055"/>
+        <dia:real val="19.365000000000002"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="11.4"/>
@@ -4257,7 +4257,7 @@
             <dia:enum val="2"/>
           </dia:attribute>
           <dia:attribute name="query">
-            <dia:boolean val="false"/>
+            <dia:boolean val="true"/>
           </dia:attribute>
           <dia:attribute name="class_scope">
             <dia:boolean val="false"/>
@@ -4305,7 +4305,7 @@
             <dia:enum val="2"/>
           </dia:attribute>
           <dia:attribute name="query">
-            <dia:boolean val="false"/>
+            <dia:boolean val="true"/>
           </dia:attribute>
           <dia:attribute name="class_scope">
             <dia:boolean val="false"/>
@@ -4353,7 +4353,7 @@
             <dia:enum val="2"/>
           </dia:attribute>
           <dia:attribute name="query">
-            <dia:boolean val="false"/>
+            <dia:boolean val="true"/>
           </dia:attribute>
           <dia:attribute name="class_scope">
             <dia:boolean val="false"/>
@@ -4401,7 +4401,7 @@
             <dia:enum val="2"/>
           </dia:attribute>
           <dia:attribute name="query">
-            <dia:boolean val="false"/>
+            <dia:boolean val="true"/>
           </dia:attribute>
           <dia:attribute name="class_scope">
             <dia:boolean val="false"/>
@@ -4449,7 +4449,7 @@
             <dia:enum val="2"/>
           </dia:attribute>
           <dia:attribute name="query">
-            <dia:boolean val="false"/>
+            <dia:boolean val="true"/>
           </dia:attribute>
           <dia:attribute name="class_scope">
             <dia:boolean val="false"/>
@@ -6279,16 +6279,16 @@
         <dia:point val="-9.656,-26.0203"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-38.6859,-31.1039;-8.806,-25.9703"/>
+        <dia:rectangle val="-41.1952,-31.3596;-8.806,-25.9703"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="-9.656,-26.0203"/>
-        <dia:point val="-9.656,-28.9371"/>
-        <dia:point val="-38.6359,-28.9371"/>
-        <dia:point val="-38.6359,-31.0539"/>
+        <dia:point val="-9.656,-29.0649"/>
+        <dia:point val="-41.1452,-29.0649"/>
+        <dia:point val="-41.1452,-31.3096"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>

@@ -11,7 +11,7 @@ namespace state {
     Setup::Setup(BloodBowlGame *game) : AbstractState(game) {
     }
 
-    int Setup::nbCharacterOnBoard(const Team& team) {
+    int Setup::nbCharacterOnBoard(const Team& team) const{
         int count = 0;
         for (const auto& pptr : team.getCharacters()) {
             if (pptr != nullptr) {
@@ -24,7 +24,7 @@ namespace state {
         return count;
     }
 
-    int Setup::nbCharacterOnLine(const Team& team) {
+    int Setup::nbCharacterOnLine(const Team& team) const {
 
         bool isTeamA = (team.getTeamId() == game->getTeamA().getTeamId());
         int frontlineCol;
@@ -48,7 +48,7 @@ namespace state {
         return count;
     }
 
-    int Setup::nbCharacterOnTop(const Team& team) {
+    int Setup::nbCharacterOnTop(const Team& team) const{
         int height = game->getHeight();
         int limitTopRow = height - 4; // (height-1) - 4 => les 4 lignes du haut du terrain  (Attention height est le nombre de lignes!!)
 
@@ -64,7 +64,7 @@ namespace state {
         return count;
     }
 
-    int Setup::nbCharacterOnBottom(const Team& team) {
+    int Setup::nbCharacterOnBottom(const Team& team) const{
         int limitBottomRow = 3;
 
         int count = 0;
@@ -80,7 +80,7 @@ namespace state {
     }
 
 
-    bool Setup::isValidSetup(const Team& team) {
+    bool Setup::isValidSetup(const Team& team) const {
         int onBoard = nbCharacterOnBoard(team);
         if (onBoard > 11) return false;
 
