@@ -33,11 +33,12 @@ namespace state {
 
         int count = 0;
         for (const Character& piece : team.getCharacters()) {
-            if (piece.getStatus() != playable) continue;
             auto pos = piece.getPosition();
-            if (pos == HORS_TABLEAU) continue;
-            // pos.first is row
-            if (pos.first == frontlineCol) count++;
+            if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU && pos.first == frontlineCol) {
+                if (pos.second >= 4 && pos.second <= (game->getHeight() - 4)) {
+                    count++;
+                }
+            }
         }
         return count;
     }

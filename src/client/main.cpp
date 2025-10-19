@@ -22,41 +22,86 @@ int main(int argc, char* argv[]) {
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
-    //Test fonctionnement des méthodes score
-    teamB.setScore(45);
-    cout << "L'équipe B à un avantage initial de " << teamB.getScore() << " points." << endl;
+    Character human1("Ligne1", "Human", 6, 3, 3, 8);
+    human1.setPosition({12, 6});
+    human1.setStatus(playable);
+    teamA.addCharacter(human1);
+    Character human2("Ligne2", "Human", 6, 3, 3, 8);
+    human2.setPosition({12, 7});
+    human2.setStatus(playable);
+    teamA.addCharacter(human2);
+    Character human3("Ligne3", "Human", 6, 3, 3, 8);
+    human3.setPosition({12, 8});
+    human3.setStatus(playable);
+    teamA.addCharacter(human3);
 
-    for (int i = 0; i < 11; i++) {
-        Character human("Player" + to_string(i+1), "Human", 6, 3, 3, 8);
-        if (i < 3) {
-            human.setPosition({12, 4+i}); 
+    Character human4("Bottom1", "Human", 6, 3, 3, 8);
+    human4.setPosition({10, 2});
+    human4.setStatus(playable);
+    teamA.addCharacter(human4);
+    Character human5("Bottom2", "Human", 6, 3, 3, 8);
+    human5.setPosition({10, 3});
+    human5.setStatus(playable);
+    teamA.addCharacter(human5);
+
+    Character human6("Top1", "Human", 6, 3, 3, 8);
+    human6.setPosition({10, 12});
+    human6.setStatus(playable);
+    teamA.addCharacter(human6);
+    Character human7("Top2", "Human", 6, 3, 3, 8);
+    human7.setPosition({10, 13});
+    human7.setStatus(playable);
+    teamA.addCharacter(human7);
+
+    for (int i = 0; i < 5; i++) {
+        if (i != 2) {
+            Character human("Behind", "Human", 6, 3, 3, 8);
+            human.setPosition({5, 5+i});
             human.setStatus(playable);
-        } else if (i < 5) {
-            human.setPosition({11, 4+i});
-            human.setStatus(playable);
-        } else if (i < 9) {
-            human.setPosition({8, 3+i});
-            human.setStatus(playable);
-        } else {
-            human.setPosition({-1, -1});
-            human.setStatus(bench);
+            teamA.addCharacter(human);
         }
-        teamA.addCharacter(human);
+
     }
 
-    for (int i = 0; i < 11; i++) {
-        Character orc("Orc" + to_string(i+1), "Orc", 5, 3, 2, 9);
-        if (i < 3) {
-            orc.setPosition({13, 2+i});
+
+    Character orc1("Ligne1", "orc", 6, 3, 3, 8);
+    orc1.setPosition({13, 6});
+    orc1.setStatus(playable);
+    teamB.addCharacter(orc1);
+    Character orc2("Ligne2", "orc", 6, 3, 3, 8);
+    orc2.setPosition({13, 7});
+    orc2.setStatus(playable);
+    teamB.addCharacter(orc2);
+    Character orc3("Ligne3", "orc", 6, 3, 3, 8);
+    orc3.setPosition({13, 8});
+    orc3.setStatus(playable);
+    teamB.addCharacter(orc3);
+
+    Character orc4("Bottom1", "orc", 6, 3, 3, 8);
+    orc4.setPosition({13, 2});
+    orc4.setStatus(playable);
+    teamB.addCharacter(orc4);
+    Character orc5("Bottom2", "orc", 6, 3, 3, 8);
+    orc5.setPosition({13, 3});
+    orc5.setStatus(playable);
+    teamB.addCharacter(orc5);
+
+    Character orc6("Top1", "orc", 6, 3, 3, 8);
+    orc6.setPosition({15, 12});
+    orc6.setStatus(playable);
+    teamB.addCharacter(orc6);
+    Character orc7("Top2", "orc", 6, 3, 3, 8);
+    orc7.setPosition({15, 13});
+    orc7.setStatus(playable);
+    teamB.addCharacter(orc7);
+
+    for (int i = 0; i < 5; i++) {
+        if (i != 2) {
+            Character orc("Behind", "orc", 6, 3, 3, 8);
+            orc.setPosition({20, 5+i});
             orc.setStatus(playable);
-        } else if (i < 9) {
-            orc.setPosition({15, 3+i});
-            orc.setStatus(playable);
-        } else {
-            orc.setPosition({-1, -1});
-            orc.setStatus(bench);
+            teamB.addCharacter(orc);
         }
-        teamB.addCharacter(orc);
     }
 
     // Initialize game
@@ -115,8 +160,8 @@ int main(int argc, char* argv[]) {
                 cout << "Simulating TOUCHDOWN for team " << game.getCurrentTeam()->getTeamId() << "!\n";
                 playerTurnState->setTouchDown(true);
             } else {
-                cout << "Simulating turn end for team " << game.getCurrentTeam()->getTeamId() << "\n";
-                playerTurnState->setEndTurn(true);
+                cout << "Simulating TurnOver for team " << game.getCurrentTeam()->getTeamId() << "\n";
+                playerTurnState->setTurnOver(true);
             }
         }
         else if (currentState == game.getStateList().at(HALFTIME).get()) {

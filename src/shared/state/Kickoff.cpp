@@ -10,14 +10,13 @@ namespace state {
 
     void Kickoff::update()
     {
-        int side;
+        int targetX;
         if (game->getCurrentTeam()->getTeamId() == game->getTeamA().getTeamId()) {
-            side = game->getWidth()/2;
+            targetX = (rand() % 12) +1;
         }else {
-            side = 0;
+            targetX = (rand() % 12) +12;
         }
 
-        int targetX = rand() % (game->getWidth() / 2) + (side);
         int targetY = rand() % game->getHeight();
         std::pair<int,int> targetSquare;
         targetSquare.first = targetX;

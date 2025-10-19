@@ -1,4 +1,7 @@
 #include "BloodBowlGame.h"
+
+#include <filesystem>
+
 #include "Setup.h"
 #include "Kickoff.h"
 #include "PlayerTurn.h"
@@ -11,50 +14,66 @@
 
 namespace  state {
 
-static void placeFromTeam(const Team& team, char mark, std::vector<std::string> &grid, int w, int h) {
-    for (const Character &p : team.getCharacters()) {
-        auto pos = p.getPosition(); // expected: pair<int,int>
-        if (pos.first >= 0 && pos.first < w && pos.second >= 0 && pos.second < h) {
-            char &cell = grid[pos.second][pos.first];
-            if (cell == '.' || cell == 'O') cell = mark;
-            else cell = '*'; // conflict marker
+    const char* stateToString(const BloodBowlGame& game)  {
+        if (game.getCurrentState() == game.getStateList().at(SETUP).get()) {
+            return "Setup";
+        } else if (game.getCurrentState() == game.getStateList().at(KICKOFF).get()) {
+            return "Kickoff";
+        } else if (game.getCurrentState() == game.getStateList().at(PLAYERTURN).get()) {
+            return "PlayerTurn";
+        } else if (game.getCurrentState() == game.getStateList().at(HALFTIME).get()) {
+            return "HalfTime";
+        } else if (game.getCurrentState() == game.getStateList().at(ENDGAME).get()) {
+            return "EndGame";
+        } else {
+            return "Unknown State";
         }
     }
-}
 
-static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
-    int w = game.getWidth();
-    int h = game.getHeight();
-    if (w <= 0 || h <= 0) {
-        os << "(board not initialized)\n";
-        return;
-    }
-
-    std::vector<std::string> grid(h, std::string(w, '.'));
-
-    auto ball = game.getBallPosition();
-    if (ball.first >= 0 && ball.first < w && ball.second >= 0 && ball.second < h) {
-        grid[ball.second][ball.first] = 'O';
-    }
-
-    placeFromTeam(game.getTeamA(), 'A', grid, w, h);
-    placeFromTeam(game.getTeamB(), 'B', grid, w, h);
-
-    // print column indices
-    os << "\nBoard (" << w << "x" << h << "):\n";
-    os << "     ";
-    for (int x = 0; x < w; ++x) os << (x % 10) << ' ';
-    os << '\n';
-
-    for (int y = h - 1; y >= 0; --y) {
-        os << std::setw(2) << y << " | ";
-        for (int x = 0; x < w; ++x) {
-            os << grid[y][x];
-            if (x < w - 1) os << ' ';
+    static void placeFromTeam(const Team& team, char mark, std::vector<std::string> &grid, int w, int h) {
+        for (const Character &p : team.getCharacters()) {
+            auto pos = p.getPosition(); // expected: pair<int,int>
+            if (pos.first >= 0 && pos.first < w && pos.second >= 0 && pos.second < h) {
+                char &cell = grid[pos.second][pos.first];
+                if (cell == '.' || cell == 'O') cell = mark;
+                else cell = '*'; // conflict marker
+            }
         }
-        os << " |\n";
     }
-}
+
+    static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
+        int w = game.getWidth();
+        int h = game.getHeight();
+        if (w <= 0 || h <= 0) {
+            os << "(board not initialized)\n";
+            return;
+        }
+
+        std::vector<std::string> grid(h, std::string(w, '.'));
+
+        auto ball = game.getBallPosition();
+        if (ball.first >= 0 && ball.first < w && ball.second >= 0 && ball.second < h) {
+            grid[ball.second][ball.first] = 'O';
+        }
+
+        placeFromTeam(game.getTeamA(), 'A', grid, w, h);
+        placeFromTeam(game.getTeamB(), 'B', grid, w, h);
+
+        // print column indices
+        os << "\nBoard (" << w << "x" << h << "):\n";
+        os << "     ";
+        for (int x = 0; x < w; ++x) os << (x % 10) << ' ';
+        os << '\n';
+
+        for (int y = h - 1; y >= 0; --y) {
+            os << std::setw(2) << y << " | ";
+            for (int x = 0; x < w; ++x) {
+                os << grid[y][x];
+                if (x < w - 1) os << ' ';
+            }
+            os << " |\n";
+        }
+    }
 
     BloodBowlGame::BloodBowlGame(Team teamA, Team teamB)
         : teamA(std::move(teamA)),
@@ -293,7 +312,7 @@ static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
 
     std::ostream& operator<<(std::ostream& os, const BloodBowlGame& game) {
         os << "\n=== GAME STATE ===\n";
-        os << "Current State: " << (game.getCurrentState() ? typeid(*game.getCurrentState()).name() : "None") << "\n";
+        os << "Current State: " << stateToString(game)<< "\n";
         os << "Turn Counter: " << game.getTurnCounter() << "\n";
         os << "Current Team: ";
         if (game.getCurrentTeam())

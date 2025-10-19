@@ -17,67 +17,38 @@ namespace state {
     }
 
     void PlayerTurn::update() {
-        if (game->getTurnCounter() == 16) {
-            if (isTurnOver) {
-                restoreCharactersStatus();
-                switchTeam();
-                game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(HALFTIME).get());
-            }
-            if (isTouchDown) {
-                game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
-                restoreCharactersStatus();
-                switchTeam();
-                game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(HALFTIME).get());
-            }
-            if (endTurn) {
-                restoreCharactersStatus();
-                switchTeam();
-                game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(HALFTIME).get());
-            }
-        } else if (game->getTurnCounter() == 32) {
-            if (isTurnOver) {
-                restoreCharactersStatus();
-                switchTeam();
-                game->setCurrentState(game->getStateList().at(ENDGAME).get());
-            }
-            if (isTouchDown) {
-                game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
-                restoreCharactersStatus();
-                switchTeam();
-                game->setCurrentState(game->getStateList().at(ENDGAME).get());
-            }
-            if (endTurn) {
-                restoreCharactersStatus();
-                switchTeam();
-                game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(ENDGAME).get());
-            }
-        } else {
-            if (isTurnOver) {
-                restoreCharactersStatus();
-                switchTeam();
-                game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
-            }
-            if (isTouchDown) {
-                game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
-                restoreCharactersStatus();
-                switchTeam();
-                game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
-            }
-            if (endTurn) {
-                restoreCharactersStatus();
-                switchTeam();
-                game->setTurnCounter(game->getTurnCounter() + 1);
-                game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
+        bool scored = isTouchDown;
+        bool turned = isTurnOver || endTurn;
 
-                game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
-            }
+        if (!scored && !turned) {
+            isTurnOver = false;
+            isTouchDown = false;
+            endTurn = false;
+            return;
         }
+
+        if (scored) {
+            game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
+        }
+
+        restoreCharactersStatus();
+
+        switchTeam();
+
+        game->setTurnCounter(game->getTurnCounter() + 1);
+
+        int tc = game->getTurnCounter();
+        if (scored) {
+            // After a touchdown we go to setup for the next kickoff/setup
+            game->setCurrentState(game->getStateList().at(SETUP).get());
+        } else if (tc == 16) {
+            game->setCurrentState(game->getStateList().at(HALFTIME).get());
+        } else if (tc == 32) {
+            game->setCurrentState(game->getStateList().at(ENDGAME).get());
+        } else {
+            game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
+        }
+
         isTurnOver = false;
         isTouchDown = false;
         endTurn = false;
@@ -109,7 +80,7 @@ namespace state {
         }
     }
 
-    bool PlayerTurn::getTurnOver ()
+    bool PlayerTurn::getTurnOver () const
     {
         return isTurnOver;
     }
@@ -117,7 +88,7 @@ namespace state {
     {
         isTurnOver = turnOver;
     }
-    bool PlayerTurn::getTouchDown ()
+    bool PlayerTurn::getTouchDown () const
     {
         return isTouchDown;
     }
@@ -125,7 +96,7 @@ namespace state {
     {
         isTouchDown = touchDown;
     }
-    bool PlayerTurn::getEndTurn ()
+    bool PlayerTurn::getEndTurn () const
     {
         return endTurn;
     }
