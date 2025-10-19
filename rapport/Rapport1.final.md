@@ -63,3 +63,4 @@ BloodBowlGame gère les transitions entre états grâce à la méthode setCurren
 ### 2.4 Conception logicielle: extension pour le moteur de jeu
 
 ### 2.5 Ressources
+![Diagramme des états](res/diaState.png)
