@@ -7,5 +7,6 @@ add_custom_test(endgame)
 add_custom_test(abstract_state)
 add_custom_test(team)
 add_custom_test(character)
+add_custom_test(blood_bowl_game)
 # vim: set sw=2 sts=2 et:
 
