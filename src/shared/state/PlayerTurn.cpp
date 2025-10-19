@@ -56,17 +56,14 @@ namespace state {
     }
 
     void PlayerTurn::restoreCharactersStatus() {
-        // Get a reference to the team's characters to avoid copying
-        std::vector<Character>& characters = game->getCurrentTeam()->getCharacters();
-        for (Character & character : characters)
-        {
-            if (character.getStatus() == played)
-            {
-                character.setStatus(playable);
-            }
-            else if (character.getStatus() == stunned)
-            {
-                character.setStatus(knockedDown);
+        for (auto& pptr : game->getCurrentTeam()->getCharacters()) {
+            if (pptr != nullptr) {
+                Character& character = *pptr;
+                if (character.getStatus() == played) {
+                    character.setStatus(playable);
+                } else if (character.getStatus() == stunned) {
+                    character.setStatus(knockedDown);
+                }
             }
         }
     }

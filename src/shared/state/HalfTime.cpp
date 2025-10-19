@@ -13,19 +13,25 @@ namespace state {
     }
 
     void HalfTime::checkKO (BloodBowlGame* game) {
-        for (Character& character : game->getTeamA().getCharacters()) {
-            if (character.getStatus() == ko) {
-                int diceRoll = rand() % 2;
-                if (diceRoll == 1) {
-                    character.setStatus(bench);
+        for (auto& characterPtr : game->getTeamA().getCharacters()) {
+            if (characterPtr != nullptr) {
+                Character& character = *characterPtr;
+                if (character.getStatus() == ko) {
+                    int diceRoll = rand() % 2;
+                    if (diceRoll == 1) {
+                        character.setStatus(bench);
+                    }
                 }
             }
         }
-        for (Character& character : game->getTeamB().getCharacters()) {
-            if (character.getStatus() == ko) {
-                int diceRoll = rand() % 2;
-                if (diceRoll == 1) {
-                    character.setStatus(bench);
+        for (auto& characterPtr : game->getTeamB().getCharacters()) {
+            if (characterPtr != nullptr) {
+                Character& character = *characterPtr;
+                if (character.getStatus() == ko) {
+                    int diceRoll = rand() % 2;
+                    if (diceRoll == 1) {
+                        character.setStatus(bench);
+                    }
                 }
             }
         }

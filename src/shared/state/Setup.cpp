@@ -13,9 +13,12 @@ namespace state {
 
     int Setup::nbCharacterOnBoard(const Team& team) {
         int count = 0;
-        for (const Character& piece : team.getCharacters()) {
-            if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU) {
-                count++;
+        for (const auto& pptr : team.getCharacters()) {
+            if (pptr != nullptr) {
+                const Character& piece = *pptr;
+                if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU) {
+                    count++;
+                }
             }
         }
         return count;
@@ -32,7 +35,9 @@ namespace state {
         }
 
         int count = 0;
-        for (const Character& piece : team.getCharacters()) {
+        for (const auto& pptr : team.getCharacters()) {
+            if (!pptr) continue;
+            const Character& piece = *pptr;
             auto pos = piece.getPosition();
             if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU && pos.first == frontlineCol) {
                 if (pos.second >= 4 && pos.second <= (game->getHeight() - 4)) {
@@ -48,7 +53,9 @@ namespace state {
         int limitTopRow = height - 4; // (height-1) - 4 => les 4 lignes du haut du terrain  (Attention height est le nombre de lignes!!)
 
         int count = 0;
-        for (const Character& piece : team.getCharacters()) {
+        for (const auto& pptr : team.getCharacters()) {
+            if (!pptr) continue;
+            const Character& piece = *pptr;
             auto pos = piece.getPosition();
             if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.second >= limitTopRow) { //Attention .second ! On souhaite comparer des ordonnées!
                 count++;
@@ -61,7 +68,9 @@ namespace state {
         int limitBottomRow = 3;
 
         int count = 0;
-        for (const Character& piece : team.getCharacters()) {
+        for (const auto& pptr : team.getCharacters()) {
+            if (!pptr) continue;
+            const Character& piece = *pptr;
             auto pos = piece.getPosition();
             if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.second <= limitBottomRow) { //Idem
                 count++;

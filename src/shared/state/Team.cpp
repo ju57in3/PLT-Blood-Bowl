@@ -7,13 +7,11 @@ namespace state {
         : teamId(teamId), name(std::move(name)), rerolls(rerolls), score(0) {
     }
 
-    // Return a non-const reference so callers can modify characters in-place
-    std::vector<Character>& Team::getCharacters() {
+    std::vector<std::unique_ptr<Character>>& Team::getCharacters() {
         return characters;
     }
 
-    // Const overload for read-only access
-    const std::vector<Character>& Team::getCharacters() const {
+    const std::vector<std::unique_ptr<Character>>& Team::getCharacters() const {
         return characters;
     }
 
@@ -23,11 +21,11 @@ namespace state {
 
     std::vector<Character*> Team::getPlayableCharacter() {
         std::vector<Character*> playableChars;
-        for (auto & character : characters)
+        for (auto & characterPtr : characters)
         {
-            if (character.getStatus() == playable)
+            if (characterPtr->getStatus() == playable)
             {
-                playableChars.push_back(&character);
+                playableChars.push_back(characterPtr.get());
             }
         }
         return playableChars;
@@ -35,11 +33,11 @@ namespace state {
 
     std::vector<const Character*> Team::getPlayableCharacter() const {
         std::vector<const Character*> playableChars;
-        for (const auto & character : characters)
+        for (const auto & characterPtr : characters)
         {
-            if (character.getStatus() == playable)
+            if (characterPtr->getStatus() == playable)
             {
-                playableChars.push_back(&character);
+                playableChars.push_back(characterPtr.get());
             }
         }
         return playableChars;
@@ -53,16 +51,16 @@ namespace state {
         this->score = score;
     }
 
-    void Team::addCharacter(const Character& character) {
-        characters.push_back(character);
+    void Team::addCharacter(std::unique_ptr<Character> character) {
+        characters.push_back(std::move(character));
     }
 
     std::ostream& operator<<(std::ostream& os, const Team& team) {
         os << "Team ID: " << team.getTeamId() << "\n";
         os << "Score: " << team.getScore() << "\n";
         os << "Characters:\n";
-        for (const auto& character : team.getCharacters()) {
-            os << character << "\n";
+        for (const auto& characterPtr : team.getCharacters()) {
+            os << *characterPtr << "\n";
         }
         return os;
     }

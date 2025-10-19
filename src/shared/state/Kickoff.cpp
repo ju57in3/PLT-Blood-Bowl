@@ -67,6 +67,7 @@ namespace state {
             case 6: //West
                 newTarget.first = targetSquare.first - rebounds;
                 newTarget.second = targetSquare.second;
+                break;
 
             case 7: //South-West
                 newTarget.first = targetSquare.first - rebounds;
