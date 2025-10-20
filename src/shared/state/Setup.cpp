@@ -35,13 +35,14 @@ namespace state {
         }
 
         int count = 0;
-        for (const auto& pptr : team.getCharacters()) {
-            if (!pptr) continue;
-            const Character& piece = *pptr;
-            auto pos = piece.getPosition();
-            if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU && pos.first == frontlineCol) {
-                if (pos.second >= 4 && pos.second <= (game->getHeight() - 4)) {
-                    count++;
+        for (const auto& ptr : team.getCharacters()) {
+            if (ptr != nullptr) {
+                const Character& piece = *ptr;
+                auto pos = piece.getPosition();
+                if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU && pos.first == frontlineCol) {
+                    if (pos.second >= 4 && pos.second <= (game->getHeight() - 4)) {
+                        count++;
+                    }
                 }
             }
         }
@@ -53,12 +54,13 @@ namespace state {
         int limitTopRow = height - 2; // (height-1) - 4 => les 4 lignes du haut du terrain  (Attention height est le nombre de lignes!!)
 
         int count = 0;
-        for (const auto& pptr : team.getCharacters()) {
-            if (!pptr) continue;
-            const Character& piece = *pptr;
-            auto pos = piece.getPosition();
-            if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.second >= limitTopRow) { //Attention .second ! On souhaite comparer des ordonnées!
-                count++;
+        for (const auto& ptr : team.getCharacters()) {
+            if (ptr != nullptr) {
+                const Character& piece = *ptr;
+                auto pos = piece.getPosition();
+                if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.second >= limitTopRow) { //Attention .second ! On souhaite comparer des ordonnées!
+                    count++;
+                }
             }
         }
         return count;
@@ -68,12 +70,13 @@ namespace state {
         int limitBottomRow = 3;
 
         int count = 0;
-        for (const auto& pptr : team.getCharacters()) {
-            if (!pptr) continue;
-            const Character& piece = *pptr;
-            auto pos = piece.getPosition();
-            if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.second <= limitBottomRow) { //Idem
-                count++;
+        for (const auto& ptr : team.getCharacters()) {
+            if (ptr != nullptr) {
+                const Character& piece = *ptr;
+                auto pos = piece.getPosition();
+                if (piece.getStatus() == playable && pos != HORS_TABLEAU && pos.second <= limitBottomRow) { //Idem
+                    count++;
+                }
             }
         }
         return count;
