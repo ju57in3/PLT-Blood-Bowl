@@ -7,11 +7,11 @@ namespace state {
         : teamId(teamId), name(std::move(name)), rerolls(rerolls), score(0) {
     }
 
-    std::vector<std::unique_ptr<Character>>& Team::getCharacters() {
+    std::vector<std::shared_ptr<Character>>& Team::getCharacters() {
         return characters;
     }
 
-    const std::vector<std::unique_ptr<Character>>& Team::getCharacters() const {
+    const std::vector<std::shared_ptr<Character>>& Team::getCharacters() const {
         return characters;
     }
 
@@ -51,7 +51,7 @@ namespace state {
         this->score = score;
     }
 
-    void Team::addCharacter(std::unique_ptr<Character> character) {
+    void Team::addCharacter(std::shared_ptr<Character> character) {
         characters.push_back(std::move(character));
     }
 
