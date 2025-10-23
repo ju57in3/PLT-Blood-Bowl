@@ -23,13 +23,15 @@ int main(int argc, char* argv[]) {
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
-    teamA.addCharacter(std::make_unique<Character>("Ligne1", "Human", 6, 3, 3, 8));
-    teamA.getCharacters().back()->setPosition({12, 6});
-    teamA.getCharacters().back()->setStatus(playable);
+    auto hum1 = std::make_shared<Character>("Ligne1", "Human", 6, 3, 3, 8);
+    hum1->setPosition({12, 6});
+    hum1->setStatus(playable);
 
-    teamA.addCharacter(std::make_unique<Character>("Ligne2", "Human", 6, 3, 3, 8));
-    teamA.getCharacters().back()->setPosition({12, 7});
-    teamA.getCharacters().back()->setStatus(playable);
+
+
+    auto hum2 = std::make_shared<Character>("Ligne2", "Human", 6, 3, 3, 8);
+    hum2->setPosition({12, 7});
+    hum2->setStatus(playable);
 
     teamA.addCharacter(std::make_unique<Character>("Ligne3", "Human", 6, 3, 3, 8));
     teamA.getCharacters().back()->setPosition({12, 8});

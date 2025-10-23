@@ -22,9 +22,9 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     BOOST_CHECK_EQUAL(teamA.getName(),"Humans Team");
 
     BOOST_CHECK_EQUAL(size(teamA.getCharacters()), 0);
-    Character human("Player 1", "human", 6, 3, 3, 8);
-    human.setPosition({1,1});
-    teamA.addCharacter(std::make_unique<Character>(human));
+    auto human = std::make_shared<Character>("Player 1", "human", 6, 3, 3, 8);
+    human->setPosition({1,1});
+    teamA.addCharacter(human);
     BOOST_CHECK_EQUAL(size(teamA.getCharacters()), 1);
     BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getName(),"Player 1");
     BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getType(),"human");
@@ -34,8 +34,7 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getArmor(),8);
 
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),0);
-    human.setStatus(playable);
-    //teamA.getCharacters().back()->setStatus(playable);
+    human->setStatus(playable);
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),1);
 
     std::ostringstream oss;
