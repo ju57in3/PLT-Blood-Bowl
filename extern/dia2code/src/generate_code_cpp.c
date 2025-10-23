@@ -897,8 +897,16 @@ gen_namespace(batch *b, declaration *nsd) {
                             print("#include \"%s.%s\"\n", incfile->name, file_ext);
                         }
                     } else {
-                        if (strcmp(incfile->package,"sf") != 0) { // Don't #include from sfml (handled by print_include_stdlib())
-                            print("#include \"%s/%s.%s\"\n", incfile->package, incfile->name, file_ext);
+                        if (strcmp(incfile->package,"sf") != 0) {
+                            // Don't #include from sfml (handled by print_include_stdlib())
+                            char nsnsname[80];
+                            strcpy(nsnsname, incfile->package);
+                            subst(nsnsname, ':', '/');
+                            if (strncmp(nsnsname, "boost", 5) == 0) {
+                                print("#include <%s/%s.%s>\n", nsnsname, incfile->name, "hpp");
+                            } else {
+                                print("#include \"%s/%s.%s\"\n", nsnsname, incfile->name, file_ext);
+                            }
                         }
                     }
                 } else {
