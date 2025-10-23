@@ -34,7 +34,8 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getArmor(),8);
 
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),0);
-    teamA.getCharacters().back()->setStatus(playable);
+    human.setStatus(playable);
+    //teamA.getCharacters().back()->setStatus(playable);
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),1);
 
     std::ostringstream oss;
