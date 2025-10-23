@@ -6,9 +6,9 @@ name: PLT build
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ master, main]
   pull_request:
-    branches: [ master ]
+    branches: [ master, main]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -29,7 +29,7 @@ jobs:
       run: |
         set -x
         sudo apt-get update
-        sudo apt-get install -yy libsfml-dev libboost-test-dev libmicrohttpd-dev libxml2-dev xvfb lcov gcovr
+        sudo apt-get install -yy libsfml-dev libboost1.74-all-dev libmicrohttpd-dev libxml2-dev xvfb lcov gcovr
 
     - name: switch to gcc-12 on linux
       run: |
@@ -43,7 +43,7 @@ jobs:
         set -x
         mkdir build
         cd build
-        cmake -DBOOST_ROOT=$BOOST_ROOT_1_69_0 -DBoost_ARCHITECTURE=-x64 ..
+        cmake -DBOOST_ROOT=$BOOST_ROOT_1_74_0 -DBoost_ARCHITECTURE=-x64 ..
 
     # Compile project
     - name: Compile project
