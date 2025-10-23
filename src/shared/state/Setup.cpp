@@ -50,7 +50,7 @@ namespace state {
 
     int Setup::nbCharacterOnTop(const Team& team) const{
         int height = game->getHeight();
-        int limitTopRow = height - 2; // (height-1) - 4 => les 4 lignes du haut du terrain  (Attention height est le nombre de lignes!!)
+        int limitTopRow = height - 4; // (height-1) - 3 => les 4 lignes du haut du terrain  (Attention height est le nombre de lignes!!)
 
         int count = 0;
         for (const auto& pptr : team.getCharacters()) {
