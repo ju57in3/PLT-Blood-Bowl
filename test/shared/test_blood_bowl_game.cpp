@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
     BOOST_CHECK_EQUAL(game.getTeamB().getName(), "Orcs");
 
     // Check the states
-    auto stateList = game.getStateList();
+    const auto& stateList = game.getStateList();
     BOOST_CHECK(!stateList.empty());
     BOOST_CHECK_GE(stateList.size(), 5); // SETUP, KICKOFF, PLAYERTURN, HALFTIME, ENDGAME
 
