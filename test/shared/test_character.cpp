@@ -1,4 +1,5 @@
 
+#include <bits/fs_fwd.h>
 #include <boost/test/unit_test.hpp>
 
 #include "../shared/state.h"
@@ -45,6 +46,21 @@ BOOST_AUTO_TEST_CASE(TestCharacter)
     oss << human;
     std::string expected =  "Position: (1, 2) | Status: playable";
     BOOST_CHECK_EQUAL(oss.str(), expected);
+
+    human.setStatus(knockedDown);
+    oss << human;
+    human.setStatus(stunned);
+    oss << human;
+    human.setStatus(ko);
+    oss << human;
+    human.setStatus(injured);
+    oss << human;
+    human.setStatus(played);
+    oss << human;
+    human.setStatus(bench);
+    oss << human;
+
+
 }
 
 /* vim: set sw=2 sts=2 et : */
