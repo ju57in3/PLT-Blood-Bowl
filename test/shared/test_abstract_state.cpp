@@ -7,6 +7,13 @@
 
 using namespace state;
 
+class DummyState : public AbstractState {
+    public:
+    DummyState(BloodBowlGame* game) : AbstractState(game) {}
+    // Direct call of the method
+    void callBaseUpdate() {AbstractState::update();}
+};
+
 BOOST_AUTO_TEST_CASE(TestAbstractState)
 {
     Team teamA(1, "Humans", 3);
@@ -20,6 +27,10 @@ BOOST_AUTO_TEST_CASE(TestAbstractState)
     // Polymorphic virtual call
     state->update();
     BOOST_CHECK(game.getCurrentState() != nullptr);
+
+    // Explicit call of the empty method AbstractState::update()
+    DummyState dummy(&game);
+    dummy.callBaseUpdate();
 
     // Checks that the state remains consistent
     BOOST_CHECK(game.getCurrentState() != nullptr);
