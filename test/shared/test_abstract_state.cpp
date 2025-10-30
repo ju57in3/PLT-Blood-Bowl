@@ -19,6 +19,7 @@ BOOST_AUTO_TEST_CASE(TestAbstractState)
 
     // Polymorphic virtual call
     state->update();
+    BOOST_CHECK(game.getCurrentState() != nullptr);
 
     // Checks that the state remains consistent
     BOOST_CHECK(game.getCurrentState() != nullptr);

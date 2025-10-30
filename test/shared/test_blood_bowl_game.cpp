@@ -42,6 +42,10 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
 
     BOOST_CHECK(game.getCurrentState() != nullptr);
     BOOST_CHECK(game.getCurrentState() == stateList[SETUP].get());
+    BOOST_CHECK(game.getCurrentState() == stateList[KICKOFF].get());
+    BOOST_CHECK(game.getCurrentState() == stateList[PLAYERTURN].get());
+    BOOST_CHECK(game.getCurrentState() == stateList[HALFTIME].get());
+    BOOST_CHECK(game.getCurrentState() == stateList[ENDGAME].get());
 
     // Check the draw
     Team* coinWinner = game.coinToss();
