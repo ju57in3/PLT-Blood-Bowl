@@ -31,18 +31,6 @@ namespace state {
         return playableChars;
     }
 
-    std::vector<const Character*> Team::getPlayableCharacter() const {
-        std::vector<const Character*> playableChars;
-        for (const auto & characterPtr : characters)
-        {
-            if (characterPtr->getStatus() == playable)
-            {
-                playableChars.push_back(characterPtr.get());
-            }
-        }
-        return playableChars;
-    }
-
     int Team::getTeamId() const{
         return teamId;
     }
