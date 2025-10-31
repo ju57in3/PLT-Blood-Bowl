@@ -139,6 +139,7 @@ Chaque mise à jour du jeu (mouvement, changement de tour, action spéciale) est
 
 ### 3.3 Ressources
 ![Diagramme du rendu](res/diaRender.png)
+Le diagramme du rendu "diaRender.png" se trouve dans le dossier "res" dans la branche "Master".
 
 ### 3.4 Exemple de rendu
 
