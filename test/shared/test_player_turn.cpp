@@ -40,4 +40,58 @@ BOOST_AUTO_TEST_CASE(TestPlayerTurn)
     int oldScore = game.getCurrentTeam()->getScore();
     playerTurn.update();
     BOOST_CHECK(game.getCurrentTeam()->getScore() >= oldScore);
+
+    // Coverage : update() with no score, no turn end
+    PlayerTurn noChange(&game);
+    noChange.setTurnOver(false);
+    noChange.setTouchDown(false);
+    noChange.update();
+    BOOST_CHECK_EQUAL(noChange.getTurnOver(), false);
+
+    // Coverage : restoreCharactersStatus
+    auto cPlayed = std::make_unique<Character>("H2", "Human", 5, 4, 4, 6);
+    cPlayed->setStatus(played);
+    teamA.addCharacter(std::move(cPlayed));
+
+    auto cStunned = std::make_unique<Character>("H3", "Human", 5, 4, 4, 6);
+    cStunned->setStatus(stunned);
+    teamA.addCharacter(std::move(cStunned));
+
+    game.setCurrentTeam(&teamA);
+    playerTurn.restoreCharactersStatus();
+    for (auto& c : teamA.getCharacters()) {
+        if (c->getName() == "H2") BOOST_CHECK_EQUAL(c->getStatus(), playable);
+        if (c->getName() == "H3") BOOST_CHECK_EQUAL(c->getStatus(), knockedDown);
+    }
+
+    // Coverage: switchTeam() else branch
+    game.setCurrentTeam(&teamB);
+    playerTurn.switchTeam();
+    BOOST_CHECK_EQUAL(game.getCurrentTeam()->getTeamId(), teamA.getTeamId());
+
+    // Coverage: tc == 16
+    game.setCurrentTeam(&teamA);
+    game.setTurnCounter(15);
+    playerTurn.setTurnOver(true);
+    playerTurn.update();
+    BOOST_CHECK(game.getTurnCounter() == 16);
+
+    // Coverage: tc == 32
+    game.setTurnCounter(31);
+    playerTurn.setTurnOver(true);
+    playerTurn.update();
+    BOOST_CHECK(game.getTurnCounter() == 32);
+
+    // Coverage: else branch, return to PLAYERTURN
+    game.setTurnCounter(5);
+    playerTurn.setTurnOver(true);
+    playerTurn.setTouchDown(false);
+    playerTurn.setEndTurn(false);
+    playerTurn.update();
+
+    BOOST_CHECK(game.getCurrentState() == game.getStateList().at(PLAYERTURN).get());
+
+    // Coverage: get/setEndTurn()
+    playerTurn.setEndTurn(true);
+    BOOST_CHECK(playerTurn.getEndTurn());
 }
