@@ -91,8 +91,6 @@ namespace  state {
         width = 26;
         height = 15;
         ballIsHold = false;
-        nb_repetition = 0;
-        nb_repetition_max = 3;
     }
 
     void BloodBowlGame::setCurrentState(AbstractState* state) {
@@ -143,7 +141,7 @@ namespace  state {
         if (position.first >= 0 && position.first <= 25 && position.second >= 0 && position.second <= 14) {
             ballPosition = position;
         } else {
-            if (currentState == stateList.at(KICKOFF).get() || (currentState == stateList.at(PLAYERTURN).get() && getNbRepetition() == getNbRepetitionMax())) {
+            if (currentState == stateList.at(KICKOFF).get() || (currentState == stateList.at(PLAYERTURN).get())) {
                 currentTeam = (currentTeam == &teamA) ? &teamB : &teamA;
                 unsigned long teamSize = getCurrentTeam()->getPlayableCharacter().size();
                 std::random_device rd;
@@ -164,21 +162,6 @@ namespace  state {
 
     void BloodBowlGame::setTurnCounter(int newTurnCount) {
         turnCounter = newTurnCount;
-    }
-
-    int BloodBowlGame::getNbRepetition() const
-    {
-        return nb_repetition;
-    }
-
-    int BloodBowlGame::getNbRepetitionMax() const
-    {
-        return nb_repetition_max;
-    }
-
-    void BloodBowlGame::setNbRepetition(int nb_repetitionValue)
-    {
-        nb_repetition = nb_repetitionValue;
     }
 
     std::pair<int, int> BloodBowlGame::getBallPosition() const {

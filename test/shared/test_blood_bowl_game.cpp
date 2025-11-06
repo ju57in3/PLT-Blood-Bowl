@@ -76,10 +76,6 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
     game.setCurrentTeam(&teamB);
     BOOST_CHECK_EQUAL(game.getCurrentTeam()->getName(), "Orcs");
 
-    // Check the number of repetition
-    game.setNbRepetition(3);
-    BOOST_CHECK_EQUAL(game.getNbRepetition(), 3);
-
     // State change test
     game.setCurrentState(stateList[KICKOFF].get());
     BOOST_CHECK(game.getCurrentState() == stateList[KICKOFF].get());

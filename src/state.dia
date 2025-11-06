@@ -97,7 +97,6 @@
       </dia:composite>
     </dia:attribute>
   </dia:diagramdata>
-  <dia:layer name="Arrière-plan" visible="true" connectable="false"/>
   <dia:layer name="Background" visible="true" connectable="true" active="true">
     <dia:object type="UML - LargePackage" version="0" id="O0">
       <dia:attribute name="obj_pos">
@@ -3503,7 +3502,7 @@
         <dia:point val="-8.1438,-8.4891"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-24.6169,-9.2891;-7.3938,-6.11967"/>
+        <dia:rectangle val="-24.6169,-9.2491;-7.3938,-6.11967"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -3582,7 +3581,7 @@
         <dia:point val="23.822,-13.0402"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="19.3066,-13.8402;24.572,-3.0891"/>
+        <dia:rectangle val="19.3066,-13.8002;24.572,-3.0491"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -6081,7 +6080,7 @@
         <dia:point val="23.8725,-24.0402"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-2.13647,-26.1734;24.6225,-23.2402"/>
+        <dia:rectangle val="-2.13647,-26.1334;24.6225,-23.2002"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -6315,7 +6314,7 @@
         <dia:point val="-9.1244,-22.423"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-31.5685,-22.473;-8.2744,-20.0123"/>
+        <dia:rectangle val="-31.5685,-22.473;-8.2744,-20.0027"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -6650,7 +6649,7 @@
         <dia:point val="-9.1244,-28.2734"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-9.9744,-36.6948;3.67321,-28.2234"/>
+        <dia:rectangle val="-9.9744,-36.6548;3.67321,-28.2234"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
