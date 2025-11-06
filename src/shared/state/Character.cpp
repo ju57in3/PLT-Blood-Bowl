@@ -26,6 +26,14 @@ namespace state {
             this->status = bench;
         }
 
+    int Character::getId() const {
+        return id;
+    }
+
+    void Character::setId(int idValue) {
+        this->id = idValue;
+    }
+
     std::string Character::getName() const
     {
         return name;
