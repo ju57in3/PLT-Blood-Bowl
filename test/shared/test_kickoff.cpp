@@ -8,6 +8,9 @@
 
 using namespace state;
 
+int fake_rand_value = 0;
+int rand(){return fake_rand_value;}
+
 BOOST_AUTO_TEST_CASE(TestKickoff)
 {
     Team teamA(1, "Humans", 3);
@@ -34,7 +37,7 @@ BOOST_AUTO_TEST_CASE(TestKickoff)
     //Test of KickBall on 8 directions
     std::pair<int, int> base = {10, 10};
     for (int dir = 0; dir < 8; dir++) {
-        srand(dir);                      //force rand() to a reproductable result
+        fake_rand_value = dir;                      //force rand() to a reproductable result
         kickoff.kickBall(base);
         auto pos = game.getBallPosition();
 

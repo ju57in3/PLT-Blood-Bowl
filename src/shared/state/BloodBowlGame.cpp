@@ -1,7 +1,6 @@
 #include "BloodBowlGame.h"
 
 #include <filesystem>
-
 #include "Setup.h"
 #include "Kickoff.h"
 #include "PlayerTurn.h"
