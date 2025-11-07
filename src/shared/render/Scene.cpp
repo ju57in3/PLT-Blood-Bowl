@@ -3,9 +3,8 @@
 namespace render{
 
     Scene::Scene(SceneId sceneId, std::shared_ptr<state::BloodBowlGame> game)
-    : id(sceneId), game(game)
+    : id(sceneId), window(nullptr), game(std::move(game)), sceneData("blue","red")
     {
-
     }
 
     Scene::~Scene() {}
@@ -14,10 +13,17 @@ namespace render{
     {
         this->id = sceneId;
         this->game = std::move(game);
+        if (window && this->game && sceneData.boardTexture.getSize().x == 0) {
+            sceneData.init(window, this->game);
+        }
     }
 
     void Scene::drawScene()
     {
+        if (!window) {
+            return;
+        }
+
         if (game && window->isOpen()) {
             window->clear(sf::Color::Black);
             sceneData.draw(window);
@@ -28,8 +34,9 @@ namespace render{
     SceneId Scene::getId() const {
         return id;
     }
-    void Scene::setId(SceneId newId) {
-        id = newId;
+
+    void Scene::setId(SceneId idValue) {
+        id = idValue;
     }
 
     std::shared_ptr<state::BloodBowlGame> Scene::getGame() const {
@@ -37,6 +44,9 @@ namespace render{
     }
     void Scene::setGame(std::shared_ptr<state::BloodBowlGame>& newGame) {
         game = newGame;
+        if (window && game && sceneData.boardTexture.getSize().x == 0) {
+            sceneData.init(window, game);
+        }
     }
 
     sf::RenderWindow* Scene::getWindow() const{
@@ -45,6 +55,9 @@ namespace render{
 
     void Scene::setWindow(sf::RenderWindow* newWindow) {
         this->window = newWindow;
+        if (window && game && sceneData.boardTexture.getSize().x == 0) {
+            sceneData.init(window, game);
+        }
     }
 
     SceneData Scene::getSceneData() const {

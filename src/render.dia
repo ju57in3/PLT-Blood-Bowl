@@ -1247,7 +1247,7 @@
         </dia:composite>
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
-            <dia:string>#PlayersSprites_TeamB#</dia:string>
+            <dia:string>#playersSprites_TeamB#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>#std::vector&lt;sf::Sprite&gt;#</dia:string>
@@ -1488,7 +1488,7 @@
                 <dia:string>#window#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#sf::RenderWindow&amp;#</dia:string>
+                <dia:string>#sf::RenderWindow*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
