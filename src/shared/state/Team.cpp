@@ -1,7 +1,7 @@
 #include "Team.h"
 #include "Character.h"
 #include <iostream>
-#include "constants.h"
+#include "include/constants.h"
 
 namespace state {
     Team::Team(int teamId, std::string name, int rerolls)

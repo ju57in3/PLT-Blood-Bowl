@@ -81,8 +81,10 @@ namespace state {
     }
 
     Kickoff::~Kickoff() {
-
     }
 
+    std::string Kickoff::getName() const {
+        return "Kickoff";
+    }
 
 }

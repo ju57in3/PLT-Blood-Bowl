@@ -5,7 +5,7 @@
 #include "HalfTime.h"
 #include "Setup.h"
 #include "Team.h"
-#include "constants.h"
+#include "include/constants.h"
 
 namespace state {
     PlayerTurn::PlayerTurn(BloodBowlGame* game) : AbstractState(game) {
@@ -107,4 +107,7 @@ namespace state {
 
     }
 
+    std::string PlayerTurn::getName() const {
+        return "PlayerTurn";
+    }
 }

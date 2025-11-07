@@ -14,22 +14,6 @@
 
 namespace  state {
 
-    const char* stateToString(const BloodBowlGame& game)  {
-        if (game.getCurrentState() == game.getStateList().at(SETUP).get()) {
-            return "Setup";
-        } else if (game.getCurrentState() == game.getStateList().at(KICKOFF).get()) {
-            return "Kickoff";
-        } else if (game.getCurrentState() == game.getStateList().at(PLAYERTURN).get()) {
-            return "PlayerTurn";
-        } else if (game.getCurrentState() == game.getStateList().at(HALFTIME).get()) {
-            return "HalfTime";
-        } else if (game.getCurrentState() == game.getStateList().at(ENDGAME).get()) {
-            return "EndGame";
-        } else {
-            return "Unknown State";
-        }
-    }
-
     static void placeFromTeam(const Team& team, char mark, std::vector<std::string> &grid, int w, int h) {
         for (const auto& pptr : team.getCharacters()) {
             if (pptr != nullptr) {
@@ -188,7 +172,7 @@ namespace  state {
 
     std::ostream& operator<<(std::ostream& os, const BloodBowlGame& game) {
         os << "\n=== GAME STATE ===\n";
-        os << "Current State: " << stateToString(game)<< "\n";
+        os << "Current State: " << (game.getCurrentState() ? game.getCurrentState()->getName() : "None") << "\n";
         os << "Turn Counter: " << game.getTurnCounter() << "\n";
         os << "Current Team: ";
         if (game.getCurrentTeam())

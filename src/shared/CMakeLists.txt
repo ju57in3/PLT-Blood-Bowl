@@ -1,4 +1,3 @@
-
 set(lib_shared_target shared_static)
 
 # Generate header files from dia UML files
@@ -18,5 +17,7 @@ target_include_directories(${lib_shared_target} PUBLIC
   ${jsoncpp_include_dir}
   )
 
-# vim: set sw=2 sts=2 et:
+# Add manual include directory for non-dia headers
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# vim: set sw=2 sts=2 et:

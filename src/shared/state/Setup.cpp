@@ -123,8 +123,9 @@ namespace state {
         this->setupEnded = setupStatus;
     }
 
-
-
+    std::string Setup::getName() const {
+        return "Setup";
+    }
 
 
 }
