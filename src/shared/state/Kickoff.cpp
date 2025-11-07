@@ -2,7 +2,6 @@
 
 #include "Team.h"
 #include "BloodBowlGame.h"
-#include "PlayerTurn.h"
 
 
 namespace state {

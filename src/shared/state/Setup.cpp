@@ -3,7 +3,6 @@
 
 #include "Kickoff.h"
 #include "BloodBowlGame.h"
-#include <set>
 
 constexpr std::pair<int, int> HORS_TABLEAU = {-1, -1};
 

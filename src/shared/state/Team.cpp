@@ -1,12 +1,16 @@
 #include "Team.h"
 #include "Character.h"
 #include <iostream>
-#include "include/constants.h"
+#include <unicode/urename.h>
+
+#include "utility/Constants.h"
+
+using namespace utility;
 
 namespace state {
     Team::Team(int teamId, std::string name, int rerolls)
         : teamId(teamId), name(std::move(name)), rerolls(rerolls), score(0) {
-        characters.reserve(TEAM_MAX_PLAYERS);
+        characters.reserve(Constants::MAX_PLAYERS_PER_TEAM);
     }
 
     std::vector<std::shared_ptr<Character>>& Team::getCharacters() {
@@ -54,8 +58,8 @@ namespace state {
     }
 
     void Team::addCharacter(std::shared_ptr<Character> character) {
-        if (characters.size() >= TEAM_MAX_PLAYERS) {
-            std::cerr << "Team " << name << " is full (" << TEAM_MAX_PLAYERS << " players max). Character not added." << std::endl;
+        if (characters.size() >= Constants::MAX_PLAYERS_PER_TEAM) {
+            std::cerr << "Team " << name << " is full (" << Constants::MAX_PLAYERS_PER_TEAM << " players max). Character not added." << std::endl;
             return;
         }
         characters.push_back(std::move(character));

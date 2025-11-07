@@ -1,7 +1,9 @@
 #include "SceneData.h"
-#include "include/constants.h"
+#include "utility/Constants.h"
 #include <filesystem>
 #include <iostream>
+
+using namespace utility;
 
 namespace render{
 
@@ -16,8 +18,8 @@ namespace render{
     }
 
     static sf::Vector2f pos2Coords(const std::pair<int,int> &pos) {
-        const int x = BOARD_OFFSET_X + (BOARD_TILE_PIXEL_SIZE+1) * pos.first;
-        const int y = BOARD_OFFSET_Y + (BOARD_TILE_PIXEL_SIZE+1) * pos.second;
+        const int x = Constants::BOARD_OFFSET_X + (Constants::BOARD_TILE_PIXEL_SIZE+1) * pos.first;
+        const int y = Constants::BOARD_OFFSET_Y + (Constants::BOARD_TILE_PIXEL_SIZE+1) * pos.second;
         return {static_cast<float>(x), static_cast<float>(y)};
     }
 
@@ -35,10 +37,10 @@ namespace render{
 
     void SceneData::init(sf::RenderWindow* window, std::shared_ptr<state::BloodBowlGame> game)
     {
-        playersTextures_TeamA.resize(MAX_PLAYERS_PER_TEAM);
-        playersTextures_TeamB.resize(MAX_PLAYERS_PER_TEAM);
-        playersSprites_TeamA.resize(MAX_PLAYERS_PER_TEAM);
-        playersSprites_TeamB.resize(MAX_PLAYERS_PER_TEAM);
+        playersTextures_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
+        playersTextures_TeamB.resize(Constants::MAX_PLAYERS_PER_TEAM);
+        playersSprites_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
+        playersSprites_TeamB.resize(Constants::MAX_PLAYERS_PER_TEAM);
 
         if (loadTextureFromFile("res/board.png", boardTexture)) {
             board.setTexture(boardTexture);
@@ -55,7 +57,7 @@ namespace render{
         for ( const auto& character : game->getTeamA().getCharacters()) {
             const std::string texturePath = charactersDir + character->getType() + "_"+ colorA + ".png";
             const size_t index = static_cast<size_t>(character->getId());
-            if (index < MAX_PLAYERS_PER_TEAM && loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
+            if (index < Constants::MAX_PLAYERS_PER_TEAM && loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
                 playersSprites_TeamA.at(index).setTexture(playersTextures_TeamA.at(index));
                 playersSprites_TeamA.at(index).setPosition(pos2Coords(character->getPosition()));
             } else {
@@ -66,7 +68,7 @@ namespace render{
         for ( const auto& character : game->getTeamB().getCharacters()) {
             const std::string texturePath = charactersDir + character->getType() + "_"+ colorB + ".png";
             const size_t index = static_cast<size_t>(character->getId());
-            if (index < MAX_PLAYERS_PER_TEAM && loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
+            if (index < Constants::MAX_PLAYERS_PER_TEAM && loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
                 playersSprites_TeamB.at(index).setTexture(playersTextures_TeamB.at(index));
                 playersSprites_TeamB.at(index).setPosition(pos2Coords(character->getPosition()));
             } else {
