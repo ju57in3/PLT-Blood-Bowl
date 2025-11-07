@@ -3,7 +3,7 @@
 namespace render{
 
     Scene::Scene(SceneId sceneId, std::shared_ptr<state::BloodBowlGame> game)
-    : id(sceneId), game(game), sceneData()
+    : id(sceneId), game(game)
     {
 
     }
@@ -32,17 +32,25 @@ namespace render{
         id = newId;
     }
 
-    const std::shared_ptr<state::BloodBowlGame>& Scene::getGame() const {
+    std::shared_ptr<state::BloodBowlGame> Scene::getGame() const {
         return game;
     }
-    void Scene::setGame(const std::shared_ptr<state::BloodBowlGame>& newGame) {
+    void Scene::setGame(std::shared_ptr<state::BloodBowlGame>& newGame) {
         game = newGame;
     }
 
-    const SceneData& Scene::getSceneData() const {
+    sf::RenderWindow& Scene::getWindow() const{
+        return window;
+    }
+
+    void Scene::setWindow(sf::RenderWindow& newWindow) {
+        this->window = newWindow;
+    }
+
+    SceneData Scene::getSceneData() const {
         return sceneData;
     }
-    void Scene::setSceneData(const SceneData& newSceneData) {
+    void Scene::setSceneData(SceneData& newSceneData) {
         sceneData = newSceneData;
     }
 
