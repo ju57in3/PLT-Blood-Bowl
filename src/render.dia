@@ -268,7 +268,7 @@
             <dia:string>#window#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#sf::RenderWindow&amp;#</dia:string>
+            <dia:string>#sf::RenderWindow*#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -610,7 +610,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#sf::RenderWindow&amp;#</dia:string>
+            <dia:string>#sf::RenderWindow*#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
@@ -666,7 +666,7 @@
                 <dia:string>#newWindow#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#sf::RenderWindow&amp;#</dia:string>
+                <dia:string>#sf::RenderWindow*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -1553,7 +1553,7 @@
                 <dia:string>#target#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#sf::RenderTarget&amp;#</dia:string>
+                <dia:string>#sf::RenderTarget*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>

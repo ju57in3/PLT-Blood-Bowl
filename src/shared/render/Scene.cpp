@@ -18,10 +18,10 @@ namespace render{
 
     void Scene::drawScene()
     {
-        if (game && window.isOpen()) {
-            window.clear(sf::Color::Black);
+        if (game && window->isOpen()) {
+            window->clear(sf::Color::Black);
             sceneData.draw(window);
-            window.display();
+            window->display();
         }
     }
 
@@ -39,11 +39,11 @@ namespace render{
         game = newGame;
     }
 
-    sf::RenderWindow& Scene::getWindow() const{
+    sf::RenderWindow* Scene::getWindow() const{
         return window;
     }
 
-    void Scene::setWindow(sf::RenderWindow& newWindow) {
+    void Scene::setWindow(sf::RenderWindow* newWindow) {
         this->window = newWindow;
     }
 

@@ -67,10 +67,10 @@ namespace render{
         }
     }
 
-    void SceneData::draw(sf::RenderTarget& target)
+    void SceneData::draw(sf::RenderTarget* target)
     {
         // Draw board
-        target.draw(board);
+        target->draw(board);
 
         // Draw players
         std::vector<sf::Sprite> playersSprites;
@@ -78,7 +78,7 @@ namespace render{
         playersSprites.insert(playersSprites.end(), playersSprites_TeamA.begin(), playersSprites_TeamA.end());
         playersSprites.insert(playersSprites.end(), PlayersSprites_TeamB.begin(), PlayersSprites_TeamB.end());
         for (auto& s : playersSprites) {
-            target.draw(s);
+            target->draw(s);
         }
     }
 
