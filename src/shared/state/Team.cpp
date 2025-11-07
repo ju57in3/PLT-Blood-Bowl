@@ -1,11 +1,12 @@
 #include "Team.h"
 #include "Character.h"
 #include <iostream>
+#include "constants.h"
 
 namespace state {
     Team::Team(int teamId, std::string name, int rerolls)
         : teamId(teamId), name(std::move(name)), rerolls(rerolls), score(0) {
-        characters.reserve(16);
+        characters.reserve(TEAM_MAX_PLAYERS);
     }
 
     std::vector<std::shared_ptr<Character>>& Team::getCharacters() {
@@ -53,8 +54,8 @@ namespace state {
     }
 
     void Team::addCharacter(std::shared_ptr<Character> character) {
-        if (characters.size() >= 16) {
-            std::cerr << "Team " << name << " is full (16 players max). Character not added." << std::endl;
+        if (characters.size() >= TEAM_MAX_PLAYERS) {
+            std::cerr << "Team " << name << " is full (" << TEAM_MAX_PLAYERS << " players max). Character not added." << std::endl;
             return;
         }
         characters.push_back(std::move(character));

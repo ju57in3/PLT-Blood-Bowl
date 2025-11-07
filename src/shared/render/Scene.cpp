@@ -13,7 +13,7 @@ namespace render{
     {
         this->id = sceneId;
         this->game = std::move(game);
-        if (window && this->game && sceneData.boardTexture.getSize().x == 0) {
+        if (window && this->game && !sceneData.isBoardLoaded()) {
             sceneData.init(window, this->game);
         }
     }
@@ -23,7 +23,6 @@ namespace render{
         if (!window) {
             return;
         }
-
         if (game && window->isOpen()) {
             window->clear(sf::Color::Black);
             sceneData.draw(window);
@@ -44,7 +43,7 @@ namespace render{
     }
     void Scene::setGame(std::shared_ptr<state::BloodBowlGame>& newGame) {
         game = newGame;
-        if (window && game && sceneData.boardTexture.getSize().x == 0) {
+        if (window && game && !sceneData.isBoardLoaded()) {
             sceneData.init(window, game);
         }
     }
@@ -55,7 +54,7 @@ namespace render{
 
     void Scene::setWindow(sf::RenderWindow* newWindow) {
         this->window = newWindow;
-        if (window && game && sceneData.boardTexture.getSize().x == 0) {
+        if (window && game && !sceneData.isBoardLoaded()) {
             sceneData.init(window, game);
         }
     }
