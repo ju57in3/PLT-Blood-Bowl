@@ -2,6 +2,8 @@
 #include <string>
 #include <memory>
 
+#include <render.h>
+
 // The following lines are here to check that SFML is installed and working
 #include <SFML/Graphics.hpp>
 
@@ -135,99 +137,34 @@ int main(int argc, char* argv[]) {
     orc11->setStatus(playable);
 
     // Initialize game
-    BloodBowlGame game(teamA, teamB);
-    
+    auto gamePtr = std::make_shared<BloodBowlGame>(BloodBowlGame(teamA,teamB));
+
     cout << "Initial Teams:\n";
     cout << "Team A (Humans):\n" << teamA << "\n";
     cout << "Team B (Orcs):\n" << teamB << "\n";
 
-    cout << "Coin toss winner: Team " << game.getCurrentTeam()->getTeamId() << "\n";
+    // testing render
+    cout << "\n=== TESTING RENDER ===\n";
+    render::Scene scene(render::SceneId::MENU, gamePtr);
 
-    cout << "\n=== INITIAL GAME STATE ===\n";
-    cout << game << endl;
+    // init scene
+    scene.init(render::SceneId::MENU, gamePtr);
 
-    // Test state machine progression
-    cout << "\n=== TESTING STATE MACHINE ===\n";
-    for (int round = 1; round <= 8; round++) {
-        cout << "\n--- Round " << round << " ---\n";
-        AbstractState *currentState = game.getCurrentState();
-        cout << "Before update:\n" << game << "\n";
-        // Simulate conditions based on current state to trigger transitions
-        if (currentState == game.getStateList().at(SETUP).get()) {
-            cout << "SETUP state detected - checking setup validity...\n";
-            Setup* setupState = static_cast<Setup*>(currentState);
-            // Check if both teams have valid setups
-            bool teamAValid = setupState->isValidSetup(game.getTeamA());
-            bool teamBValid = setupState->isValidSetup(game.getTeamB());
-            cout << "Team A setup valid: " << (teamAValid ? "YES" : "NO") << "\n";
-            cout << "  - Characters on board: " << setupState->nbCharacterOnBoard(game.getTeamA()) << " (max 11)\n";
-            cout << "  - Characters on line: " << setupState->nbCharacterOnLine(game.getTeamA()) << " (min 3)\n";
-            cout << "  - Characters on top: " << setupState->nbCharacterOnTop(game.getTeamA()) << " (max 2)\n";
-            cout << "  - Characters on bottom: " << setupState->nbCharacterOnBottom(game.getTeamA()) << " (max 2)\n";
-            cout << "Team B setup valid: " << (teamBValid ? "YES" : "NO") << "\n";
-            cout << "  - Characters on board: " << setupState->nbCharacterOnBoard(game.getTeamB()) << " (max 11)\n";
-            cout << "  - Characters on line: " << setupState->nbCharacterOnLine(game.getTeamB()) << " (min 3)\n";
-            cout << "  - Characters on top: " << setupState->nbCharacterOnTop(game.getTeamB()) << " (max 2)\n";
-            cout << "  - Characters on bottom: " << setupState->nbCharacterOnBottom(game.getTeamB()) << " (max 2)\n";
-            if (teamAValid && teamBValid) {
-                cout << "Both setups valid - ending setup to trigger transition...\n";
-                setupState->endSetup();
-            } else {
-                cout << "Invalid setup - staying in SETUP state\n";
+    // main loop
+    while (scene.getWindow()->isOpen()) {
+        sf::Event event{};
+        while (scene.getWindow()->pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                scene.getWindow()->close();
             }
         }
-        else if (currentState == game.getStateList().at(KICKOFF).get()) {
-            cout << "KICKOFF state detected - will automatically transition to PLAYERTURN\n";
-        }
-        else if (currentState == game.getStateList().at(PLAYERTURN).get()) {
-            cout << "PLAYERTURN state detected - simulating player actions...\n";
-            PlayerTurn* playerTurnState = static_cast<PlayerTurn*>(currentState);
-            // Simulate different outcomes based on round
-            if (round <= 3) {
-                cout << "Simulating normal turn end for team " << game.getCurrentTeam()->getTeamId() << "\n";
-                playerTurnState->setEndTurn(true);
-            } else if (round == 4) {
-                cout << "Simulating TOUCHDOWN for team " << game.getCurrentTeam()->getTeamId() << "!\n";
-                playerTurnState->setTouchDown(true);
-            } else {
-                cout << "Simulating TurnOver for team " << game.getCurrentTeam()->getTeamId() << "\n";
-                playerTurnState->setTurnOver(true);
-            }
-        }
-        else if (currentState == game.getStateList().at(HALFTIME).get()) {
-            cout << "HALFTIME state detected - will transition back to SETUP\n";
-        }
-        else if (currentState == game.getStateList().at(ENDGAME).get()) {
-            cout << "ENDGAME state detected - game over\n";
-        }
-        if (currentState) {
-            currentState->update();
-        }
-        cout << "After update:\n" << game << "\n";
-        // Stop if we reach endgame
-        if (game.getCurrentState() == game.getStateList().at(ENDGAME).get()) {
-            cout << "Game has ended!\n";
-            break;
-        }
+
+        // Dessin de la scène
+        scene.drawScene();
     }
 
-    // Test team switching and scoring
-    cout << "\n=== TESTING SCORING ===\n";
-    cout << "Before scoring:\n" << game << "\n";
-    
-    game.getCurrentTeam()->setScore(game.getCurrentTeam()->getScore() + 1);
-    cout << "After touchdown:\n" << game << "\n";
+    cout << "\nRender test completed successfully!\n";
 
-    // Test character status changes
-    cout << "\n=== TESTING CHARACTER STATUS CHANGES ===\n";
-    auto& characters = teamA.getCharacters();
-    if (!characters.empty()) {
-        cout << "Character example: " << *characters[0] << "\n";
-        // This shows the improved status display you implemented
-    }
-
-    cout << "\n=== FINAL STATE ===\n";
-    cout << game << "\n";
     
     cout << "\nTest completed successfully!\n";
     return 0;

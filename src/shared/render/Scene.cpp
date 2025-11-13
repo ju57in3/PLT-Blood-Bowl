@@ -1,13 +1,22 @@
 #include "Scene.h"
 
+#include "utility/Constants.h"
+
 namespace render{
 
     Scene::Scene(SceneId sceneId, std::shared_ptr<state::BloodBowlGame> game)
     : id(sceneId), window(nullptr), game(std::move(game)), sceneData("blue","red")
     {
+        window = new sf::RenderWindow(sf::VideoMode(800,600),"BloodBowl");
     }
 
-    Scene::~Scene() {}
+    Scene::~Scene() {
+        if (window) {
+            window->close();
+            delete window;
+            window = nullptr;
+        }
+    }
 
     void Scene::init(SceneId sceneId, std::shared_ptr<state::BloodBowlGame> game)
     {
