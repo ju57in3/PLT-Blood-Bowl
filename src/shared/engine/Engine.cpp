@@ -4,7 +4,7 @@
 #include "Engine.h"
 
 namespace engine{
-    bool checkTouchDown(std::shared_ptr<state::BloodBowlGame> game)
+    bool checkTouchDown(std::shared_ptr<state::BloodBowlGame> game)  //Ici, on a pris le partit de définir une fonction et non une méthode pour pouvoir l'appeler à chaque action commandée par engine!
     {
         if (!game->getBallIsHold())
         {
