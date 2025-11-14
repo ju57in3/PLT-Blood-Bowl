@@ -89,6 +89,8 @@ namespace engine {
         }
         if (blockResult == Pushed || blockResult == DefenderStumbles)
         {
+            //Il faudra voir si on autorise la poussée du joueur defenseur sur d'autres cases que celle derrière lui.
+            //Peut-on tacler un joueur dans le sens adverses du jeu? Verticalement?
             std::pair<int,int> newTarget;
             std::pair<int,int> actualTarget;
 
