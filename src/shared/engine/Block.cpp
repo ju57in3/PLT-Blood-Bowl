@@ -1,4 +1,5 @@
 #include "Block.h"
+#include <memory>
 
 #include <state/PlayerTurn.h>
 
@@ -12,10 +13,11 @@ namespace engine {
         int roll1 = rollDice(6);
         diceResult = roll1; //Si l'attaquant et le défenseur ont le même nombre de points de force, il n'y a qu'un seul lancé de dé
 
-        if (attacker->getStrength()>= defender->getStrength())
+        if (attacker->getStrength() > defender->getStrength())
         {
             int roll2 = rollDice(6);
             diceResult = std::max(roll1,roll2);  // Le choix arrangeant le plus l'attaquant sont les résultats élevés
+            // pas forcément : l(attaquant doit choisir dois choisir le résultat.
             if (attacker->getStrength()>= 2*defender->getStrength())
             {
                 int roll3 = rollDice(6);
@@ -23,10 +25,11 @@ namespace engine {
             }
         }
 
-        else if (attacker->getStrength() <= defender->getStrength())
+        else if (attacker->getStrength() < defender->getStrength())
         {
             int roll2 = rollDice(6);
             diceResult = std::min(roll1,roll2); // Le choix arrangeant le plus le défenseur sont les résultats faibles
+            // meme chose... le defenseur doit choisir ce q'il veut.
             if (attacker->getStrength()>= 2*defender->getStrength())
             {
                 int roll3 = rollDice(6);
@@ -34,6 +37,7 @@ namespace engine {
             }
         }
 
+        // bares ne va pas etre content mdrr
         if (diceResult == 1)
         {
             blockResult = AttackerDown;
@@ -60,6 +64,7 @@ namespace engine {
     {
         int roll1 = rollDice(6);
         int roll2 = rollDice(6);
+        // why not : rollDice(12); ??
         if (roll1 + roll2 >= targetCharacter->getArmor())
         {
             roll1 = rollDice(6);
@@ -76,6 +81,8 @@ namespace engine {
             {
                 targetCharacter->setStatus(state::CharacterStatus::ko);
             }
+
+            // manque le cas de blessure
         }
     }
 
@@ -90,7 +97,7 @@ namespace engine {
         if (blockResult == Pushed || blockResult == DefenderStumbles)
         {
             //Il faudra voir si on autorise la poussée du joueur defenseur sur d'autres cases que celle derrière lui.
-            //Peut-on tacler un joueur dans le sens adverses du jeu? Verticalement?
+            //Peut-on tacler un joueur dans le sens adverses du jeu? Verticalement? // OUI
             std::pair<int,int> newTarget;
             std::pair<int,int> actualTarget;
 
