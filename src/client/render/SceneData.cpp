@@ -42,13 +42,13 @@ namespace render{
         playersSprites_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
         playersSprites_TeamB.resize(Constants::MAX_PLAYERS_PER_TEAM);
 
-        if (loadTextureFromFile("res/board.png", boardTexture)) {
+        if (loadTextureFromFile("../res/board.png", boardTexture)) {
             board.setTexture(boardTexture);
         } else {
             std::cerr << "Error loading res/board.png" << std::endl;
         }
 
-        const std::string charactersDir = "res/characters/";
+        const std::string charactersDir = "../res/characters/";
         if (!std::filesystem::exists(charactersDir) || !std::filesystem::is_directory(charactersDir)) {
             std::cerr << "Error: characters directory does not exist: " << charactersDir << std::endl;
             return;

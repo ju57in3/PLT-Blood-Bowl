@@ -7,7 +7,8 @@ namespace render{
     Scene::Scene(SceneId sceneId, std::shared_ptr<state::BloodBowlGame> game)
     : id(sceneId), window(nullptr), game(std::move(game)), sceneData("blue","red")
     {
-        window = new sf::RenderWindow(sf::VideoMode(800,600),"BloodBowl");
+        window = new sf::RenderWindow(sf::VideoMode(1920,1080),"BloodBowl");
+        sceneData.init(window, this->game);
     }
 
     Scene::~Scene() {
@@ -15,15 +16,6 @@ namespace render{
             window->close();
             delete window;
             window = nullptr;
-        }
-    }
-
-    void Scene::init(SceneId sceneId, std::shared_ptr<state::BloodBowlGame> game)
-    {
-        this->id = sceneId;
-        this->game = std::move(game);
-        if (window && this->game && !sceneData.isBoardLoaded()) {
-            sceneData.init(window, this->game);
         }
     }
 
