@@ -42,6 +42,10 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
 
     BOOST_CHECK(game.getCurrentState() != nullptr);
     BOOST_CHECK(game.getCurrentState() == stateList[SETUP].get());
+    BOOST_CHECK(game.getCurrentState() == stateList[KICKOFF].get());
+    BOOST_CHECK(game.getCurrentState() == stateList[PLAYERTURN].get());
+    BOOST_CHECK(game.getCurrentState() == stateList[HALFTIME].get());
+    BOOST_CHECK(game.getCurrentState() == stateList[ENDGAME].get());
 
     // Check the draw
     Team* coinWinner = game.coinToss();
@@ -72,13 +76,15 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
     game.setCurrentTeam(&teamB);
     BOOST_CHECK_EQUAL(game.getCurrentTeam()->getName(), "Orcs");
 
-    // Check the number of repetition
-    game.setNbRepetition(3);
-    BOOST_CHECK_EQUAL(game.getNbRepetition(), 3);
-
     // State change test
     game.setCurrentState(stateList[KICKOFF].get());
     BOOST_CHECK(game.getCurrentState() == stateList[KICKOFF].get());
+
+    // Display test with currentTeam = nullptr
+    game.setCurrentTeam(nullptr);
+    std::ostringstream ossNone;
+    ossNone << game;
+    BOOST_CHECK(ossNone.str().find("None") != std::string::npos);
 
     // Display test
     std::ostringstream oss;

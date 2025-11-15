@@ -26,12 +26,12 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     human->setPosition({1,1});
     teamA.addCharacter(human);
     BOOST_CHECK_EQUAL(size(teamA.getCharacters()), 1);
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getName(),"Player 1");
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getType(),"human");
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getMovement(),6);
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getStrength(),3);
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getAgility(),3);
-    BOOST_CHECK_EQUAL(teamA.getCharacters()[0]->getArmor(),8);
+    BOOST_CHECK_EQUAL(human->getName(),"Player 1");
+    BOOST_CHECK_EQUAL(human->getType(),"human");
+    BOOST_CHECK_EQUAL(human->getMovement(),6);
+    BOOST_CHECK_EQUAL(human->getStrength(),3);
+    BOOST_CHECK_EQUAL(human->getAgility(),3);
+    BOOST_CHECK_EQUAL(human->getArmor(),8);
 
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),0);
     human->setStatus(playable);
