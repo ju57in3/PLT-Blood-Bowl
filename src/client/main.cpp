@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     hum1->setPosition({12, 6});
     hum1->setStatus(playable);
 
-    auto hum2 = std::make_shared<Character>(2.,"Ligne2", "human_blitzer", 6, 3, 3, 8);
+    auto hum2 = std::make_shared<Character>(2,"Ligne2", "human_blitzer", 6, 3, 3, 8);
     teamA.addCharacter(hum2);
     hum2->setPosition({12, 7});
     hum2->setStatus(playable);
@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
     orc11->setStatus(playable);
 
     // Initialize game
-    auto gamePtr = std::make_shared<BloodBowlGame>(BloodBowlGame(teamA,teamB));
+    auto gamePtr = std::make_shared<BloodBowlGame>(teamA, teamB);
 
     cout << "Initial Teams:\n";
     cout << "Team A (Humans):\n" << teamA << "\n";

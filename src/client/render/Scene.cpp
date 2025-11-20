@@ -26,6 +26,7 @@ namespace render{
         }
         if (game && window->isOpen()) {
             window->clear(sf::Color::Black);
+            sceneData.updatePositions(game);  // Update sprite positions from game state
             sceneData.draw(window);
             window->display();
         }
