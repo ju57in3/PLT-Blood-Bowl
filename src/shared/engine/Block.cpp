@@ -111,7 +111,7 @@ namespace engine {
         int followDefender = -1;
         while (!correctAnswer)
         {
-            std::cout << "Veuillez choisir si vous souhaitez poursuivre le défenseur avec votre attaquant en tapant 1 pour OUI ou 0 pour NON." << endl;
+            std::cout << "Veuillez choisir si vous souhaitez poursuivre le défenseur avec votre attaquant en tapant 1 pour OUI ou 0 pour NON." << std::endl;
             std::cin >> followDefender;
             if (followDefender == 1)
             {
