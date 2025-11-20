@@ -96,7 +96,7 @@ namespace engine {
         return BlockId;
     }
 
-    void Block::rollBlockDice()
+    static BlockResult rollBlockDice(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender)
     {
         bool answered = false;
         std::vector<int> listOfDiceResult;
@@ -129,27 +129,27 @@ namespace engine {
 
         if (diceResult == 1)
         {
-            blockResult = AttackerDown;
+            return AttackerDown;
         }
         if (diceResult == 2)
         {
-            blockResult = BothDown;
+            return BothDown;
         }
         if (diceResult == 3 || diceResult == 4)
         {
-            blockResult = Pushed;
+            return Pushed;
         }
         if (diceResult == 5)
         {
-            blockResult = DefenderStumbles;
+            return DefenderStumbles;
         }
         if (diceResult == 6)
         {
-            blockResult = DefenderDown;
+            return DefenderDown;
         }
     }
 
-    void Block::resolveInjury(std::shared_ptr<state::Character> targetCharacter)
+    void resolveInjury(std::shared_ptr<state::Character> targetCharacter)
     {
         int roll1 = rand() % 11 + 1;
         if (roll1>= targetCharacter->getArmor())
@@ -175,7 +175,8 @@ namespace engine {
 
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)
     {
-        rollBlockDice();
+        blockResult=rollBlockDice(attacker,defender);
+
         if (blockResult == AttackerDown || blockResult == BothDown)
         {
             resolveInjury(attacker);
