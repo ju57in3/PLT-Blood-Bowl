@@ -132,6 +132,9 @@ namespace engine {
             //Gestion Esquive du plaquage. A faire plus tard. En attendant, on considère qu'il est plaqué à chaque fois
             resolveInjury(defender);
         }
+
+        // Vérification touchdown (cas où le ballon se déplace suite au plaquage)
+        checkAndHandleTouchdown(game);
     }
 
 };

@@ -11,6 +11,8 @@
 #include <iomanip>
 #include <random>
 
+#include "utility/Constants.h"
+
 namespace  state {
 
     static void placeFromTeam(const Team& team, char mark, std::vector<std::string> &grid, int w, int h) {
@@ -72,8 +74,8 @@ namespace  state {
         stateList.push_back(std::make_unique<HalfTime>(this));
         stateList.push_back(std::make_unique<EndGame>(this));
         currentState = stateList.at(SETUP).get(); // initial state
-        width = 26;
-        height = 15;
+        width = utility::Constants::BOARD_WIDTH;
+        height = utility::Constants::BOARD_HEIGHT;
         ballIsHold = false;
     }
 

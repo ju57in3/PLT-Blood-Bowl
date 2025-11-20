@@ -35,6 +35,13 @@ namespace engine {
     void Move::execute(std::shared_ptr<state::BloodBowlGame> game) {
         if (std::find(range.begin(), range.end(), position) != range.end()) {
             character->setPosition(position);
+
+            if (character->getHasBall()) {
+                game->setBallPosition(position);
+            }
+
+            // Vérification touchdown
+            checkAndHandleTouchdown(game);
         }
     }
 }

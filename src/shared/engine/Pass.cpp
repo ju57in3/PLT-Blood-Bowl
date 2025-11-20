@@ -9,6 +9,8 @@
 #include <state/PlayerTurn.h>
 #include <random>
 
+#include "utility/Constants.h"
+
 namespace engine {
 
     // TODO: généralisation de countTackleZone
@@ -71,6 +73,7 @@ namespace engine {
         int ny = from.second + dy;
         return {nx, ny};
     }
+
 
     Pass::Pass(std::shared_ptr<state::Character> passer, std::shared_ptr<state::Character> receiver)
         : passer(std::move(passer)), receiver(std::move(receiver)) {
@@ -248,7 +251,6 @@ namespace engine {
             receiver->setHasBall(true);
             game->setBallPosition(receiver->getPosition());
             game->setBallIsHold(true);
-            if (receiver->getStatus() == state::playable) receiver->setStatus(state::played);
         } else {
             auto scatterPos = receiver->getPosition();
             scatterPos = scatterOnce(scatterPos, game->getWidth(), game->getHeight());
@@ -259,5 +261,8 @@ namespace engine {
                 pt->setTurnOver(true);
             }
         }
+
+        // Vérification touchdown centralisée
+        checkAndHandleTouchdown(game);
     }
 }
