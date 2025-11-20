@@ -80,6 +80,12 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
     game.setCurrentState(stateList[KICKOFF].get());
     BOOST_CHECK(game.getCurrentState() == stateList[KICKOFF].get());
 
+    // Display test with currentTeam = nullptr
+    game.setCurrentTeam(nullptr);
+    std::ostringstream ossNone;
+    ossNone << game;
+    BOOST_CHECK(ossNone.str().find("None") != std::string::npos);
+
     // Display test
     std::ostringstream oss;
     oss << game;

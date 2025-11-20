@@ -2,7 +2,6 @@
 
 #include "Team.h"
 #include "BloodBowlGame.h"
-#include "PlayerTurn.h"
 
 
 namespace state {
@@ -81,8 +80,10 @@ namespace state {
     }
 
     Kickoff::~Kickoff() {
-
     }
 
+    std::string Kickoff::getName() const {
+        return "Kickoff";
+    }
 
 }

@@ -40,4 +40,7 @@ namespace state {
     HalfTime::~HalfTime() {
     }
 
+    std::string HalfTime::getName() const {
+        return "HalfTime";
+    }
 }

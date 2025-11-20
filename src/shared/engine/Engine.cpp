@@ -3,48 +3,49 @@
 //
 #include "Engine.h"
 #include <memory>
+#include <utility>
 
 namespace engine {
 
-Engine::Engine()
-    : gameState(nullptr)
-{
-}
-
-Engine::~Engine() = default;
-
-std::shared_ptr<state::BloodBowlGame> Engine::getGameState()
-{
-    return gameState;
-}
-
-void Engine::setGameState(std::shared_ptr<state::BloodBowlGame> newGameState)
-{
-    gameState = std::move(newGameState);
-}
-
-void Engine::executeCommand()
-{
-    if (commandHistory.empty()) {
-        return;
-    }
-    if (!gameState) {
-        return;
+    Engine::Engine(std::shared_ptr<state::BloodBowlGame> game)
+        : game(std::move(game))
+    {
     }
 
-    auto cmd = std::move(commandHistory.front());
-    commandHistory.pop_front();
-    if (cmd) {
-        cmd->execute(gameState);
-    }
-}
+    Engine::~Engine() = default;
 
-void Engine::addCommand(std::unique_ptr<Command> cmd_ptr)
-{
-    if (!cmd_ptr) {
-        return;
+    std::shared_ptr<state::BloodBowlGame> Engine::getGameState()
+    {
+        return game;
     }
-    commandHistory.push_back(std::move(cmd_ptr));
-}
+
+    void Engine::setGameState(std::shared_ptr<state::BloodBowlGame> newGameState)
+    {
+        game = std::move(newGameState);
+    }
+
+    void Engine::executeCommand()
+    {
+        if (commandHistory.empty()) {
+            return;
+        }
+        if (!game) {
+            return;
+        }
+
+        auto cmd = std::move(commandHistory.front());
+        commandHistory.pop_front();
+        if (cmd) {
+            cmd->execute(game);
+        }
+    }
+
+    void Engine::addCommand(std::unique_ptr<Command> cmd_ptr)
+    {
+        if (!cmd_ptr) {
+            return;
+        }
+        commandHistory.push_back(std::move(cmd_ptr));
+    }
 
 } // namespace engine

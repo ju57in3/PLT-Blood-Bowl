@@ -36,5 +36,9 @@ namespace state {
         this->restart = restartValue;
     }
 
+    std::string EndGame::getName() const {
+        return "EndGame";
+    }
+
 
 }

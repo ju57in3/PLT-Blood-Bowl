@@ -5,6 +5,9 @@
 #include "HalfTime.h"
 #include "Setup.h"
 #include "Team.h"
+#include "utility/Constants.h"
+
+using namespace utility;
 
 namespace state {
     PlayerTurn::PlayerTurn(BloodBowlGame* game) : AbstractState(game) {
@@ -27,10 +30,6 @@ namespace state {
             return;
         }
 
-        if (scored) {
-            game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
-        }
-
         restoreCharactersStatus();
 
         switchTeam();
@@ -41,9 +40,9 @@ namespace state {
         if (scored) {
             // After a touchdown we go to setup for the next kickoff/setup
             game->setCurrentState(game->getStateList().at(SETUP).get());
-        } else if (tc == 16) {
+        } else if (tc == Constants::HALF_TIME_TURN) {
             game->setCurrentState(game->getStateList().at(HALFTIME).get());
-        } else if (tc == 32) {
+        } else if (tc == Constants::END_GAME_TURN) {
             game->setCurrentState(game->getStateList().at(ENDGAME).get());
         } else {
             game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
@@ -106,4 +105,7 @@ namespace state {
 
     }
 
+    std::string PlayerTurn::getName() const {
+        return "PlayerTurn";
+    }
 }

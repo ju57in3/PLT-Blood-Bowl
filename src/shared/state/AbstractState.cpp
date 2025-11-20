@@ -6,8 +6,9 @@ namespace state {
 
     void AbstractState::update() {}
 
+    std::string AbstractState::getName() const {
+        return "AbstractState";
+    }
+
     AbstractState::~AbstractState() {}
-
-
-
 } // namespace state

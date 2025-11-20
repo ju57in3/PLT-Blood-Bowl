@@ -1,20 +1,26 @@
 #include "Move.h"
 #include <algorithm>
+#include <utility>
+
 
 namespace engine {
-    Move::Move(state::Character character, std::pair<int, int> targetPosition)
-        : character(character), position(targetPosition) {
+    Move::Move(std::shared_ptr<state::Character> character, std::pair<int, int> targetPosition)
+        : character(character), position(std::move(targetPosition)) {
         dodgeAttempts = 0;
-        int current_xposition = character.getPosition().first;
-        int current_yposition = character.getPosition().second;
-        for (int i= -character.getMovement(); i<= character.getMovement();i++) {
-            for (int j= -character.getMovement(); j<= character.getMovement(); j++) {
+        int current_xposition = character->getPosition().first;
+        int current_yposition = character->getPosition().second;
+        for (int i= -character->getMovement(); i<= character->getMovement();i++) {
+            for (int j= -character->getMovement(); j<= character->getMovement(); j++) {
                 range.push_back(std::make_pair(current_xposition + i,current_yposition + j)); // Add condition if case already taken
             }
         }
     }
 
     Move::~Move() {
+    }
+
+    CommandTypeId Move::getCommandTypeId() {
+        return MoveId;
     }
 
     std::vector<std::pair<int, int> > Move::calculatePath(std::pair<int, int> dest) {
@@ -28,10 +34,14 @@ namespace engine {
 
     void Move::execute(std::shared_ptr<state::BloodBowlGame> game) {
         if (std::find(range.begin(), range.end(), position) != range.end()) {
-            character.setPosition(position);
+            character->setPosition(position);
+
+            if (character->getHasBall()) {
+                game->setBallPosition(position);
+            }
+
+            // Vérification touchdown
+            checkAndHandleTouchdown(game);
         }
     }
-
-
-
 }

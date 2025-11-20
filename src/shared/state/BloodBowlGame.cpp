@@ -11,23 +11,9 @@
 #include <iomanip>
 #include <random>
 
-namespace  state {
+#include "utility/Constants.h"
 
-    const char* stateToString(const BloodBowlGame& game)  {
-        if (game.getCurrentState() == game.getStateList().at(SETUP).get()) {
-            return "Setup";
-        } else if (game.getCurrentState() == game.getStateList().at(KICKOFF).get()) {
-            return "Kickoff";
-        } else if (game.getCurrentState() == game.getStateList().at(PLAYERTURN).get()) {
-            return "PlayerTurn";
-        } else if (game.getCurrentState() == game.getStateList().at(HALFTIME).get()) {
-            return "HalfTime";
-        } else if (game.getCurrentState() == game.getStateList().at(ENDGAME).get()) {
-            return "EndGame";
-        } else {
-            return "Unknown State";
-        }
-    }
+namespace  state {
 
     static void placeFromTeam(const Team& team, char mark, std::vector<std::string> &grid, int w, int h) {
         for (const auto& pptr : team.getCharacters()) {
@@ -88,8 +74,8 @@ namespace  state {
         stateList.push_back(std::make_unique<HalfTime>(this));
         stateList.push_back(std::make_unique<EndGame>(this));
         currentState = stateList.at(SETUP).get(); // initial state
-        width = 26;
-        height = 15;
+        width = utility::Constants::BOARD_WIDTH;
+        height = utility::Constants::BOARD_HEIGHT;
         ballIsHold = false;
     }
 
@@ -170,7 +156,7 @@ namespace  state {
 
     std::ostream& operator<<(std::ostream& os, const BloodBowlGame& game) {
         os << "\n=== GAME STATE ===\n";
-        os << "Current State: " << stateToString(game)<< "\n";
+        os << "Current State: " << (game.getCurrentState() ? game.getCurrentState()->getName() : "None") << "\n";
         os << "Turn Counter: " << game.getTurnCounter() << "\n";
         os << "Current Team: ";
         if (game.getCurrentTeam())

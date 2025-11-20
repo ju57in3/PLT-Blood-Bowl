@@ -38,6 +38,13 @@ namespace engine {
     }
 
     static void choosePushedPosition(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender)
+    Block::~Block() = default;
+
+    CommandTypeId Block::getCommandTypeId() {
+        return BlockId;
+    }
+
+    int chooseDiceResult(std::vector<int>)
     {
         int answer;
         std::vector<std::pair<int,int>> listOfPositions;
@@ -91,8 +98,6 @@ namespace engine {
         defender->setPosition(newPosition);
 
     }
-
-
     void Block::rollBlockDice()
     {
         bool answered = false;
@@ -123,7 +128,6 @@ namespace engine {
         }
 
         int diceResult = chooseDiceResult(listOfDiceResult);
-
 
         if (diceResult == 1)
         {
@@ -195,7 +199,5 @@ namespace engine {
             resolveInjury(defender);
         }
     }
-
-
 
 };

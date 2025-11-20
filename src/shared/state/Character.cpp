@@ -17,14 +17,22 @@ namespace state {
         }
     }
 
-    Character::Character(std::string name, std::string type, int movement, int strength, int agility, int armor)
-        : name(std::move(name)), type(std::move(type)), movement(movement), strength(strength), agility(agility), armor(armor)
+    Character::Character(int id, std::string name, std::string type, int movement, int strength, int agility, int armor)
+        : id(id), name(std::move(name)), type(std::move(type)), movement(movement), strength(strength), agility(agility), armor(armor)
         {
             
             this->currentPosition = std::make_pair(-1,-1);
             this->hasBall = false;
             this->status = bench;
         }
+
+    int Character::getId() const {
+        return id;
+    }
+
+    void Character::setId(int idValue) {
+        this->id = idValue;
+    }
 
     std::string Character::getName() const
     {
