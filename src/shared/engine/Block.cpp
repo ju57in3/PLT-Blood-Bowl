@@ -49,6 +49,7 @@ namespace engine {
         int Dx = defender_x - attacker_x;
         int Dy = defender_y - attacker_y;
 
+        std::pair<int,int> oldPosition = defender->getPosition(); //Utile pour la poursuite de l'attaquant
 
         std::pair<int,int> newPosition1;
         std::pair<int,int> newPosition2;
@@ -86,10 +87,42 @@ namespace engine {
             newPosition3.first= defender_x + Dx;
             newPosition3.second = defender_y;
         }
+        bool correctAnswer = false;
+        while (!correctAnswer)
+        {
+            std::cin >> answer;
+
+            if (answer<listOfPositions.size() || answer>1)
+            {
+                correctAnswer = true;
+            }
+            else{
+                std::cout << "Choix invalide. Veuillez entrer un nombre entre 1 et " << listOfPositions.size() << " pour choisir la position associée. \r\n" << std::endl;
+            }
+        }
+        correctAnswer = false; // Pour pouvoir l'utiliser pour la seconde requête
 
         std::pair<int,int> newPosition = listOfPositions[answer-1];
         defender->setPosition(newPosition);
 
+        std::cout << "Vous avez choisi la position (" << listOfPositions[answer-1].first <<"," <<listOfPositions[answer-1].second << ") .\r\n" << std::endl;
+
+        //Choix de poursuivre ou non
+        int followDefender = -1;
+        while (!correctAnswer)
+        {
+            std::cout << "Veuillez choisir si vous souhaitez poursuivre le défenseur avec votre attaquant en tapant 1 pour OUI ou 0 pour NON." << endl;
+            std::cin >> followDefender;
+            if (followDefender == 1)
+            {
+                attacker->setPosition(oldPosition);
+                correctAnswer = true;
+            }
+            else if (followDefender == 0)
+            {
+                correctAnswer = true;
+            }
+        }
     }
 
     CommandTypeId Block::getCommandTypeId() {
@@ -182,9 +215,7 @@ namespace engine {
         }
         if (blockResult == Pushed || blockResult == DefenderStumbles)
         {
-            // choosePushedPosition(attacker->getPosition(),defender->getPosition());
             choosePushedPosition(attacker,defender);
-
         }
         if (blockResult == DefenderDown || blockResult == BothDown) //Si pas d'esquive, la dernière boucle s'inclue ici.
         {
@@ -196,5 +227,4 @@ namespace engine {
             resolveInjury(defender);
         }
     }
-
 };
