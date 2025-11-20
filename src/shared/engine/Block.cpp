@@ -168,8 +168,6 @@ namespace engine {
             {
                 targetCharacter->setStatus(state::CharacterStatus::ko);
             }
-
-            // manque le cas de blessure
         }
     }
 
