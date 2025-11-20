@@ -8,7 +8,7 @@
 namespace engine {
 
     Engine::Engine(std::shared_ptr<state::BloodBowlGame> game)
-        : gameState(std::move(game))
+        : game(std::move(game))
     {
     }
 
@@ -16,12 +16,12 @@ namespace engine {
 
     std::shared_ptr<state::BloodBowlGame> Engine::getGameState()
     {
-        return gameState;
+        return game;
     }
 
     void Engine::setGameState(std::shared_ptr<state::BloodBowlGame> newGameState)
     {
-        gameState = std::move(newGameState);
+        game = std::move(newGameState);
     }
 
     void Engine::executeCommand()
@@ -29,14 +29,14 @@ namespace engine {
         if (commandHistory.empty()) {
             return;
         }
-        if (!gameState) {
+        if (!game) {
             return;
         }
 
         auto cmd = std::move(commandHistory.front());
         commandHistory.pop_front();
         if (cmd) {
-            cmd->execute(gameState);
+            cmd->execute(game);
         }
     }
 

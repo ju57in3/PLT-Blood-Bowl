@@ -5,7 +5,7 @@
 
 namespace engine {
     Move::Move(std::shared_ptr<state::Character> character, std::pair<int, int> targetPosition)
-        : position(std::move(targetPosition)), character(std::move(character)) {
+        : character(character), position(std::move(targetPosition)) {
         dodgeAttempts = 0;
         int current_xposition = character->getPosition().first;
         int current_yposition = character->getPosition().second;

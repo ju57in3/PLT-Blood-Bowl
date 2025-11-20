@@ -151,11 +151,12 @@ int main(int argc, char* argv[]) {
     engine::Engine eng(gamePtr);
 
     // Create and add commands
-    std::unique_ptr<engine::Command> cmd_ptr = std::make_unique<engine::Command>(engine::Move(hum1, std::make_pair(10,6)));
+    cout << "\n=== TESTING COMMANDS ===\n";
+    cout << "Position initiale de hum1: (" << hum1->getPosition().first << ", " << hum1->getPosition().second << ")\n";
+
+    std::unique_ptr<engine::Command> cmd_ptr(new engine::Move(hum1, std::make_pair(10,6)));
     eng.addCommand(std::move(cmd_ptr));
 
-    // Execute the command
-    eng.executeCommand();
 
     // main loop
     while (scene.getWindow()->isOpen()) {
@@ -169,6 +170,16 @@ int main(int argc, char* argv[]) {
                     case sf::Keyboard::Escape:
                         scene.getWindow()->close();
                         break;
+
+                    case sf::Keyboard::Space:
+                        eng.executeCommand();
+                        cout << "Position de hum1 après commande: (" << hum1->getPosition().first << ", " << hum1->getPosition().second << ")\n";
+                        break;
+
+                    case sf::Keyboard::L:
+                        cout << gamePtr->getTeamA() << endl;
+                        break;
+
                     default:
                         break;
                 }
