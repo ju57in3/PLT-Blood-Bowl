@@ -2,42 +2,46 @@
 #include <memory>
 
 #include <state/PlayerTurn.h>
+#include <iostream>
 
 namespace engine {
     Block::Block(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender):attacker(attacker), defender(defender){}
 
+    int chooseDiceResult(std::vector<int>)
+    {
+        return 1; // return 0; mettre à jour
+    }
     void Block::rollBlockDice()
     {
-        int diceResult;
+        bool answered = false;
+        std::vector<int> listOfDiceResult;
         int range = 6; //Range lancé de Dé pour le Block
-        int roll1 = rollDice(6);
-        diceResult = roll1; //Si l'attaquant et le défenseur ont le même nombre de points de force, il n'y a qu'un seul lancé de dé
+        int roll1 = rand() % range + 1;
+        int roll2 = rand() % range + 1;
+        int roll3 = rand() % range + 1;
+
+        listOfDiceResult.push_back(roll1); //Si l'attaquant et le défenseur ont le même nombre de points de force, il n'y a qu'un seul lancé de dé
 
         if (attacker->getStrength() > defender->getStrength())
         {
-            int roll2 = rollDice(6);
-            diceResult = std::max(roll1,roll2);  // Le choix arrangeant le plus l'attaquant sont les résultats élevés
-            // pas forcément : l(attaquant doit choisir dois choisir le résultat.
+            listOfDiceResult.push_back(roll2);
             if (attacker->getStrength()>= 2*defender->getStrength())
             {
-                int roll3 = rollDice(6);
-                diceResult = std::max(roll3,diceResult);
+                listOfDiceResult.push_back(roll3);
             }
         }
 
         else if (attacker->getStrength() < defender->getStrength())
         {
-            int roll2 = rollDice(6);
-            diceResult = std::min(roll1,roll2); // Le choix arrangeant le plus le défenseur sont les résultats faibles
-            // meme chose... le defenseur doit choisir ce q'il veut.
+            listOfDiceResult.push_back(roll2);
             if (attacker->getStrength()>= 2*defender->getStrength())
             {
-                int roll3 = rollDice(6);
-                diceResult = std::min(roll3,diceResult);
+                listOfDiceResult.push_back(roll3);
             }
         }
 
-        // bares ne va pas etre content mdrr
+        int diceResult = chooseDiceResult(listOfDiceResult);
+
         if (diceResult == 1)
         {
             blockResult = AttackerDown;
@@ -62,22 +66,20 @@ namespace engine {
 
     void Block::resolveInjury(std::shared_ptr<state::Character> targetCharacter)
     {
-        int roll1 = rollDice(6);
-        int roll2 = rollDice(6);
-        // why not : rollDice(12); ??
-        if (roll1 + roll2 >= targetCharacter->getArmor())
+        int roll1 = rand() % 11 + 1;
+        if (roll1>= targetCharacter->getArmor())
         {
-            roll1 = rollDice(6);
-            roll2 = rollDice(6);
-            if (roll1 + roll2 <= 7)
+            int roll2 = rand() % 6 + 1;
+            int roll3 = rand() % 6 + 1;
+            if (roll2 + roll3 <= 7)
             {
                 targetCharacter->setStatus(state::CharacterStatus::knockedDown);
             }
-            else if (roll1 + roll2 <= 9)
+            else if (roll2 + roll3 <= 9)
             {
                 targetCharacter->setStatus(state::CharacterStatus::injured);
             }
-            else if (roll1 + roll2 <= 12)
+            else if (roll2 + roll3 <= 12)
             {
                 targetCharacter->setStatus(state::CharacterStatus::ko);
             }
@@ -96,8 +98,12 @@ namespace engine {
         }
         if (blockResult == Pushed || blockResult == DefenderStumbles)
         {
-            //Il faudra voir si on autorise la poussée du joueur defenseur sur d'autres cases que celle derrière lui.
-            //Peut-on tacler un joueur dans le sens adverses du jeu? Verticalement? // OUI
+            std::pair<int,int> target1;
+            std::pair<int,int> target2;
+            std::pair<int,int> target3;
+
+
+            /*
             std::pair<int,int> newTarget;
             std::pair<int,int> actualTarget;
 
@@ -109,6 +115,7 @@ namespace engine {
 
             defender->setPosition(newTarget);
             attacker->setPosition(actualTarget); //Pour l'instant, on considère que l'attaquant prend obligatoirement la place du défenseur. Il faudra coder une requête auprès de l'utilisateur.
+            */
         }
         if (blockResult == DefenderDown || blockResult == BothDown)
         {
