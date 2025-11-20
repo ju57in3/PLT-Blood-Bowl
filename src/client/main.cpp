@@ -12,8 +12,8 @@ void testSFML() {
 
 #include <client.h>
 #include <state.h>
-
 #include <render.h>
+#include <engine.h>
 
 using namespace std;
 using namespace client;
@@ -146,6 +146,16 @@ int main(int argc, char* argv[]) {
     // testing render
     cout << "\n=== TESTING RENDER ===\n";
     render::Scene scene(render::SceneId::MENU, gamePtr);
+
+    // Create Engine
+    engine::Engine eng(gamePtr);
+
+    // Create and add commands
+    std::unique_ptr<engine::Command> cmd_ptr = std::make_unique<engine::Command>(engine::Move(hum1, std::make_pair(10,6)));
+    eng.addCommand(std::move(cmd_ptr));
+
+    // Execute the command
+    eng.executeCommand();
 
     // main loop
     while (scene.getWindow()->isOpen()) {

@@ -69,9 +69,6 @@ namespace engine {
         }
         int nx = from.first + dx;
         int ny = from.second + dy;
-        // rester dans les limites
-        if (nx < 0) nx = 0; if (nx >= width) nx = width - 1;
-        if (ny < 0) ny = 0; if (ny >= height) ny = height - 1;
         return {nx, ny};
     }
 
@@ -80,6 +77,10 @@ namespace engine {
     }
 
     Pass::~Pass() = default;
+
+    CommandTypeId Pass::getCommandTypeId() {
+        return PassId;
+    }
 
     std::vector<std::shared_ptr<state::Character>> Pass::checkInterceptions(const std::shared_ptr<state::BloodBowlGame>& game) {
         auto from = passer->getPosition();
@@ -204,7 +205,7 @@ namespace engine {
         bool passAccurate = false;
         if (!automaticFumble) {
             int passModifiers = rangeMod - passerTZ; // -1 par zone de tacle adverse sur passeur
-            passAccurate = agilityTest(passer->getAgility(), passModifiers, [&](int r){ return rollDice(r); });
+            passAccurate = agilityTest(passer->getAgility(), passModifiers, [&](int r){ return rand() % r; });
         }
 
         if (!passAccurate) {
@@ -225,7 +226,7 @@ namespace engine {
             // Modificateurs interception: -2 + zones de tacle (déjà inclus via countTackleZones sur inter par adversaires? Officiellement -2 et -1 par TZ adverse sur intercepteur). On ajoute -2 et - countTackleZones par équipe du passeur.
             int interTZ = countTackleZones(*chosenInterceptor, *passerTeam);
             int interceptionModifiers = -2 - interTZ;
-            bool interceptionSuccess = agilityTest(chosenInterceptor->getAgility(), interceptionModifiers, [&](int r){ return rollDice(r); });
+            bool interceptionSuccess = agilityTest(chosenInterceptor->getAgility(), interceptionModifiers, [&](int r){ return rand() % r; });
             if (interceptionSuccess) {
                 passer->setHasBall(false);
                 chosenInterceptor->setHasBall(true);
@@ -240,7 +241,7 @@ namespace engine {
 
         int catcherTZ = countTackleZones(*receiver, *opposingTeam);
         int catchModifiers = +1 /* accurate */ - catcherTZ;
-        bool catchSuccess = agilityTest(receiver->getAgility(), catchModifiers, [&](int r){ return rollDice(r); });
+        bool catchSuccess = agilityTest(receiver->getAgility(), catchModifiers, [&](int r){ return rand() % r; });
 
         passer->setHasBall(false);
         if (catchSuccess) {

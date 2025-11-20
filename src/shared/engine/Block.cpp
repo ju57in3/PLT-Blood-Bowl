@@ -6,6 +6,12 @@
 namespace engine {
     Block::Block(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender):attacker(attacker), defender(defender){}
 
+    Block::~Block() = default;
+
+    CommandTypeId Block::getCommandTypeId() {
+        return BlockId;
+    }
+
     void Block::rollBlockDice()
     {
         int diceResult;
