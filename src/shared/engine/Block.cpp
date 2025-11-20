@@ -7,10 +7,92 @@
 namespace engine {
     Block::Block(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender):attacker(attacker), defender(defender){}
 
-    int chooseDiceResult(std::vector<int>)
+    static int chooseDiceResult(std::vector<int> diceResults)
     {
-        return 1; // return 0; mettre à jour
+        int answer = 0;
+        std::cout << "Les choix de dés sont les suivants, entrez le score que vous souhaitez utiliser pour le bloc:" << std::endl;
+
+        for (int i = 0; i < diceResults.size(); i++)
+        {
+            std::cout << diceResults[i] << std::endl;
+        }
+        bool correctAnswer = false;
+        while (!correctAnswer)
+        {
+            std::cin >> answer;
+
+            for (int i = 0; i < diceResults.size(); i++)
+            {
+                if (diceResults[i] == answer)
+                {
+                    correctAnswer = true;
+                }
+                if (diceResults[i] != answer && i == diceResults.size() - 1)
+                {
+                    std::cout << "Choix invalide. Veuillez entrer un score valide." << std::endl;
+                }
+            }
+        }
+        std::cout << "Vous avez choisi le score: " << answer << std::endl;
+        return answer;
     }
+
+    static void choosePushedPosition(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender)
+    {
+        int answer;
+        std::vector<std::pair<int,int>> listOfPositions;
+        int attacker_x = attacker->getPosition().first;
+        int attacker_y = attacker->getPosition().second;
+        int defender_x = defender->getPosition().first;
+        int defender_y = defender->getPosition().second;
+
+        int Dx = defender_x - attacker_x;
+        int Dy = defender_y - attacker_y;
+
+
+        std::pair<int,int> newPosition1;
+        std::pair<int,int> newPosition2;
+        std::pair<int,int> newPosition3;
+        if (Dx == 0)
+        {
+            newPosition1.first= defender_x - 1;
+            newPosition1.second = defender_y + Dy;
+
+            newPosition1.first= defender_x;
+            newPosition1.second = defender_y + Dy;
+
+            newPosition1.first= defender_x + 1;
+            newPosition1.second = defender_y + Dy;
+        }
+        else if (Dy == 0)
+        {
+            newPosition1.first= defender_x + Dx;
+            newPosition1.second = defender_y + 1;
+
+            newPosition2.first= defender_x + Dx;
+            newPosition2.second = defender_y;
+
+            newPosition3.first= defender_x + Dx;
+            newPosition3.second = defender_y -1;
+        }
+        else
+        {
+            newPosition1.first= defender_x ;
+            newPosition1.second = defender_y + Dy;
+
+            newPosition2.first= defender_x + Dx;
+            newPosition2.second = defender_y + Dy;
+
+            newPosition3.first= defender_x + Dx;
+            newPosition3.second = defender_y;
+        }
+
+        std::pair<int,int> newPosition = listOfPositions[answer-1];
+        defender->setPosition(newPosition);
+
+    }
+
+
     void Block::rollBlockDice()
     {
         bool answered = false;
@@ -41,6 +123,7 @@ namespace engine {
         }
 
         int diceResult = chooseDiceResult(listOfDiceResult);
+
 
         if (diceResult == 1)
         {
@@ -98,34 +181,21 @@ namespace engine {
         }
         if (blockResult == Pushed || blockResult == DefenderStumbles)
         {
-            std::pair<int,int> target1;
-            std::pair<int,int> target2;
-            std::pair<int,int> target3;
+            // choosePushedPosition(attacker->getPosition(),defender->getPosition());
+            choosePushedPosition(attacker,defender);
 
-
-            /*
-            std::pair<int,int> newTarget;
-            std::pair<int,int> actualTarget;
-
-            actualTarget.first = defender->getPosition().first;
-            actualTarget.second = defender->getPosition().second;
-
-            newTarget.first = defender->getPosition().first + (defender->getPosition().first - attacker->getPosition().first);
-            newTarget.second = defender->getPosition().second;
-
-            defender->setPosition(newTarget);
-            attacker->setPosition(actualTarget); //Pour l'instant, on considère que l'attaquant prend obligatoirement la place du défenseur. Il faudra coder une requête auprès de l'utilisateur.
-            */
         }
-        if (blockResult == DefenderDown || blockResult == BothDown)
+        if (blockResult == DefenderDown || blockResult == BothDown) //Si pas d'esquive, la dernière boucle s'inclue ici.
         {
             resolveInjury(defender);
         }
         if (blockResult == DefenderStumbles)
         {
-            //Gestion Esquive du plaquage. A faire plus tard. En attendant, on considère qu'il est plaqué à chaque fois
+            //Jet d'esquive ?
             resolveInjury(defender);
         }
     }
+
+
 
 };
