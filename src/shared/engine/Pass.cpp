@@ -218,9 +218,7 @@ namespace engine {
             // Premier rebond
             auto newPos = scatterOnce(dropPos, game->getWidth(), game->getHeight());
             game->setBallPosition(newPos);
-            if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
-                pt->setTurnOver(true);
-            }
+            checkAndHandleTurnover(game);
             return;
         }
 
@@ -235,9 +233,7 @@ namespace engine {
                 chosenInterceptor->setHasBall(true);
                 game->setBallPosition(chosenInterceptor->getPosition());
                 game->setBallIsHold(true);
-                if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())){
-                    pt->setTurnOver(true);
-                }
+                checkAndHandleTurnover(game);
                 return;
             }
         }
@@ -257,12 +253,9 @@ namespace engine {
             game->setBallPosition(scatterPos);
             game->setBallIsHold(false);
             // Turnover
-            if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
-                pt->setTurnOver(true);
-            }
-        }
+            checkAndHandleTurnover(game);
+         }
 
-        // Vérification touchdown centralisée
-        checkAndHandleTouchdown(game);
-    }
-}
+         checkAndHandleTouchdown(game);
+     }
+ }

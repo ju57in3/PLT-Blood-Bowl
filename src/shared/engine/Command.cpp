@@ -8,7 +8,9 @@ namespace engine {
 
     Command::~Command() {}
 
-    CommandTypeId Command::getCommandTypeId() {}
+    CommandTypeId Command::getCommandTypeId() {
+        return commandTypeId;
+    }
 
     void Command::execute(std::shared_ptr<state::BloodBowlGame> game) {}
 
@@ -35,6 +37,16 @@ namespace engine {
                 pt->setTouchDown(true);
                 pt->update();
             }
+        }
+    }
+
+    void Command::checkAndHandleTurnover(const std::shared_ptr<state::BloodBowlGame>& game) {
+        if (!game) return;
+
+        // Signal turnover to state machine: mark turn over and request update to trigger state transition
+        if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+            pt->setTurnOver(true);
+            pt->update();
         }
     }
 
