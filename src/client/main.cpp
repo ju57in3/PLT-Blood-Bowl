@@ -145,10 +145,12 @@ int main(int argc, char* argv[]) {
 
     // testing render
     cout << "\n=== TESTING RENDER ===\n";
-    render::Scene scene(render::SceneId::MENU, gamePtr);
 
     // Create Engine
     engine::Engine eng(gamePtr);
+
+    // Create Scene with engine reference
+    render::Scene scene(render::SceneId::MENU, gamePtr, &eng);
 
     // Create and add commands
     cout << "\n=== TESTING COMMANDS ===\n";
@@ -157,6 +159,16 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<engine::Command> cmd_ptr(new engine::Move(hum1, std::make_pair(10,6)));
     eng.addCommand(std::move(cmd_ptr));
 
+    cout << "\n=== INTERACTIVE MODE ===\n";
+    cout << "Controls:\n";
+    cout << "  - Click on a character to select it\n";
+    cout << "  - Press M to move (then click target position)\n";
+    cout << "  - Press P to pass (then click target character)\n";
+    cout << "  - Press B to block (then click target character)\n";
+    cout << "  - Right click or ESC to cancel\n";
+    cout << "  - Space to execute old test command\n";
+    cout << "  - L to list team A\n";
+    cout << "  - ESC in main window to quit\n\n";
 
     // main loop
     while (scene.getWindow()->isOpen()) {
@@ -165,6 +177,11 @@ int main(int argc, char* argv[]) {
             if (event.type == sf::Event::Closed) {
                 scene.getWindow()->close();
             }
+
+            // Let Scene handle most input events
+            scene.handleEvent(event);
+
+            // Handle special keys that are not part of game input
             if (event.type == sf::Event::KeyReleased) {
                 switch (event.key.code) {
                     case sf::Keyboard::Escape:
@@ -172,6 +189,7 @@ int main(int argc, char* argv[]) {
                         break;
 
                     case sf::Keyboard::Space:
+                        // Old test command - still works
                         eng.executeCommand();
                         cout << "Position de hum1 après commande: (" << hum1->getPosition().first << ", " << hum1->getPosition().second << ")\n";
                         break;

@@ -53,7 +53,7 @@ namespace engine {
     }
 
     // TODO : generalise scatter
-    static std::pair<int,int> scatterOnce(std::pair<int,int> from, int width, int height) {
+    static std::pair<int,int> scatterOnce(std::pair<int,int> from) {
         static std::random_device rd;
         static std::mt19937 gen(rd());
         std::uniform_int_distribution<int> d8(1,8);
@@ -68,6 +68,7 @@ namespace engine {
             case 6: dx = -1; dy = -1; break;// SW
             case 7: dx = -1; break;       // W
             case 8: dx = -1; dy = 1; break; // NW
+            default: ;
         }
         int nx = from.first + dx;
         int ny = from.second + dy;
@@ -216,7 +217,7 @@ namespace engine {
             game->setBallIsHold(false);
             auto dropPos = passer->getPosition();
             // Premier rebond
-            auto newPos = scatterOnce(dropPos, game->getWidth(), game->getHeight());
+            auto newPos = scatterOnce(dropPos);
             game->setBallPosition(newPos);
             checkAndHandleTurnover(game);
             return;
@@ -249,7 +250,7 @@ namespace engine {
             game->setBallIsHold(true);
         } else {
             auto scatterPos = receiver->getPosition();
-            scatterPos = scatterOnce(scatterPos, game->getWidth(), game->getHeight());
+            scatterPos = scatterOnce(scatterPos);
             game->setBallPosition(scatterPos);
             game->setBallIsHold(false);
             // Turnover

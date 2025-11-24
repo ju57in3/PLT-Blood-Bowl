@@ -3,39 +3,79 @@
 
 #include <state/PlayerTurn.h>
 #include <iostream>
+#include <random>
+#include <utility>
+
+static std::mt19937 rng(std::random_device{}());
 
 namespace engine {
-    Block::Block(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender):attacker(attacker), defender(defender){}
 
+    // TODO : Fonction deja utliser dans Pass.cpp a generaliser !
+    static std::pair<int,int> scatterOnce(std::pair<int,int> from) {
+        std::uniform_int_distribution<int> d8(1,8);
+        int dir = d8(rng);
+        int dx = 0, dy = 0;
+        switch(dir) {
+            case 1: dy = 1; break;        // N
+            case 2: dx = 1; dy = 1; break;// NE
+            case 3: dx = 1; break;        // E
+            case 4: dx = 1; dy = -1; break;// SE
+            case 5: dy = -1; break;       // S
+            case 6: dx = -1; dy = -1; break;// SW
+            case 7: dx = -1; break;       // W
+            case 8: dx = -1; dy = 1; break; // NW
+            default: ;
+        }
+        int nx = from.first + dx;
+        int ny = from.second + dy;
+        return {nx, ny};
+    }
+
+    static void resolveInjury(const std::shared_ptr<state::Character>& targetCharacter)
+    {
+        std::uniform_int_distribution<int> d12(2,12);
+        const int roll1 = d12(rng);
+        if (roll1>= targetCharacter->getArmor())
+        {
+            const int injuryRoll = d12(rng);
+            if (injuryRoll <= 7) {
+                targetCharacter->setStatus(state::CharacterStatus::stunned);
+            } else if (injuryRoll <= 9) {
+                targetCharacter->setStatus(state::CharacterStatus::ko);
+            } else {
+                targetCharacter->setStatus(state::CharacterStatus::injured);
+            }
+        }
+    }
     static int chooseDiceResult(std::vector<int> diceResults)
     {
         int answer = 0;
         std::cout << "Les choix de dés sont les suivants, entrez le score que vous souhaitez utiliser pour le bloc:" << std::endl;
 
-        for (int i = 0; i < diceResults.size(); i++)
+        for (int diceResult : diceResults)
         {
-            std::cout << diceResults[i] << std::endl;
+            std::cout << diceResult << std::endl;
         }
         bool correctAnswer = false;
-        while (!correctAnswer)
-        {
+        while (!correctAnswer) {
             std::cin >> answer;
 
-            for (int i = 0; i < diceResults.size(); i++)
-            {
-                if (diceResults[i] == answer)
-                {
+            for (int result : diceResults) {
+                if (result == answer) {
                     correctAnswer = true;
-                }
-                if (diceResults[i] != answer && i == diceResults.size() - 1)
-                {
-                    std::cout << "Choix invalide. Veuillez entrer un score valide." << std::endl;
+                    break;
                 }
             }
+            if (!correctAnswer) {
+                std::cout << "Choix invalide..." << std::endl;
+            }
         }
+
         std::cout << "Vous avez choisi le score: " << answer << std::endl;
         return answer;
     }
+
+
 
     static void choosePushedPosition(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender)
     {
@@ -54,50 +94,35 @@ namespace engine {
         std::pair<int,int> newPosition1;
         std::pair<int,int> newPosition2;
         std::pair<int,int> newPosition3;
-        if (Dx == 0)
-        {
-            newPosition1.first= defender_x - 1;
-            newPosition1.second = defender_y + Dy;
 
-            newPosition1.first= defender_x;
-            newPosition1.second = defender_y + Dy;
-
-            newPosition1.first= defender_x + 1;
-            newPosition1.second = defender_y + Dy;
+        // TODO : Verifier si la case est libre avant de la proposer
+        if (Dx == 0) {
+            newPosition1 = {defender_x - 1, defender_y + Dy};
+            newPosition2 = {defender_x,     defender_y + Dy};
+            newPosition3 = {defender_x + 1, defender_y + Dy};
+        }else if (Dy == 0){
+            newPosition1 = {defender_x + Dx, defender_y - 1};
+            newPosition2 = {defender_x + Dx, defender_y};
+            newPosition3 = {defender_x + Dx, defender_y + 1};
+        }else{
+            newPosition1 = {defender_x + Dx, defender_y};
+            newPosition2 = {defender_x,     defender_y + Dy};
+            newPosition3 = {defender_x + Dx, defender_y + Dy};
         }
-        else if (Dy == 0)
-        {
-            newPosition1.first= defender_x + Dx;
-            newPosition1.second = defender_y + 1;
 
-            newPosition2.first= defender_x + Dx;
-            newPosition2.second = defender_y;
+        listOfPositions.push_back(newPosition1);
+        listOfPositions.push_back(newPosition2);
+        listOfPositions.push_back(newPosition3);
 
-            newPosition3.first= defender_x + Dx;
-            newPosition3.second = defender_y -1;
-        }
-        else
-        {
-            newPosition1.first= defender_x ;
-            newPosition1.second = defender_y + Dy;
 
-            newPosition2.first= defender_x + Dx;
-            newPosition2.second = defender_y + Dy;
-
-            newPosition3.first= defender_x + Dx;
-            newPosition3.second = defender_y;
-        }
         bool correctAnswer = false;
-        while (!correctAnswer)
-        {
+        while (!correctAnswer) {
             std::cin >> answer;
-
-            if (answer<listOfPositions.size() || answer>1)
-            {
+            if (answer >= 1 && answer <= 3) {
                 correctAnswer = true;
             }
-            else{
-                std::cout << "Choix invalide. Veuillez entrer un nombre entre 1 et " << listOfPositions.size() << " pour choisir la position associée. \r\n" << std::endl;
+            if (!correctAnswer) {
+                std::cout << "Choix invalide..." << std::endl;
             }
         }
         correctAnswer = false; // Pour pouvoir l'utiliser pour la seconde requête
@@ -129,21 +154,19 @@ namespace engine {
         return BlockId;
     }
 
-    static BlockResult rollBlockDice(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender)
+    static BlockResult rollBlockDice(const std::shared_ptr<state::Character>& attacker, const std::shared_ptr<state::Character>& defender)
     {
-        bool answered = false;
         std::vector<int> listOfDiceResult;
-        int range = 6; //Range lancé de Dé pour le Block
-        int roll1 = rand() % range + 1;
-        int roll2 = rand() % range + 1;
-        int roll3 = rand() % range + 1;
+        std::uniform_int_distribution<int> d6(1,6);
+        const int roll1 = d6(rng);
+        const int roll2 = d6(rng);
+        const int roll3 = d6(rng);
 
         listOfDiceResult.push_back(roll1); //Si l'attaquant et le défenseur ont le même nombre de points de force, il n'y a qu'un seul lancé de dé
 
-        if (attacker->getStrength() > defender->getStrength())
-        {
+        if (attacker->getStrength() > defender->getStrength()) {
             listOfDiceResult.push_back(roll2);
-            if (attacker->getStrength()>= 2*defender->getStrength())
+            if (attacker->getStrength() >= 2*defender->getStrength())
             {
                 listOfDiceResult.push_back(roll3);
             }
@@ -152,13 +175,19 @@ namespace engine {
         else if (attacker->getStrength() < defender->getStrength())
         {
             listOfDiceResult.push_back(roll2);
-            if (attacker->getStrength()>= 2*defender->getStrength())
+            if (2*attacker->getStrength() <= defender->getStrength())
             {
                 listOfDiceResult.push_back(roll3);
             }
         }
 
-        int diceResult = chooseDiceResult(listOfDiceResult);
+        int diceResult;
+        if (attacker->getStrength() >= defender->getStrength()) {
+            diceResult = chooseDiceResult(listOfDiceResult); // Attaquant choisit
+        } else {
+            diceResult = chooseDiceResult(listOfDiceResult); // Défenseur choisit le pire
+        }
+
 
         if (diceResult == 1)
         {
@@ -180,51 +209,40 @@ namespace engine {
         {
             return DefenderDown;
         }
+        return Pushed; // Valeur par défaut.
+        // TODO : Remplacer par une exception
     }
 
-    void resolveInjury(std::shared_ptr<state::Character> targetCharacter)
-    {
-        int roll1 = rand() % 11 + 1;
-        if (roll1>= targetCharacter->getArmor())
-        {
-            int roll2 = rand() % 6 + 1;
-            int roll3 = rand() % 6 + 1;
-            if (roll2 + roll3 <= 7)
-            {
-                targetCharacter->setStatus(state::CharacterStatus::knockedDown);
-            }
-            else if (roll2 + roll3 <= 9)
-            {
-                targetCharacter->setStatus(state::CharacterStatus::injured);
-            }
-            else if (roll2 + roll3 <= 12)
-            {
-                targetCharacter->setStatus(state::CharacterStatus::ko);
-            }
-        }
+    Block::Block(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender)
+    :attacker(std::move(attacker)), defender(std::move(defender)) {
+        blockResult = rollBlockDice(this->attacker, this->defender);
     }
+
+    Block::~Block() = default;
+
 
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)
     {
-        blockResult=rollBlockDice(attacker,defender);
-
         if (blockResult == AttackerDown || blockResult == BothDown)
         {
+            attacker->setStatus(state::CharacterStatus::knockedDown);
             resolveInjury(attacker);
-            //TurnOver !!  Utilisation de la fonction setTurnOver de PlayerTurn (Voir compléter fonction update() de PlayerTurn! -> if (turnOver))
+            checkAndHandleTurnover(game);
         }
-        if (blockResult == Pushed || blockResult == DefenderStumbles)
+        if (blockResult == Pushed || blockResult == DefenderStumbles || blockResult == DefenderDown)
         {
             choosePushedPosition(attacker,defender);
         }
-        if (blockResult == DefenderDown || blockResult == BothDown) //Si pas d'esquive, la dernière boucle s'inclue ici.
+        if (blockResult == DefenderDown || blockResult == BothDown || blockResult == DefenderStumbles)
         {
+            defender->setStatus(state::CharacterStatus::knockedDown);
+            if (defender->getHasBall()) {
+                defender->setHasBall(false);
+                game->setBallPosition(scatterOnce(defender->getPosition()));
+                game->setBallIsHold(false);
+            }
             resolveInjury(defender);
         }
-        if (blockResult == DefenderStumbles)
-        {
-            //Jet d'esquive ?
-            resolveInjury(defender);
-        }
+        // TODO : Implémenter la différence entre DefenderStumbles et DefenderDown (besoin de la capacité esquive).
     }
 };

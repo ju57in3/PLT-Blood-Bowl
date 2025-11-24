@@ -3,6 +3,7 @@
 
 #include "Kickoff.h"
 #include "BloodBowlGame.h"
+#include "utility/Constants.h"
 
 constexpr std::pair<int, int> HORS_TABLEAU = {-1, -1};
 
@@ -39,7 +40,7 @@ namespace state {
                 const Character& piece = *ptr;
                 auto pos = piece.getPosition();
                 if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU && pos.first == frontlineCol) {
-                    if (pos.second >= 4 && pos.second <= (game->getHeight() - 4)) {
+                    if (pos.second >= 4 && pos.second <= (utility::Constants::BOARD_HEIGHT - 4)) {
                         count++;
                     }
                 }
@@ -49,7 +50,7 @@ namespace state {
     }
 
     int Setup::nbCharacterOnTop(const Team& team) const{
-        int height = game->getHeight();
+        int height = utility::Constants::BOARD_HEIGHT;
         int limitTopRow = height - 4; // (height-1) - 3 => les 4 lignes du haut du terrain  (Attention height est le nombre de lignes!!)
 
         int count = 0;

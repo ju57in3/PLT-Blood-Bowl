@@ -30,12 +30,8 @@ namespace  state {
     }
 
     static void renderBoardAscii(std::ostream &os, const BloodBowlGame &game) {
-        int w = game.getWidth();
-        int h = game.getHeight();
-        if (w <= 0 || h <= 0) {
-            os << "(board not initialized)\n";
-            return;
-        }
+        int w = utility::Constants::BOARD_WIDTH;
+        int h = utility::Constants::BOARD_HEIGHT;
 
         std::vector<std::string> grid(h, std::string(w, '.'));
 
@@ -74,8 +70,6 @@ namespace  state {
         stateList.push_back(std::make_unique<HalfTime>(this));
         stateList.push_back(std::make_unique<EndGame>(this));
         currentState = stateList.at(SETUP).get(); // initial state
-        width = utility::Constants::BOARD_WIDTH;
-        height = utility::Constants::BOARD_HEIGHT;
         ballIsHold = false;
     }
 
@@ -115,12 +109,12 @@ namespace  state {
         currentTeam = team;
     }
 
-    int BloodBowlGame::getWidth() const {
-        return width;
+    bool BloodBowlGame::getBallIsHold() const {
+        return ballIsHold;
     }
 
-    int BloodBowlGame::getHeight() const{
-        return height;
+    void BloodBowlGame::setBallIsHold(bool holdValue) {
+        ballIsHold = holdValue;
     }
 
     void BloodBowlGame::setBallPosition(std::pair<int, int> position) {

@@ -1,14 +1,16 @@
 #include "Scene.h"
-
+#include "InputHandler.h"
 #include "utility/Constants.h"
 
 namespace render{
 
-    Scene::Scene(SceneId sceneId, std::shared_ptr<state::BloodBowlGame> game)
-    : id(sceneId), window(nullptr), game(std::move(game)), sceneData("blue","red")
+    Scene::Scene(SceneId sceneId, std::shared_ptr<state::BloodBowlGame> game, engine::Engine* engine)
+    : engine(engine), id(sceneId), window(nullptr), game(std::move(game)), sceneData("blue","red")
     {
-        window = new sf::RenderWindow(sf::VideoMode(1920,1080),"BloodBowl");
+        window = new sf::RenderWindow(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl");
         sceneData.init(window, this->game);
+
+        inputHandler = std::make_unique<InputHandler>(this->game, engine);
     }
 
     Scene::~Scene() {
@@ -29,6 +31,16 @@ namespace render{
             sceneData.updatePositions(game);  // Update sprite positions from game state
             sceneData.draw(window);
             window->display();
+        }
+    }
+
+    void Scene::handleEvent(const sf::Event& event) {
+        if (!inputHandler) return;
+
+        if (event.type == sf::Event::MouseButtonPressed) {
+            inputHandler->handleMouseClick(event.mouseButton, window);
+        } else if (event.type == sf::Event::KeyPressed) {
+            inputHandler->handleKeyPress(event.key);
         }
     }
 
@@ -66,6 +78,10 @@ namespace render{
     }
     void Scene::setSceneData(SceneData& newSceneData) {
         sceneData = newSceneData;
+    }
+
+    InputHandler* Scene::getInputHandler() const {
+        return inputHandler.get();
     }
 
 }
