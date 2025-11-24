@@ -12,8 +12,8 @@ void testSFML() {
 
 #include <client.h>
 #include <state.h>
-
 #include <render.h>
+#include <engine.h>
 
 using namespace std;
 using namespace client;
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     hum1->setPosition({12, 6});
     hum1->setStatus(playable);
 
-    auto hum2 = std::make_shared<Character>(2.,"Ligne2", "human_blitzer", 6, 3, 3, 8);
+    auto hum2 = std::make_shared<Character>(2,"Ligne2", "human_blitzer", 6, 3, 3, 8);
     teamA.addCharacter(hum2);
     hum2->setPosition({12, 7});
     hum2->setStatus(playable);
@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
     orc11->setStatus(playable);
 
     // Initialize game
-    auto gamePtr = std::make_shared<BloodBowlGame>(BloodBowlGame(teamA,teamB));
+    auto gamePtr = std::make_shared<BloodBowlGame>(teamA, teamB);
 
     cout << "Initial Teams:\n";
     cout << "Team A (Humans):\n" << teamA << "\n";
@@ -145,7 +145,30 @@ int main(int argc, char* argv[]) {
 
     // testing render
     cout << "\n=== TESTING RENDER ===\n";
-    render::Scene scene(render::SceneId::MENU, gamePtr);
+
+    // Create Engine
+    engine::Engine eng(gamePtr);
+
+    // Create Scene with engine reference
+    render::Scene scene(render::SceneId::MENU, gamePtr, &eng);
+
+    // Create and add commands
+    cout << "\n=== TESTING COMMANDS ===\n";
+    cout << "Position initiale de hum1: (" << hum1->getPosition().first << ", " << hum1->getPosition().second << ")\n";
+
+    std::unique_ptr<engine::Command> cmd_ptr(new engine::Move(hum1, std::make_pair(10,6)));
+    eng.addCommand(std::move(cmd_ptr));
+
+    cout << "\n=== INTERACTIVE MODE ===\n";
+    cout << "Controls:\n";
+    cout << "  - Click on a character to select it\n";
+    cout << "  - Press M to move (then click target position)\n";
+    cout << "  - Press P to pass (then click target character)\n";
+    cout << "  - Press B to block (then click target character)\n";
+    cout << "  - Right click or ESC to cancel\n";
+    cout << "  - Space to execute old test command\n";
+    cout << "  - L to list team A\n";
+    cout << "  - ESC in main window to quit\n\n";
 
     // main loop
     while (scene.getWindow()->isOpen()) {
@@ -154,11 +177,27 @@ int main(int argc, char* argv[]) {
             if (event.type == sf::Event::Closed) {
                 scene.getWindow()->close();
             }
+
+            // Let Scene handle most input events
+            scene.handleEvent(event);
+
+            // Handle special keys that are not part of game input
             if (event.type == sf::Event::KeyReleased) {
                 switch (event.key.code) {
                     case sf::Keyboard::Escape:
                         scene.getWindow()->close();
                         break;
+
+                    case sf::Keyboard::Space:
+                        // Old test command - still works
+                        eng.executeCommand();
+                        cout << "Position de hum1 après commande: (" << hum1->getPosition().first << ", " << hum1->getPosition().second << ")\n";
+                        break;
+
+                    case sf::Keyboard::L:
+                        cout << gamePtr->getTeamA() << endl;
+                        break;
+
                     default:
                         break;
                 }

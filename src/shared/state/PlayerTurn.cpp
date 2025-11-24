@@ -30,10 +30,6 @@ namespace state {
             return;
         }
 
-        if (scored) {
-            game->getCurrentTeam()->setScore(game->getCurrentTeam()->getScore() + 1);
-        }
-
         restoreCharactersStatus();
 
         switchTeam();

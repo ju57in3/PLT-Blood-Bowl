@@ -96,4 +96,28 @@ namespace render{
         }
     }
 
+    void SceneData::updatePositions(std::shared_ptr<state::BloodBowlGame> game)
+    {
+        if (!game) return;
+
+        // Update TeamA positions
+        for (const auto& character : game->getTeamA().getCharacters()) {
+            const size_t index = static_cast<size_t>(character->getId());
+            if (index < Constants::MAX_PLAYERS_PER_TEAM) {
+                playersSprites_TeamA.at(index).setPosition(pos2Coords(character->getPosition()));
+            }
+        }
+
+        // Update TeamB positions
+        for (const auto& character : game->getTeamB().getCharacters()) {
+            const size_t index = static_cast<size_t>(character->getId());
+            if (index < Constants::MAX_PLAYERS_PER_TEAM) {
+                playersSprites_TeamB.at(index).setPosition(pos2Coords(character->getPosition()));
+            }
+        }
+
+        // Update ball position
+        ballSprite.setPosition(pos2Coords(game->getBallPosition()));
+    }
+
 }

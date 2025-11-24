@@ -2,6 +2,7 @@
 
 #include "Team.h"
 #include "BloodBowlGame.h"
+#include "utility/Constants.h"
 
 
 namespace state {
@@ -16,7 +17,7 @@ namespace state {
             targetX = (rand() % 12) +12;
         }
 
-        int targetY = rand() % game->getHeight();
+        int targetY = rand() % utility::Constants::BOARD_HEIGHT;
         std::pair<int,int> targetSquare;
         targetSquare.first = targetX;
         targetSquare.second = targetY;

@@ -83,3 +83,4 @@ namespace state {
         this->rerolls = rerollsValue;
     }
 }
+

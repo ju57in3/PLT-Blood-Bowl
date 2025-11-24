@@ -138,7 +138,7 @@
         <dia:point val="6.55,5.35"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="6.5,5.3;23.27,13"/>
+        <dia:rectangle val="6.5,5.3;23.27,16.2"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="6.55,5.35"/>
@@ -147,7 +147,7 @@
         <dia:real val="16.669999999999998"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="7.5999999999999996"/>
+        <dia:real val="10.800000000000001"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#Constants#</dia:string>
@@ -242,13 +242,59 @@
       <dia:attribute name="attributes">
         <dia:composite type="umlattribute">
           <dia:attribute name="name">
+            <dia:string>#BOARD_WIDTH#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#constexpr int#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>#26#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="true"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#BOARD_HEIGHT#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#constexpr int#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>#15#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="true"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
             <dia:string>#BOARD_TILE_PIXEL_SIZE#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#52#</dia:string>
+            <dia:string>#32#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -271,7 +317,7 @@
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#50#</dia:string>
+            <dia:string>#0#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -294,7 +340,7 @@
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#50#</dia:string>
+            <dia:string>#0#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -387,6 +433,52 @@
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>#32#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="true"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#WINDOW_WIDTH#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#constexpr int#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>#859#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="true"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#WINDOW_HEIGHT#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#constexpr int#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>#496#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
