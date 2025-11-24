@@ -5,6 +5,8 @@
 // The following lines are here to check that SFML is installed and working
 #include <SFML/Graphics.hpp>
 
+#include "utility/Constants.h"
+
 void testSFML() {
     sf::Texture texture;
 }
@@ -148,9 +150,14 @@ int main(int argc, char* argv[]) {
 
     // Create Engine
     engine::Engine eng(gamePtr);
+    sf::RenderWindow window(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl");
 
-    // Create Scene with engine reference
-    render::Scene scene(render::SceneId::MENU, gamePtr, &eng);
+
+    // Create Scene with engine reference (scene no longer owns the window)
+    render::Scene scene(render::SceneId::MENU, gamePtr);
+
+    // Create InputHandler (owned by client)
+    client::InputHandler inputHandler(gamePtr, &eng);
 
     // Create and add commands
     cout << "\n=== TESTING COMMANDS ===\n";
@@ -170,22 +177,22 @@ int main(int argc, char* argv[]) {
     cout << "  - L to list team A\n";
     cout << "  - ESC in main window to quit\n\n";
 
-    // main loop
-    while (scene.getWindow()->isOpen()) {
+    // main loop - client owns the window and handles events
+    while (window.isOpen()) {
         sf::Event event{};
-        while (scene.getWindow()->pollEvent(event)) {
+        while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
-                scene.getWindow()->close();
+                window.close();
             }
 
-            // Let Scene handle most input events
-            scene.handleEvent(event);
+            // Let inputHandler process game-related events first
+            inputHandler.handleEvent(event, &window);
 
             // Handle special keys that are not part of game input
             if (event.type == sf::Event::KeyReleased) {
                 switch (event.key.code) {
                     case sf::Keyboard::Escape:
-                        scene.getWindow()->close();
+                        window.close();
                         break;
 
                     case sf::Keyboard::Space:
@@ -204,8 +211,8 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        // Dessin de la scène
-        scene.drawScene();
+        // Dessin de la scène (pass the window owned by the client)
+        scene.drawScene(window, inputHandler.getSelectedCharacter());
     }
 
     cout << "\nRender test completed successfully!\n";

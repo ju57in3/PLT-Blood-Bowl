@@ -1,4 +1,5 @@
 #include "InputHandler.h"
+
 #include "utility/Constants.h"
 #include "engine/Engine.h"
 #include "engine/Move.h"
@@ -9,14 +10,14 @@
 #include <iostream>
 #include <utility>
 
-namespace render {
+namespace client {
 
     InputHandler::InputHandler(std::shared_ptr<state::BloodBowlGame> game, engine::Engine* engine)
-        : currentMode(InputMode::Idle), selectedCharacter(nullptr), game(std::move(game)), engine(engine) {
+        : currentMode(Idle), selectedCharacter(nullptr), game(std::move(game)), engine(engine) {
     }
 
-    InputHandler::~InputHandler() {
-    }
+    InputHandler::~InputHandler() = default;
+
 
     std::pair<int, int> InputHandler::screenToBoard(const sf::Vector2i& screenPos) const {
         // Convert screen coordinates to board coordinates
@@ -196,5 +197,18 @@ namespace render {
         return selectedCharacter;
     }
 
+    void InputHandler::handleEvent(const sf::Event& event, sf::RenderWindow* window) {
+        // New implementation: call member functions directly and forward window pointer
+        if (event.type == sf::Event::MouseButtonPressed) {
+            this->handleMouseClick(event.mouseButton, window);
+        } else if (event.type == sf::Event::KeyPressed) {
+            this->handleKeyPress(event.key);
+        }
+    }
+
 }
 
+/*
+
+
+*/

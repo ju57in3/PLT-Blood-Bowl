@@ -29,13 +29,11 @@ namespace render{
 
     }
 
-    SceneData::~SceneData() {}
-
     bool SceneData::isBoardLoaded() const {
         return boardTexture.getSize().x > 0 && boardTexture.getSize().y > 0;
     }
 
-    void SceneData::init(sf::RenderWindow* window, std::shared_ptr<state::BloodBowlGame> game)
+    void SceneData::init(sf::RenderTarget& target, const std::shared_ptr<state::BloodBowlGame>& game)
     {
         playersTextures_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
         playersTextures_TeamB.resize(Constants::MAX_PLAYERS_PER_TEAM);
@@ -51,12 +49,12 @@ namespace render{
         const std::string charactersDir = "../res/characters/";
         if (!std::filesystem::exists(charactersDir) || !std::filesystem::is_directory(charactersDir)) {
             std::cerr << "Error: characters directory does not exist: " << charactersDir << std::endl;
-            return;
+            // try fallback
         }
 
         for ( const auto& character : game->getTeamA().getCharacters()) {
             const std::string texturePath = charactersDir + character->getType() + "_"+ colorA + ".png";
-            const size_t index = static_cast<size_t>(character->getId());
+            const auto index = static_cast<size_t>(character->getId());
             if (index < Constants::MAX_PLAYERS_PER_TEAM && loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
                 playersSprites_TeamA.at(index).setTexture(playersTextures_TeamA.at(index));
                 playersSprites_TeamA.at(index).setPosition(pos2Coords(character->getPosition()));
@@ -67,7 +65,7 @@ namespace render{
 
         for ( const auto& character : game->getTeamB().getCharacters()) {
             const std::string texturePath = charactersDir + character->getType() + "_"+ colorB + ".png";
-            const size_t index = static_cast<size_t>(character->getId());
+            const auto index = static_cast<size_t>(character->getId());
             if (index < Constants::MAX_PLAYERS_PER_TEAM && loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
                 playersSprites_TeamB.at(index).setTexture(playersTextures_TeamB.at(index));
                 playersSprites_TeamB.at(index).setPosition(pos2Coords(character->getPosition()));
@@ -76,33 +74,43 @@ namespace render{
             }
         }
 
-        if (loadTextureFromFile("res/ball.png", ballTexture)) {
+        if (loadTextureFromFile("../res/ball.png", ballTexture) || loadTextureFromFile("res/ball.png", ballTexture)) {
             ballSprite.setTexture(ballTexture);
             ballSprite.setPosition(pos2Coords(game->getBallPosition()));
         }
     }
-
-    void SceneData::draw(sf::RenderTarget* target)
+    void SceneData::draw(sf::RenderTarget& target, const std::shared_ptr<state::Character>& highlighted)
     {
-        target->draw(board);
+        target.draw(board);
+
+        // Draw highlights first (a translucent rectangle under the sprite)
+        if (highlighted) {
+            sf::RectangleShape highlightRect;
+            highlightRect.setFillColor(sf::Color(255, 255, 0, 80)); // semi-transparent yellow
+            const auto pos = pos2Coords(highlighted->getPosition());
+            highlightRect.setSize(sf::Vector2f(Constants::BOARD_TILE_PIXEL_SIZE, Constants::BOARD_TILE_PIXEL_SIZE));
+            highlightRect.setPosition(pos);
+            target.draw(highlightRect);
+        }
+
         for (auto& s : playersSprites_TeamA) {
-            target->draw(s);
+            target.draw(s);
         }
         for (auto& s : playersSprites_TeamB) {
-            target->draw(s);
+            target.draw(s);
         }
         if (ballTexture.getSize().x > 0 && ballTexture.getSize().y > 0) {
-            target->draw(ballSprite);
+            target.draw(ballSprite);
         }
     }
 
-    void SceneData::updatePositions(std::shared_ptr<state::BloodBowlGame> game)
+    void SceneData::updatePositions(const std::shared_ptr<state::BloodBowlGame>& game)
     {
         if (!game) return;
 
         // Update TeamA positions
         for (const auto& character : game->getTeamA().getCharacters()) {
-            const size_t index = static_cast<size_t>(character->getId());
+            const auto index = static_cast<size_t>(character->getId());
             if (index < Constants::MAX_PLAYERS_PER_TEAM) {
                 playersSprites_TeamA.at(index).setPosition(pos2Coords(character->getPosition()));
             }
@@ -110,7 +118,7 @@ namespace render{
 
         // Update TeamB positions
         for (const auto& character : game->getTeamB().getCharacters()) {
-            const size_t index = static_cast<size_t>(character->getId());
+            const auto index = static_cast<size_t>(character->getId());
             if (index < Constants::MAX_PLAYERS_PER_TEAM) {
                 playersSprites_TeamB.at(index).setPosition(pos2Coords(character->getPosition()));
             }
