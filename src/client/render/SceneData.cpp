@@ -29,6 +29,8 @@ namespace render{
 
     }
 
+    SceneData::~SceneData() = default;
+
     bool SceneData::isBoardLoaded() const {
         return boardTexture.getSize().x > 0 && boardTexture.getSize().y > 0;
     }

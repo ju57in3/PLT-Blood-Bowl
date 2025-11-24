@@ -152,8 +152,46 @@ namespace client {
                 }
             }
         } else if (mouseButton.button == sf::Mouse::Right) {
-            // Right click cancels current action
-            resetSelection();
+            // Right click: if a character is selected
+            sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
+            auto boardPos = screenToBoard(mousePos);
+
+            auto targetCharacter = getCharacterAt(boardPos);
+
+            if (selectedCharacter) {
+                // determine whether targetCharacter belongs to current team
+                bool targetBelongsToCurrent = false;
+                auto* currentTeam = game->getCurrentTeam();
+                if (currentTeam) {
+                    for (const auto& c : currentTeam->getCharacters()) {
+                        if (c == targetCharacter) { targetBelongsToCurrent = true; break; }
+                    }
+                }
+
+                if (targetCharacter && !targetBelongsToCurrent && targetCharacter != selectedCharacter) {
+                    // Right-click on opponent -> Block
+                    std::cout << "Creating Block command against " << targetCharacter->getName() << "\n";
+                    auto blockCmd = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
+                    engine->addCommand(std::move(blockCmd));
+                    engine->executeCommand();
+                    std::cout << "Block command executed\n";
+                    resetSelection();
+                    return;
+                }
+
+                // Right-click on empty tile -> Move
+                if (!targetCharacter) {
+                    std::cout << "Creating Move command to (" << boardPos.first << ", " << boardPos.second << ")\n";
+                    auto moveCmd = std::make_unique<engine::Move>(selectedCharacter, boardPos);
+                    engine->addCommand(std::move(moveCmd));
+                    engine->executeCommand();
+                    std::cout << "Move command executed\n";
+                    resetSelection();
+                    return;
+                }
+            } else {
+                std::cout << "No character selected. Left click to select a character first.\n";
+            }
         }
     }
 
@@ -207,8 +245,3 @@ namespace client {
     }
 
 }
-
-/*
-
-
-*/
