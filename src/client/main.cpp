@@ -163,17 +163,10 @@ int main(int argc, char* argv[]) {
     cout << "\n=== TESTING COMMANDS ===\n";
     cout << "Position initiale de hum1: (" << hum1->getPosition().first << ", " << hum1->getPosition().second << ")\n";
 
-    std::unique_ptr<engine::Command> cmd_ptr(new engine::Move(hum1, std::make_pair(10,6)));
-    eng.addCommand(std::move(cmd_ptr));
-
     cout << "\n=== INTERACTIVE MODE ===\n";
     cout << "Controls:\n";
     cout << "  - Click on a character to select it\n";
-    cout << "  - Press M to move (then click target position)\n";
-    cout << "  - Press P to pass (then click target character)\n";
-    cout << "  - Press B to block (then click target character)\n";
-    cout << "  - Right click or ESC to cancel\n";
-    cout << "  - Space to execute old test command\n";
+    cout << "  - Right click to Move/Block\n";
     cout << "  - L to list team A\n";
     cout << "  - ESC in main window to quit\n\n";
 
@@ -187,6 +180,24 @@ int main(int argc, char* argv[]) {
 
             // Let inputHandler process game-related events first
             inputHandler.handleEvent(event, &window);
+
+            // If pending block exists and the user clicked left button, check dice overlay bounds
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                if (inputHandler.hasPendingBlock()) {
+                    const auto& bounds = scene.getDiceOptionBounds();
+                    if (!bounds.empty()) {
+                        float mx = static_cast<float>(event.mouseButton.x);
+                        float my = static_cast<float>(event.mouseButton.y);
+                        for (size_t i = 0; i < bounds.size(); ++i) {
+                            if (bounds[i].contains(mx, my)) {
+                                // apply choice (1-based index)
+                                inputHandler.applyPendingBlockChoice(static_cast<int>(i+1));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
 
             // Handle special keys that are not part of game input
             if (event.type == sf::Event::KeyReleased) {
@@ -212,7 +223,7 @@ int main(int argc, char* argv[]) {
         }
 
         // Dessin de la scène (pass the window owned by the client)
-        scene.drawScene(window, inputHandler.getSelectedCharacter());
+        scene.drawScene(window, inputHandler.getSelectedCharacter(), inputHandler.getPreviewPosition(), inputHandler.hasPreviewPosition(), inputHandler.isPreviewLegal(), inputHandler.getPendingBlockDiceOptions(), inputHandler.hasPendingBlock());
     }
 
     cout << "\nRender test completed successfully!\n";

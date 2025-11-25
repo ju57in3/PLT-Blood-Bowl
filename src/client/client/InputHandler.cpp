@@ -13,7 +13,7 @@
 namespace client {
 
     InputHandler::InputHandler(std::shared_ptr<state::BloodBowlGame> game, engine::Engine* engine)
-        : currentMode(Idle), selectedCharacter(nullptr), game(std::move(game)), engine(engine) {
+        : currentMode(Idle), selectedCharacter(nullptr), game(std::move(game)), engine(engine), pendingBlock(nullptr), previewBoardPos({0,0}), previewExists(false), previewCharacter(nullptr), previewIsLegal(false) {
     }
 
     InputHandler::~InputHandler() = default;
@@ -21,8 +21,9 @@ namespace client {
 
     std::pair<int, int> InputHandler::screenToBoard(const sf::Vector2i& screenPos) const {
         // Convert screen coordinates to board coordinates
-        int boardX = (screenPos.x - utility::Constants::BOARD_OFFSET_X) / (utility::Constants::BOARD_TILE_PIXEL_SIZE + 1);
-        int boardY = (screenPos.y - utility::Constants::BOARD_OFFSET_Y) / (utility::Constants::BOARD_TILE_PIXEL_SIZE + 1);
+        const int stride = utility::Constants::BOARD_TILE_PIXEL_SIZE + utility::Constants::BOARD_TILE_SPACING;
+        int boardX = (screenPos.x - utility::Constants::BOARD_OFFSET_X) / stride;
+        int boardY = (screenPos.y - utility::Constants::BOARD_OFFSET_Y) / stride;
 
         // Clamp to board bounds
         if (boardX < 0) boardX = 0;
@@ -33,7 +34,7 @@ namespace client {
         return {boardX, boardY};
     }
 
-    std::shared_ptr<state::Character> InputHandler::getCharacterAt(const std::pair<int, int>& boardPos) {
+    std::shared_ptr<state::Character> InputHandler::getCharacterAt(const std::pair<int, int>& boardPos) const {
         if (!game) return nullptr;
 
         // Check current team first (only current team can be selected)
@@ -74,8 +75,8 @@ namespace client {
                       << ") -> board (" << boardPos.first << ", " << boardPos.second << ")\n";
 
             switch (currentMode) {
-                case InputMode::Idle:
-                case InputMode::Selected_Character: {
+                case Idle:
+                case Selected_Character: {
                     // Try to select a character from current team
                     auto character = getCharacterAt(boardPos);
                     if (character) {
@@ -95,7 +96,6 @@ namespace client {
                             std::cout << "Character selected: " << character->getName()
                                       << " at (" << character->getPosition().first
                                       << ", " << character->getPosition().second << ")\n";
-                            std::cout << "Press M for Move, P for Pass, B for Block\n";
                         } else {
                             std::cout << "Cannot select opponent's character\n";
                         }
@@ -105,7 +105,7 @@ namespace client {
                     break;
                 }
 
-                case InputMode::Select_Move_Target: {
+                case Select_Move_Target: {
                     if (selectedCharacter) {
                         std::cout << "Creating Move command to (" << boardPos.first << ", " << boardPos.second << ")\n";
                         auto moveCmd = std::make_unique<engine::Move>(selectedCharacter, boardPos);
@@ -117,7 +117,7 @@ namespace client {
                     break;
                 }
 
-                case InputMode::Select_Pass_Target: {
+                case Select_Pass_Target: {
                     if (selectedCharacter) {
                         auto targetCharacter = getCharacterAt(boardPos);
                         if (targetCharacter) {
@@ -134,15 +134,18 @@ namespace client {
                     break;
                 }
 
-                case InputMode::Select_Block_Target: {
+                case Select_Block_Target: {
                     if (selectedCharacter) {
                         auto targetCharacter = getCharacterAt(boardPos);
                         if (targetCharacter && targetCharacter != selectedCharacter) {
-                            std::cout << "Creating Block command against " << targetCharacter->getName() << "\n";
-                            auto blockCmd = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
-                            engine->addCommand(std::move(blockCmd));
-                            engine->executeCommand();
-                            std::cout << "Block command executed\n";
+                            // Create a pending block and expose dice options to the UI
+                            pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
+                            auto options = pendingBlock->getDiceOptions();
+                            std::cout << "Block initiated against " << targetCharacter->getName() << ". Dice options: ";
+                            for (size_t i = 0; i < options.size(); ++i) {
+                                std::cout << "[" << (i+1) << ":" << options[i] << "] ";
+                            }
+                            std::cout << "\nPress the number key corresponding to the die to choose (or ESC to cancel)." << std::endl;
                         } else {
                             std::cout << "Invalid block target\n";
                         }
@@ -169,13 +172,15 @@ namespace client {
                 }
 
                 if (targetCharacter && !targetBelongsToCurrent && targetCharacter != selectedCharacter) {
-                    // Right-click on opponent -> Block
-                    std::cout << "Creating Block command against " << targetCharacter->getName() << "\n";
-                    auto blockCmd = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
-                    engine->addCommand(std::move(blockCmd));
-                    engine->executeCommand();
-                    std::cout << "Block command executed\n";
-                    resetSelection();
+                    // Right-click on opponent -> start pending Block (wait for dice choice)
+                    pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
+                    auto options = pendingBlock->getDiceOptions();
+                    std::cout << "Block initiated against " << targetCharacter->getName() << ". Dice options: ";
+                    for (size_t i = 0; i < options.size(); ++i) {
+                        std::cout << "[" << (i+1) << ":" << options[i] << "] ";
+                    }
+                    std::cout << "\nPress the number key corresponding to the die to choose (or ESC to cancel)." << std::endl;
+                    // keep selection active until player chooses
                     return;
                 }
 
@@ -192,6 +197,62 @@ namespace client {
             } else {
                 std::cout << "No character selected. Left click to select a character first.\n";
             }
+        }
+    }
+
+    std::vector<int> InputHandler::getPendingBlockDiceOptions() const {
+        if (pendingBlock) return pendingBlock->getDiceOptions();
+        return {};
+    }
+
+    bool InputHandler::hasPendingBlock() const {
+        return pendingBlock != nullptr;
+    }
+
+    std::pair<int,int> InputHandler::getPreviewPosition() const {
+        return previewBoardPos;
+    }
+
+    bool InputHandler::hasPreviewPosition() const {
+        return previewExists;
+    }
+
+    std::shared_ptr<state::Character> InputHandler::getPreviewCharacter() const {
+        return previewCharacter;
+    }
+
+    bool InputHandler::isPreviewLegal() const {
+        return previewIsLegal;
+    }
+
+    void InputHandler::updatePreviewFromMouse(const sf::Vector2i& mousePos) {
+        if (!game) { previewExists = false; previewIsLegal = false; previewCharacter = nullptr; return; }
+        auto boardPos = screenToBoard(mousePos);
+        previewBoardPos = boardPos;
+        previewExists = true;
+        previewCharacter = getCharacterAt(boardPos);
+        previewIsLegal = false;
+
+        switch (currentMode) {
+            case InputMode::Idle:
+            case InputMode::Selected_Character:
+                previewIsLegal = false;
+                break;
+            case InputMode::Select_Move_Target:
+                if (selectedCharacter) {
+                    previewIsLegal = isMoveLegal(boardPos);
+                }
+                break;
+            case InputMode::Select_Pass_Target:
+                if (selectedCharacter && previewCharacter) {
+                    previewIsLegal = (previewCharacter != selectedCharacter);
+                }
+                break;
+            case InputMode::Select_Block_Target:
+                if (selectedCharacter && previewCharacter) {
+                    previewIsLegal = isBlockLegal(previewCharacter);
+                }
+                break;
         }
     }
 
@@ -219,12 +280,40 @@ namespace client {
                 break;
 
             case sf::Keyboard::Escape:
+                // cancel pending block if any
+                pendingBlock.reset();
                 resetSelection();
                 break;
 
             default:
+                // handle numeric keys for block dice choice (1..6)
+                if (pendingBlock) {
+                    int index = -1;
+                    if (key.code >= sf::Keyboard::Num0 && key.code <= sf::Keyboard::Num9) {
+                        index = key.code - sf::Keyboard::Num0; // 0..9
+                    } else if (key.code >= sf::Keyboard::Numpad0 && key.code <= sf::Keyboard::Numpad9) {
+                        index = key.code - sf::Keyboard::Numpad0; // 0..9
+                    }
+                    if (index > 0) {
+                        // apply choice and execute
+                        pendingBlock->applyDiceChoice(index);
+                        engine->addCommand(std::unique_ptr<engine::Command>(pendingBlock.release()));
+                        engine->executeCommand();
+                        std::cout << "Block executed with chosen die index " << index << "\n";
+                        resetSelection();
+                    }
+                }
                 break;
         }
+    }
+
+    void InputHandler::applyPendingBlockChoice(int chosenIndex) {
+        if (!pendingBlock || !engine) return;
+        pendingBlock->applyDiceChoice(chosenIndex);
+        engine->addCommand(std::unique_ptr<engine::Command>(pendingBlock.release()));
+        engine->executeCommand();
+        std::cout << "Block executed with chosen die index " << chosenIndex << "\n";
+        resetSelection();
     }
 
     InputMode InputHandler::getCurrentMode() const {
@@ -236,12 +325,60 @@ namespace client {
     }
 
     void InputHandler::handleEvent(const sf::Event& event, sf::RenderWindow* window) {
-        // New implementation: call member functions directly and forward window pointer
         if (event.type == sf::Event::MouseButtonPressed) {
             this->handleMouseClick(event.mouseButton, window);
+        } else if (event.type == sf::Event::MouseMoved) {
+            if (window) {
+                sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);
+                updatePreviewFromMouse(mousePos);
+            }
         } else if (event.type == sf::Event::KeyPressed) {
             this->handleKeyPress(event.key);
         }
     }
 
-}
+    bool InputHandler::isMoveLegal(const std::pair<int, int> &dest) const {
+        if (!selectedCharacter || !game) return false;
+
+        // Movement: allow positions where max(|dx|,|dy|) <= movement (Chebyshev / square range)
+        auto start = selectedCharacter->getPosition();
+        int dx = std::abs(dest.first - start.first);
+        int dy = std::abs(dest.second - start.second);
+        int maxDelta = std::max(dx, dy);
+        if (maxDelta > selectedCharacter->getMovement()) return false;
+
+        // Check board bounds
+        if (dest.first < 0 || dest.first >= utility::Constants::BOARD_WIDTH) return false;
+        if (dest.second < 0 || dest.second >= utility::Constants::BOARD_HEIGHT) return false;
+
+        // Destination must not be occupied by any character
+        auto occ = getCharacterAt(dest);
+        if (occ) return false;
+
+        // Further rules (tackle zones, terrain, stamina, etc.) can be added here
+        return true;
+    }
+
+    bool InputHandler::isBlockLegal (const std::shared_ptr<state::Character>& target) const{
+        if (!selectedCharacter || !target || !game) return false;
+
+        if (target == selectedCharacter) return false;
+
+        // Target must not belong to current team
+        auto* currentTeam = game->getCurrentTeam();
+        if (!currentTeam) return false;
+        for (const auto& c : currentTeam->getCharacters()) {
+            if (c == target) return false; // target is a teammate -> not legal
+        }
+
+        // Must be adjacent (8-neighbour)
+        auto a = selectedCharacter->getPosition();
+        auto b = target->getPosition();
+        int dx = std::abs(a.first - b.first);
+        int dy = std::abs(a.second - b.second);
+        if (dx <= 1 && dy <= 1) return true;
+
+        return false;
+    }
+
+} // namespace client
