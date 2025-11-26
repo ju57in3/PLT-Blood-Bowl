@@ -32,6 +32,11 @@ namespace engine {
 
             // Vérification touchdown
             checkAndHandleTouchdown(game);
+
+            // Mark character as having played if it was playable
+            if (character->getStatus() == state::CharacterStatus::playable) {
+                character->setStatus(state::CharacterStatus::played);
+            }
         }
     }
 

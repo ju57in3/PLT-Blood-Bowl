@@ -258,5 +258,10 @@ namespace engine {
          }
 
          checkAndHandleTouchdown(game);
+
+        // Mark passer as played if it was playable
+        if (passer->getStatus() == state::CharacterStatus::playable) {
+            passer->setStatus(state::CharacterStatus::played);
+        }
      }
  }

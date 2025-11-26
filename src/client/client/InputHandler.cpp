@@ -30,6 +30,12 @@ namespace client {
 
     InputHandler::~InputHandler() = default;
 
+    bool InputHandler::isCharacterPlayable(const std::shared_ptr<state::Character>& character) const {
+        if (!character || !game) return false;
+        if (!belongsToCurrentTeam(character, game)) return false;
+        return character->getStatus() == state::CharacterStatus::playable;
+    }
+
 
     std::pair<int, int> InputHandler::screenToBoard(const sf::Vector2i& screenPos) const {
 
@@ -81,7 +87,6 @@ namespace client {
         }
 
         if (mouseButton.button == sf::Mouse::Left) {
-            // If a pending block exists, a left-click may be a choice on the dice overlay
             if (pendingBlock && !diceBounds.empty()) {
                 float mx = static_cast<float>(mouseButton.x);
                 float my = static_cast<float>(mouseButton.y);
@@ -92,7 +97,6 @@ namespace client {
                         return;
                     }
                 }
-                // click not on dice overlay -> ignore while pendingBlock is active
                 return;
             }
 
@@ -102,24 +106,22 @@ namespace client {
             std::cout << "Click at screen (" << mouseButton.x << ", " << mouseButton.y
                       << ") -> board (" << boardPos.first << ", " << boardPos.second << ")\n";
 
-            // Selection logic (context sensitive: left click selects characters)
             auto character = getCharacterAt(boardPos);
             if (character) {
-                if (belongsToCurrentTeam(character, game)) {
+                if (isCharacterPlayable(character)) {
                     selectedCharacter = character;
                     currentMode = InputMode::Selected_Character;
                     std::cout << "Character selected: " << character->getName()
                               << " at (" << character->getPosition().first
                               << ", " << character->getPosition().second << ")\n";
                 } else {
-                    std::cout << "Cannot select opponent's character\n";
+                    std::cout << "Cannot select this character (not playable)\n";
                 }
             } else {
                 std::cout << "No character at this position\n";
             }
 
         } else if (mouseButton.button == sf::Mouse::Right) {
-            // Right click: context-sensitive action (move / pass / block)
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
 
@@ -202,19 +204,16 @@ namespace client {
             return;
         }
 
-        // If there is no character under cursor, show move legality
         if (!previewCharacter) {
             previewIsLegal = isMoveLegal(boardPos);
             return;
         }
 
-        // If it's a teammate (not self) -> pass is possible
         if (belongsToCurrentTeam(previewCharacter, game)) {
             previewIsLegal = (previewCharacter != selectedCharacter);
             return;
         }
 
-        // Otherwise it's an opponent -> show block legality
         previewIsLegal = isBlockLegal(previewCharacter);
     }
 
@@ -226,8 +225,6 @@ namespace client {
                 break;
 
             default:
-                // Numeric key selection for pending block removed: dice must be chosen by clicking
-                // on the dice overlay (main loop) or via applyPendingBlockChoice().
                 break;
         }
     }

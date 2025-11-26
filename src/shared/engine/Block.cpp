@@ -218,5 +218,10 @@ namespace engine {
             }
         }
         // TODO : Implémenter la différence entre DefenderStumbles et DefenderDown (besoin de la capacité esquive).
+
+        // If attacker survived and was playable, mark them as played
+        if (attacker && attacker->getStatus() == state::CharacterStatus::playable) {
+            attacker->setStatus(state::CharacterStatus::played);
+        }
     }
 };
