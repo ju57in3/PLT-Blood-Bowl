@@ -27,7 +27,6 @@ namespace render{
     SceneData::SceneData(std::string colorA, std::string colorB)
     : colorA(std::move(colorA)), colorB(std::move(colorB))
     {
-        // prepare dice textures vector empty; will be loaded in init if available
         diceTextures.clear();
         diceSprites.clear();
     }
@@ -54,7 +53,6 @@ namespace render{
         const std::string charactersDir = "../res/characters/";
         if (!std::filesystem::exists(charactersDir) || !std::filesystem::is_directory(charactersDir)) {
             std::cerr << "Error: characters directory does not exist: " << charactersDir << std::endl;
-            // try fallback
         }
 
         for ( const auto& character : game->getTeamA().getCharacters()) {
@@ -79,17 +77,17 @@ namespace render{
             }
         }
 
-        if (loadTextureFromFile("../res/ball.png", ballTexture) || loadTextureFromFile("res/ball.png", ballTexture)) {
+        if (loadTextureFromFile("../res/ball.png", ballTexture)) {
             ballSprite.setTexture(ballTexture);
             ballSprite.setPosition(pos2Coords(game->getBallPosition()));
         }
 
-        // Load dice textures from res/BlockDice with names like "1.png".."6.png" or named images
         const std::string diceDir = "../res/BlockDice/";
         diceTextures.resize(6);
         diceSprites.resize(6);
-        // fallback names for faces: index 1..6 -> name
-        const std::vector<std::string> fallbackNames = {
+
+        // TODO : Peut mieux faire ?
+        const std::vector<std::string> id2DiceName = {
             "AttackerDown.png", // face 1
             "BothDown.png",     // face 2
             "Pushed.png",       // face 3
@@ -100,22 +98,10 @@ namespace render{
 
         for (int face = 1; face <= 6; ++face) {
             const int idx = face - 1;
-            std::string p1 = diceDir + std::to_string(face) + ".png";
-            if (loadTextureFromFile(p1, diceTextures[idx])) {
+            std::string fileName = diceDir + id2DiceName[idx];
+            if (loadTextureFromFile(fileName, diceTextures[idx])) {
                 diceSprites[idx].setTexture(diceTextures[idx]);
-            } else {
-                // try descriptive fallback
-                std::string pFallback = diceDir + fallbackNames[idx];
-                if (loadTextureFromFile(pFallback, diceTextures[idx])) {
-                    diceSprites[idx].setTexture(diceTextures[idx]);
-                } else {
-                    // leave texture empty; fallback drawing will render number
-                }
             }
-        }
-        // Load default font for fallback dice labels
-        if (!defaultFont.loadFromFile("../res/arial.ttf")) {
-            // silent if not present, fallback drawing will skip text
         }
     }
 
@@ -123,12 +109,10 @@ namespace render{
     {
         window.draw(board);
 
-        // draw preview under characters so it appears as tile highlight
         if (previewExists) {
             drawPreview(window, previewPos, previewExists, legal);
         }
 
-        // Draw highlights first (a translucent rectangle under the sprite)
         if (highlighted) {
             sf::RectangleShape highlightRect;
             highlightRect.setFillColor(sf::Color(255, 255, 0, 80)); // semi-transparent yellow
@@ -148,83 +132,71 @@ namespace render{
             window.draw(ballSprite);
         }
 
-        // draw dice options overlay if requested
         if (showDice && !diceOptions.empty()) {
-            // place dice icons in the top-left corner of the window (single row) with small padding
+            // TODO : MAGIC NUMBER
             const float padding = 8.0f;
             const float size = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
             const size_t n = diceOptions.size();
-            // top-left origin with a small padding from the window border
-            float startX = padding;
+
+            float firstX = padding;
             float y = padding;
             diceOptionBounds.clear();
+
             for (size_t i = 0; i < n; ++i) {
-                float x = startX + i * (size + padding);
+                float x = firstX + i * (size + padding);
                 int faceIndex = diceOptions[i] - 1;
                 if (faceIndex >= 0 && static_cast<size_t>(faceIndex) < diceSprites.size() && diceSprites[faceIndex].getTexture()) {
-                    // scale sprite to square 'size' while preserving aspect ratio
                     const auto bounds = diceSprites[faceIndex].getLocalBounds();
                     float sx = size / bounds.width;
                     float sy = size / bounds.height;
                     diceSprites[faceIndex].setScale(sx, sy);
                     diceSprites[faceIndex].setPosition(x, y);
                     window.draw(diceSprites[faceIndex]);
-                } else {
-                    // fallback: draw a simple rectangle with number
-                    sf::RectangleShape r(sf::Vector2f(size, size));
-                    r.setPosition(x, y);
-                    r.setFillColor(sf::Color(200,200,200,200));
-                    window.draw(r);
-                    if (defaultFont.getInfo().family != "") {
-                        sf::Text t(std::to_string(diceOptions[i]), defaultFont, 14);
-                        t.setPosition(x + size/4, y + size/6);
-                        t.setFillColor(sf::Color::Black);
-                        window.draw(t);
-                    }
                 }
-                diceOptionBounds.emplace_back(sf::FloatRect(x, y, size, size));
+                diceOptionBounds.emplace_back(x, y, size, size);
             }
-            // Hover visual: check mouse position in window coords
+
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
             for (size_t i = 0; i < diceOptionBounds.size(); ++i) {
                 const auto& r = diceOptionBounds[i];
                 if (r.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-                    // draw highlight rectangle (outline) around hovered die
                     sf::RectangleShape outline(sf::Vector2f(r.width, r.height));
                     outline.setPosition(r.left, r.top);
                     outline.setFillColor(sf::Color(0,0,0,0));
                     outline.setOutlineThickness(3.0f);
                     outline.setOutlineColor(sf::Color(255, 255, 0, 160));
                     window.draw(outline);
-                    break; // only highlight first hovered
+                    break;
                 }
             }
          } else {
-             // clear bounds if not shown
              diceOptionBounds.clear();
          }
     }
 
-    void SceneData::drawPreview(sf::RenderWindow& target, const std::pair<int,int>& previewPos, bool previewExists, bool legal)
+    void SceneData::drawPreview(sf::RenderWindow& window, const std::pair<int,int>& previewPos, bool previewExists, bool legal)
     {
-        if (!previewExists) return;
-        const auto pos = pos2Coords(previewPos);
+        if (!previewExists) {
+            return;
+        }
+
+        const auto coord = pos2Coords(previewPos);
         sf::RectangleShape rect;
         rect.setSize(sf::Vector2f(Constants::BOARD_TILE_PIXEL_SIZE, Constants::BOARD_TILE_PIXEL_SIZE));
-        rect.setPosition(pos);
+        rect.setPosition(coord);
         if (legal) {
             rect.setFillColor(sf::Color(0, 255, 0, 80)); // semi-transparent green
         } else {
             rect.setFillColor(sf::Color(255, 0, 0, 80)); // semi-transparent red
         }
-        target.draw(rect);
+        window.draw(rect);
     }
 
-    void SceneData::updatePositions(const std::shared_ptr<state::BloodBowlGame>& game)
-    {
-        if (!game) return;
+    void SceneData::updatePositions(const std::shared_ptr<state::BloodBowlGame>& game) {
+        if (!game) {
+            return;
+        }
 
-        // Update TeamA positions
         for (const auto& character : game->getTeamA().getCharacters()) {
             const auto index = static_cast<size_t>(character->getId());
             if (index < Constants::MAX_PLAYERS_PER_TEAM) {
@@ -232,7 +204,6 @@ namespace render{
             }
         }
 
-        // Update TeamB positions
         for (const auto& character : game->getTeamB().getCharacters()) {
             const auto index = static_cast<size_t>(character->getId());
             if (index < Constants::MAX_PLAYERS_PER_TEAM) {
@@ -240,7 +211,6 @@ namespace render{
             }
         }
 
-        // Update ball position
         ballSprite.setPosition(pos2Coords(game->getBallPosition()));
     }
 

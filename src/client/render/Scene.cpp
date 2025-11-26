@@ -11,16 +11,17 @@ namespace render {
 
 
     void Scene::drawScene (sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool previewLegal, const std::vector<int>& diceOptions, bool showDice) {
-        if (!game || !window.isOpen()) return;
+        if (!game || !window.isOpen()) {
+            return;
+        }
 
-        // Initialize sceneData textures/sprites on first draw if needed
         if (!sceneData.isBoardLoaded()) {
             sceneData.init(game);
         }
 
         window.clear(sf::Color::Black);
-        sceneData.updatePositions(game);  // Update sprite positions from game state
-        // draw preview under characters so it appears as tile highlight
+        sceneData.updatePositions(game);
+
         sceneData.draw(window, highlighted, previewPos, previewExists, previewLegal, diceOptions, showDice);
         window.display();
     }

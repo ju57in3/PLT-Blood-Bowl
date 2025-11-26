@@ -141,22 +141,12 @@ int main(int argc, char* argv[]) {
     // Initialize game
     auto gamePtr = std::make_shared<BloodBowlGame>(teamA, teamB);
 
-    cout << "Initial Teams:\n";
-    cout << "Team A (Humans):\n" << teamA << "\n";
-    cout << "Team B (Orcs):\n" << teamB << "\n";
-
-    // testing render
-    cout << "\n=== TESTING RENDER ===\n";
-
     // Create Engine
     engine::Engine eng(gamePtr);
+
     sf::RenderWindow window(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl");
-
-
-    // Create Scene with engine reference (scene no longer owns the window)
     render::Scene scene(render::SceneId::MENU, gamePtr);
 
-    // Create InputHandler (owned by client)
     client::InputHandler inputHandler(gamePtr, &eng);
 
     // Create and add commands
@@ -166,11 +156,11 @@ int main(int argc, char* argv[]) {
     cout << "\n=== INTERACTIVE MODE ===\n";
     cout << "Controls:\n";
     cout << "  - Click on a character to select it\n";
-    cout << "  - Right click to Move/Block\n";
+    cout << "  - Right click to Move/Block/Pass\n";
     cout << "  - L to list team A\n";
-    cout << "  - ESC in main window to quit\n\n";
+    cout << "  - Q in main window to quit\n\n";
 
-    // main loop - client owns the window and handles events
+
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
@@ -178,38 +168,12 @@ int main(int argc, char* argv[]) {
                 window.close();
             }
 
-            // Let inputHandler process game-related events first
-            inputHandler.handleEvent(event, &window);
+            inputHandler.handleEvent(event, &window, scene.getDiceOptionBounds());
 
-            // If pending block exists and the user clicked left button, check dice overlay bounds
-            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                if (inputHandler.hasPendingBlock()) {
-                    const auto& bounds = scene.getDiceOptionBounds();
-                    if (!bounds.empty()) {
-                        float mx = static_cast<float>(event.mouseButton.x);
-                        float my = static_cast<float>(event.mouseButton.y);
-                        for (size_t i = 0; i < bounds.size(); ++i) {
-                            if (bounds[i].contains(mx, my)) {
-                                // apply choice (1-based index)
-                                inputHandler.applyPendingBlockChoice(static_cast<int>(i+1));
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Handle special keys that are not part of game input
             if (event.type == sf::Event::KeyReleased) {
                 switch (event.key.code) {
-                    case sf::Keyboard::Escape:
+                    case sf::Keyboard::Q:
                         window.close();
-                        break;
-
-                    case sf::Keyboard::Space:
-                        // Old test command - still works
-                        eng.executeCommand();
-                        cout << "Position de hum1 après commande: (" << hum1->getPosition().first << ", " << hum1->getPosition().second << ")\n";
                         break;
 
                     case sf::Keyboard::L:
