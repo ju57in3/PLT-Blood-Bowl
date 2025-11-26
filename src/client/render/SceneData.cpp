@@ -105,7 +105,7 @@ namespace render{
         }
     }
 
-    void SceneData::draw(sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool legal, const std::vector<int>& diceOptions, bool showDice)
+    void SceneData::draw(sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool legal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions)
     {
         window.draw(board);
 
@@ -120,6 +120,25 @@ namespace render{
             highlightRect.setSize(sf::Vector2f(Constants::BOARD_TILE_PIXEL_SIZE, Constants::BOARD_TILE_PIXEL_SIZE));
             highlightRect.setPosition(pos);
             window.draw(highlightRect);
+        }
+
+        std::vector<sf::Vector2f> playableCoords;
+        playableCoords.reserve(playablePositions.size());
+        for (const auto& p : playablePositions) {
+            playableCoords.push_back(pos2Coords(p));
+        }
+
+        // draw a circular outline centered on each playable tile
+        for (const auto& coord : playableCoords) {
+            const float tileSizeF = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
+            const float radius = tileSizeF * 0.45f;
+            sf::CircleShape outline(radius);
+            outline.setOrigin(radius, radius);
+            outline.setPosition(coord.x + tileSizeF * 0.5f, coord.y + tileSizeF * 0.5f);
+            outline.setFillColor(sf::Color::Transparent);
+            outline.setOutlineColor(sf::Color(0, 200, 0, 210));
+            outline.setOutlineThickness(2.0f);
+            window.draw(outline);
         }
 
         for (auto& s : playersSprites_TeamA) {
@@ -219,4 +238,3 @@ namespace render{
     }
 
 }
-

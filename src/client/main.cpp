@@ -187,7 +187,18 @@ int main(int argc, char* argv[]) {
         }
 
         // Dessin de la scène (pass the window owned by the client)
-        scene.drawScene(window, inputHandler.getSelectedCharacter(), inputHandler.getPreviewPosition(), inputHandler.hasPreviewPosition(), inputHandler.isPreviewLegal(), inputHandler.getPendingBlockDiceOptions(), inputHandler.hasPendingBlock());
+        // build playable positions list to show green outlines
+        std::vector<std::pair<int,int>> playablePositions;
+        if (gamePtr) {
+            for (const auto& c : gamePtr->getTeamA().getCharacters()) {
+                if (c->getStatus() == playable) playablePositions.push_back(c->getPosition());
+            }
+            for (const auto& c : gamePtr->getTeamB().getCharacters()) {
+                if (c->getStatus() == playable) playablePositions.push_back(c->getPosition());
+            }
+        }
+
+        scene.drawScene(window, inputHandler.getSelectedCharacter(), inputHandler.getPreviewPosition(), inputHandler.hasPreviewPosition(), inputHandler.isPreviewLegal(), inputHandler.getPendingBlockDiceOptions(), inputHandler.hasPendingBlock(), playablePositions);
     }
 
     cout << "\nRender test completed successfully!\n";
