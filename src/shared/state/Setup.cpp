@@ -1,5 +1,7 @@
 #include "Setup.h"
 
+#include <iostream>
+
 
 #include "Kickoff.h"
 #include "BloodBowlGame.h"
@@ -100,13 +102,21 @@ namespace state {
     }
 
     void Setup::update() {
-        if (setupEnded) {
+        if (teamSetupDone[0] && teamSetupDone[1]) {
             game->setCurrentState(game->getStateList().at(KICKOFF).get());
         }
     }
 
     void Setup::endSetup() {
-        setupEnded = true;
+        // mark current team as done
+        if (game && game->getCurrentTeam()) {
+            int id = game->getCurrentTeam()->getTeamId();
+            if (id == game->getTeamA().getTeamId()) teamSetupDone[0] = true;
+            else teamSetupDone[1] = true;
+            std::cout << "Team " << id << " finished setup.\n";
+            // switch team for next player's setup if other team still needs to place
+            game->setCurrentTeam((game->getCurrentTeam() == &game->getTeamA()) ? &game->getTeamB() : &game->getTeamA());
+        }
     }
 
     Setup::~Setup() {
@@ -115,7 +125,7 @@ namespace state {
 
     bool Setup::getSetupEnded()
     {
-        return setupEnded;
+        return teamSetupDone[0] && teamSetupDone[1];
     }
 
     void Setup::setSetupEnded(bool setupStatus)

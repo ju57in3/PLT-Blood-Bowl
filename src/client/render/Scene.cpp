@@ -10,7 +10,7 @@ namespace render {
     Scene::~Scene() = default;
 
 
-    void Scene::drawScene (sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool previewLegal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions) {
+    void Scene::drawScene (sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool previewLegal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions, const std::string& stateName, int currentTeamId) {
         if (!game || !window.isOpen()) {
             return;
         }
@@ -22,7 +22,14 @@ namespace render {
         window.clear(sf::Color::Black);
         sceneData.updatePositions(game);
 
-        sceneData.draw(window, highlighted, previewPos, previewExists, previewLegal, diceOptions, showDice, playablePositions);
+        std::string sName = "";
+        int tId = -1;
+        if (game) {
+            if (game->getCurrentState()) sName = game->getCurrentState()->getName();
+            if (game->getCurrentTeam()) tId = game->getCurrentTeam()->getTeamId();
+        }
+
+        sceneData.draw(window, highlighted, previewPos, previewExists, previewLegal, diceOptions, showDice, playablePositions, sName, tId);
         window.display();
     }
 

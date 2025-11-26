@@ -186,6 +186,11 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // Update the current state machine so state changes (turn end, setup, etc.) are applied
+        if (gamePtr && gamePtr->getCurrentState()) {
+            gamePtr->getCurrentState()->update();
+        }
+
         // Dessin de la scène (pass the window owned by the client)
         // build playable positions list to show green outlines
         std::vector<std::pair<int,int>> playablePositions;
@@ -198,7 +203,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        scene.drawScene(window, inputHandler.getSelectedCharacter(), inputHandler.getPreviewPosition(), inputHandler.hasPreviewPosition(), inputHandler.isPreviewLegal(), inputHandler.getPendingBlockDiceOptions(), inputHandler.hasPendingBlock(), playablePositions);
+        scene.drawScene(window, inputHandler.getSelectedCharacter(), inputHandler.getPreviewPosition(), inputHandler.hasPreviewPosition(), inputHandler.isPreviewLegal(), inputHandler.getPendingBlockDiceOptions(), inputHandler.hasPendingBlock(), playablePositions, "", -1);
     }
 
     cout << "\nRender test completed successfully!\n";

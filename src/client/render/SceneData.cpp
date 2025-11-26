@@ -29,6 +29,9 @@ namespace render{
     {
         diceTextures.clear();
         diceSprites.clear();
+        if (!defaultFont.loadFromFile("../res/fonts/bloodbowl_italic.ttf")) {
+            std::cout << "Fonts not loaded\n";
+        }
     }
 
     SceneData::~SceneData() = default;
@@ -105,7 +108,7 @@ namespace render{
         }
     }
 
-    void SceneData::draw(sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool legal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions)
+    void SceneData::draw(sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool legal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions, const std::string& stateName, int currentTeamId)
     {
         window.draw(board);
 
@@ -122,6 +125,7 @@ namespace render{
             window.draw(highlightRect);
         }
 
+        // Precompute pixel coords for playable positions
         std::vector<sf::Vector2f> playableCoords;
         playableCoords.reserve(playablePositions.size());
         for (const auto& p : playablePositions) {
@@ -191,6 +195,13 @@ namespace render{
          } else {
              diceOptionBounds.clear();
          }
+
+        if (!defaultFont.getInfo().family.empty()) {
+            sf::Text header(stateName + " - Team: " + (currentTeamId>=0?std::to_string(currentTeamId):std::string("-")), defaultFont, 16);
+            header.setFillColor(sf::Color::White);
+            header.setPosition(8.0f, 4.0f);
+            window.draw(header);
+        }
     }
 
     void SceneData::drawPreview(sf::RenderWindow& window, const std::pair<int,int>& previewPos, bool previewExists, bool legal)

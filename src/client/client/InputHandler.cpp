@@ -7,6 +7,8 @@
 #include "engine/Block.h"
 #include "state/BloodBowlGame.h"
 #include "state/Character.h"
+#include "state/PlayerTurn.h"
+#include "state/Setup.h"
 #include <iostream>
 #include <utility>
 #include <algorithm>
@@ -33,6 +35,8 @@ namespace client {
     bool InputHandler::isCharacterPlayable(const std::shared_ptr<state::Character>& character) const {
         if (!character || !game) return false;
         if (!belongsToCurrentTeam(character, game)) return false;
+        if (!game->getCurrentState()) return false;
+        if (!dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) return false;
         return character->getStatus() == state::CharacterStatus::playable;
     }
 
@@ -86,6 +90,44 @@ namespace client {
             return;
         }
 
+        // If we are in Setup state, handle placement/removal of characters
+        if (auto* setup = dynamic_cast<state::Setup*>(game->getCurrentState())) {
+            sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
+            auto boardPos = screenToBoard(mousePos);
+            if (mouseButton.button == sf::Mouse::Left) {
+                // place first available bench character of current team onto clicked tile if empty
+                if (getCharacterAt(boardPos)) {
+                    std::cout << "Tile occupied, cannot place character here\n";
+                    return;
+                }
+                auto* team = game->getCurrentTeam();
+                if (!team) return;
+                for (auto& cptr : team->getCharacters()) {
+                    if (cptr && cptr->getStatus() == state::CharacterStatus::bench) {
+                        cptr->setPosition(boardPos);
+                        cptr->setStatus(state::CharacterStatus::playable);
+                        std::cout << "Placed " << cptr->getName() << " at (" << boardPos.first << ", " << boardPos.second << ")\n";
+                        return;
+                    }
+                }
+                std::cout << "No bench character available to place for team " << team->getTeamId() << "\n";
+                return;
+            } else if (mouseButton.button == sf::Mouse::Right) {
+                // remove character to bench
+                auto ch = getCharacterAt(boardPos);
+                if (ch && ch->getStatus() != state::CharacterStatus::bench) {
+                    if (game->getCurrentTeam() && belongsToCurrentTeam(ch, game)) {
+                        ch->setPosition(std::make_pair(-1, -1));
+                        ch->setStatus(state::CharacterStatus::bench);
+                        std::cout << "Sent " << ch->getName() << " to bench\n";
+                    } else {
+                        std::cout << "Cannot remove opponent's character during setup\n";
+                    }
+                }
+                return;
+            }
+        }
+
         if (mouseButton.button == sf::Mouse::Left) {
             if (pendingBlock && !diceBounds.empty()) {
                 float mx = static_cast<float>(mouseButton.x);
@@ -134,6 +176,10 @@ namespace client {
 
             if (!targetCharacter) {
                 // empty tile -> move
+                if (!dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+                    std::cout << "Cannot move: not in PlayerTurn state\n";
+                    return;
+                }
                 std::cout << "Creating Move command to (" << boardPos.first << ", " << boardPos.second << ")\n";
                 auto moveCmd = std::make_unique<engine::Move>(selectedCharacter, boardPos);
                 engine->addCommand(std::move(moveCmd));
@@ -150,6 +196,10 @@ namespace client {
 
             if (belongsToCurrentTeam(targetCharacter, game)) {
                 // teammate -> pass
+                if (!dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+                    std::cout << "Cannot pass: not in PlayerTurn state\n";
+                    return;
+                }
                 std::cout << "Creating Pass command to " << targetCharacter->getName() << "\n";
                 auto passCmd = std::make_unique<engine::Pass>(selectedCharacter, targetCharacter);
                 engine->addCommand(std::move(passCmd));
@@ -222,6 +272,32 @@ namespace client {
             case sf::Keyboard::Escape:
                 pendingBlock.reset();
                 resetSelection();
+                break;
+            case sf::Keyboard::Return:
+                if (!game) break;
+                // If in Setup, attempt to finish setup for current team
+                if (auto* setup = dynamic_cast<state::Setup*>(game->getCurrentState())) {
+                    auto* team = game->getCurrentTeam();
+                    if (team && setup->isValidSetup(*team)) {
+                        setup->endSetup();
+                        std::cout << "Setup ended for team " << team->getTeamId() << "; proceeding to Kickoff if both teams done.\n";
+                    } else {
+                        std::cout << "Setup invalid for current team; cannot end setup yet.\n";
+                    }
+                    break;
+                }
+
+                // Otherwise, if in PlayerTurn, signal end of turn
+                if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+                    pt->setEndTurn(true);
+                    pt->update();
+                    // cleanup input state
+                    pendingBlock.reset();
+                    resetSelection();
+                    std::cout << "Pass turn: endTurn signaled to game state\n";
+                } else {
+                    std::cout << "Return key pressed: no action in current state (" << (game->getCurrentState()? game->getCurrentState()->getName() : "none") << ")\n";
+                }
                 break;
 
             default:
