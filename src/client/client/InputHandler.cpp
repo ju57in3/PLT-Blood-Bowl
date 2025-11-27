@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "state/Kickoff.h"
+
 namespace client {
 
     bool belongsToCurrentTeam(const std::shared_ptr<state::Character>& ch, const std::shared_ptr<state::BloodBowlGame>& game) {
@@ -100,7 +102,6 @@ namespace client {
                     return;
                 }
                 auto* team = game->getCurrentTeam();
-                if (!team) return;
                 for (auto& cptr : team->getCharacters()) {
                     if (cptr && cptr->getStatus() == state::CharacterStatus::bench) {
                         cptr->setPosition(boardPos);
@@ -126,10 +127,27 @@ namespace client {
             }
         }
 
+        if (auto* setup = dynamic_cast<state::Kickoff*>(game->getCurrentState())) {
+            sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
+            auto boardPos = screenToBoard(mousePos);
+
+            if (mouseButton.button == sf::Mouse::Left) {
+                auto team = game->getCurrentTeam();
+                if (team == &game->getTeamB()) {
+                    boardPos.first += utility::Constants::WINDOW_WIDTH/2;
+                }
+
+                setup->setTarget(boardPos);
+                std::cout << "Kickoff target set to (" << boardPos.first << ", " << boardPos.second << ")\n";
+                setup->setTargetSelected(true);
+                return;
+            }
+        }
+
         if (mouseButton.button == sf::Mouse::Left) {
             if (pendingBlock && !diceBounds.empty()) {
-                float mx = static_cast<float>(mouseButton.x);
-                float my = static_cast<float>(mouseButton.y);
+                auto mx = static_cast<float>(mouseButton.x);
+                auto my = static_cast<float>(mouseButton.y);
                 for (size_t i = 0; i < diceBounds.size(); ++i) {
                     if (diceBounds[i].contains(mx, my)) {
                         // apply choice (1-based index)

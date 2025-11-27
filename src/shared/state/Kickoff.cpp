@@ -74,7 +74,15 @@ namespace state {
         game->setBallPosition(newTarget);
     }
 
-    Kickoff::~Kickoff() {
+    Kickoff::~Kickoff() = default;
+
+    void Kickoff::setTarget(std::pair<int, int> target) {
+        this->target = target;
     }
+
+    void Kickoff::setTargetSelected(bool newValue) {
+        targetSelected = newValue;
+    }
+
 
 }
