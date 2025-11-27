@@ -80,11 +80,6 @@ namespace render{
             }
         }
 
-        if (loadTextureFromFile("../res/ball.png", ballTexture)) {
-            ballSprite.setTexture(ballTexture);
-            ballSprite.setPosition(pos2Coords(game->getBallPosition()));
-        }
-
         const std::string diceDir = "../res/BlockDice/";
         diceTextures.resize(6);
         diceSprites.resize(6);
@@ -171,9 +166,6 @@ namespace render{
         }
         for (auto& s : playersSprites_TeamB) {
             window.draw(s);
-        }
-        if (ballTexture.getSize().x > 0 && ballTexture.getSize().y > 0) {
-            window.draw(ballSprite);
         }
 
         if (showDice && !diceOptions.empty()) {
@@ -262,7 +254,6 @@ namespace render{
             }
         }
 
-        ballSprite.setPosition(pos2Coords(game->getBallPosition()));
     }
 
     const std::vector<sf::FloatRect>& SceneData::getDiceOptionBounds() const {
