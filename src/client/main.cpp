@@ -27,12 +27,12 @@ int main(int argc, char* argv[]) {
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
-    auto hum1 = std::make_shared<Character>(1,"Ligne1", "human_blitzer", 6, 3, 3, 8);
+    auto hum1 = std::make_shared<Character>(1,"Ligne1", "human_blitzer", 6, 4, 3, 8);
     teamA.addCharacter(hum1);
     hum1->setPosition({12, 6});
     hum1->setStatus(playable);
 
-    auto hum2 = std::make_shared<Character>(2,"Ligne2", "human_blitzer", 6, 3, 3, 8);
+    auto hum2 = std::make_shared<Character>(2,"Ligne2", "human_blitzer", 6, 12, 3, 8);
     teamA.addCharacter(hum2);
     hum2->setPosition({12, 7});
     hum2->setStatus(playable);
@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
                         break;
 
                     case sf::Keyboard::L:
-                        cout << gamePtr->getTeamA() << endl;
+                        cout << "Ball position : "<< gamePtr->getBallPosition().first << "," << gamePtr->getBallPosition().second << "\n";
                         break;
 
                     default:

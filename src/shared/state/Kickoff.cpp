@@ -6,26 +6,20 @@
 
 
 namespace state {
-    Kickoff::Kickoff (BloodBowlGame* game) : AbstractState(game){}
+    Kickoff::Kickoff (BloodBowlGame* game) : AbstractState(game), target({-1,-1}), targetSelected(false){}
 
     void Kickoff::update()
     {
-        int targetX;
-        if (game->getCurrentTeam()->getTeamId() == game->getTeamA().getTeamId()) {
-            targetX = (rand() % 12) +1;
-        }else {
-            targetX = (rand() % 12) +12;
+        if (targetSelected) {
+            kickBall(target);
+            game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
         }
-
-        int targetY = rand() % utility::Constants::BOARD_HEIGHT;
-        std::pair<int,int> targetSquare;
-        targetSquare.first = targetX;
-        targetSquare.second = targetY;
-
-        kickBall(targetSquare);
-        game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
     }
 
+
+    std::string Kickoff::getName() const {
+        return "Kickoff";
+    }
 
     void Kickoff::kickBall(std::pair<int,int> targetSquare)
     {
@@ -81,10 +75,6 @@ namespace state {
     }
 
     Kickoff::~Kickoff() {
-    }
-
-    std::string Kickoff::getName() const {
-        return "Kickoff";
     }
 
 }
