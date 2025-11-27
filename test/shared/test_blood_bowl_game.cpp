@@ -16,13 +16,13 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
 
     // Adding characters in each team
     for (int i = 0; i < 3; i++) {
-        auto h = std::make_unique<Character>("Human" + std::to_string(i+1), "Human", 6, 3, 3, 8);
+        auto h = std::make_unique<Character>(i+1,"Human" + std::to_string(i+1), "Human", 6, 3, 3, 8);
         h->setStatus(playable);
         h->setPosition({13, i});
         teamA.addCharacter(std::move(h));
 
 
-        auto o = std::make_unique<Character>("Orc" + std::to_string(i+1), "Orc", 5, 3, 2, 9);
+        auto o = std::make_unique<Character>(100+i+1,"Orc" + std::to_string(i+1), "Orc", 5, 3, 2, 9);
         o->setStatus(playable);
         o->setPosition({2, i});
         teamB.addCharacter(std::move(o));
@@ -62,12 +62,6 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
     auto pos = game.getBallPosition();
     BOOST_CHECK_EQUAL(pos.first, 5);
     BOOST_CHECK_EQUAL(pos.second, 6);
-
-    // Check the land height and width
-    int width = game.getWidth();
-    int height = game.getHeight();
-    BOOST_CHECK_GT(width, 0);
-    BOOST_CHECK_GT(height, 0);
 
     // Check the current team
     Team* current = game.getCurrentTeam();

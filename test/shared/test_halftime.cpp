@@ -19,9 +19,9 @@ BOOST_AUTO_TEST_CASE(TestHalfTime)
     Team teamB(2, "Orcs", 2);
 
     // Dynamics characters
-    auto cA1 = std::make_shared<Character>("H1", "Human", 6, 3, 3, 8);
-    auto cB1 = std::make_shared<Character>("O1", "Orc", 5, 3, 2, 9);
-    auto cB2 = std::make_shared<Character>("O2", "Orc", 5, 3, 2, 9);
+    auto cA1 = std::make_shared<Character>(1,"H1", "Human", 6, 3, 3, 8);
+    auto cB1 = std::make_shared<Character>(2,"O1", "Orc", 5, 3, 2, 9);
+    auto cB2 = std::make_shared<Character>(1,"O2", "Orc", 5, 3, 2, 9);
 
     // We put a character KO
     cA1->setStatus(ko);

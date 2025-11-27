@@ -12,12 +12,12 @@ BOOST_AUTO_TEST_CASE(TestPlayerTurn)
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
-    auto cA = std::make_unique<Character>("H1", "Human", 6, 3, 3, 8);
+    auto cA = std::make_unique<Character>(1,"H1", "Human", 6, 3, 3, 8);
     cA->setStatus(playable);
     cA->setPosition({5,5});
     teamA.addCharacter(std::move(cA));
 
-    auto cB = std::make_unique<Character>("O1", "Orcs", 5, 4, 2, 9);
+    auto cB = std::make_unique<Character>(2,"O1", "Orcs", 5, 4, 2, 9);
     cB->setStatus(playable);
     cB->setPosition({10,5});
     teamB.addCharacter(std::move(cB));
@@ -49,11 +49,11 @@ BOOST_AUTO_TEST_CASE(TestPlayerTurn)
     BOOST_CHECK_EQUAL(noChange.getTurnOver(), false);
 
     // Coverage : restoreCharactersStatus
-    auto cPlayed = std::make_unique<Character>("H2", "Human", 5, 4, 4, 6);
+    auto cPlayed = std::make_unique<Character>(1,"H2", "Human", 5, 4, 4, 6);
     cPlayed->setStatus(played);
     teamA.addCharacter(std::move(cPlayed));
 
-    auto cStunned = std::make_unique<Character>("H3", "Human", 5, 4, 4, 6);
+    auto cStunned = std::make_unique<Character>(2,"H3", "Human", 5, 4, 4, 6);
     cStunned->setStatus(stunned);
     teamA.addCharacter(std::move(cStunned));
 
