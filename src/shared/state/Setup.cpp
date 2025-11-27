@@ -104,6 +104,8 @@ namespace state {
     void Setup::update() {
         if (teamSetupDone[0] && teamSetupDone[1]) {
             game->setCurrentState(game->getStateList().at(KICKOFF).get());
+            teamSetupDone[1] = false;
+            teamSetupDone[0] = false;
         }
     }
 

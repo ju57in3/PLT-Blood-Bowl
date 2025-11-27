@@ -1,5 +1,4 @@
 #include "Scene.h"
-#include "utility/Constants.h"
 
 namespace render {
 
@@ -10,7 +9,7 @@ namespace render {
     Scene::~Scene() = default;
 
 
-    void Scene::drawScene (sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool previewLegal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions, const std::string& stateName, int currentTeamId) {
+    void Scene::drawScene (sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool previewLegal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions, const std::vector<std::pair<int,int>>& movePath, const std::string& stateName, int currentTeamId) {
         if (!game || !window.isOpen()) {
             return;
         }
@@ -29,7 +28,7 @@ namespace render {
             if (game->getCurrentTeam()) tId = game->getCurrentTeam()->getTeamId();
         }
 
-        sceneData.draw(window, highlighted, previewPos, previewExists, previewLegal, diceOptions, showDice, playablePositions, sName, tId);
+        sceneData.draw(window, highlighted, previewPos, previewExists, previewLegal, diceOptions, showDice, playablePositions, movePath, sName, tId);
         window.display();
     }
 
