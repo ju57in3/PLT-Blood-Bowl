@@ -108,7 +108,7 @@ namespace render{
         }
     }
 
-    void SceneData::draw(sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool legal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions, const std::string& stateName, int currentTeamId)
+    void SceneData::draw(sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool legal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions,const std::vector<std::pair<int,int>>& movePath, const std::string& stateName, int currentTeamId)
     {
         window.draw(board);
 
@@ -132,7 +132,6 @@ namespace render{
             playableCoords.push_back(pos2Coords(p));
         }
 
-        // draw a circular outline centered on each playable tile
         for (const auto& coord : playableCoords) {
             const float tileSizeF = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
             const float radius = tileSizeF * 0.45f;
@@ -143,6 +142,28 @@ namespace render{
             outline.setOutlineColor(sf::Color(0, 200, 0, 210));
             outline.setOutlineThickness(2.0f);
             window.draw(outline);
+        }
+
+        if (!movePath.empty()) {
+            sf::VertexArray va(sf::LinesStrip);
+            for (const auto& p : movePath) {
+                auto c = pos2Coords(p);
+                // center
+                c.x += Constants::BOARD_TILE_PIXEL_SIZE * 0.5f;
+                c.y += Constants::BOARD_TILE_PIXEL_SIZE * 0.5f;
+                va.append(sf::Vertex(c, sf::Color::Yellow));
+            }
+            if (va.getVertexCount() > 1) window.draw(va);
+            for (const auto& p : movePath) {
+                auto c = pos2Coords(p);
+                c.x += Constants::BOARD_TILE_PIXEL_SIZE * 0.5f;
+                c.y += Constants::BOARD_TILE_PIXEL_SIZE * 0.5f;
+                sf::CircleShape step(6.0f);
+                step.setOrigin(6.0f, 6.0f);
+                step.setPosition(c);
+                step.setFillColor(sf::Color(255, 200, 0, 200));
+                window.draw(step);
+            }
         }
 
         for (auto& s : playersSprites_TeamA) {

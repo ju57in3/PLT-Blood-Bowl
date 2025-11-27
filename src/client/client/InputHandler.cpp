@@ -82,6 +82,7 @@ namespace client {
     void InputHandler::resetSelection() {
         selectedCharacter = nullptr;
         currentMode = InputMode::Idle;
+        currentMovePath.clear();
         std::cout << "Selection reset. Mode: IDLE\n";
     }
 
@@ -90,12 +91,10 @@ namespace client {
             return;
         }
 
-        // If we are in Setup state, handle placement/removal of characters
         if (auto* setup = dynamic_cast<state::Setup*>(game->getCurrentState())) {
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
             if (mouseButton.button == sf::Mouse::Left) {
-                // place first available bench character of current team onto clicked tile if empty
                 if (getCharacterAt(boardPos)) {
                     std::cout << "Tile occupied, cannot place character here\n";
                     return;
@@ -112,8 +111,7 @@ namespace client {
                 }
                 std::cout << "No bench character available to place for team " << team->getTeamId() << "\n";
                 return;
-            } else if (mouseButton.button == sf::Mouse::Right) {
-                // remove character to bench
+            } if (mouseButton.button == sf::Mouse::Right) {
                 auto ch = getCharacterAt(boardPos);
                 if (ch && ch->getStatus() != state::CharacterStatus::bench) {
                     if (game->getCurrentTeam() && belongsToCurrentTeam(ch, game)) {
@@ -144,9 +142,6 @@ namespace client {
 
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
-
-            std::cout << "Click at screen (" << mouseButton.x << ", " << mouseButton.y
-                      << ") -> board (" << boardPos.first << ", " << boardPos.second << ")\n";
 
             auto character = getCharacterAt(boardPos);
             if (character) {
@@ -180,12 +175,49 @@ namespace client {
                     std::cout << "Cannot move: not in PlayerTurn state\n";
                     return;
                 }
-                std::cout << "Creating Move command to (" << boardPos.first << ", " << boardPos.second << ")\n";
-                auto moveCmd = std::make_unique<engine::Move>(selectedCharacter, boardPos);
-                engine->addCommand(std::move(moveCmd));
-                engine->executeCommand();
-                std::cout << "Move command executed\n";
-                resetSelection();
+                if (!selectedCharacter) {
+                    std::cout << "No character selected for move path\n";
+                    return;
+                }
+
+                if (currentMovePath.empty()) {
+                    currentMovePath.push_back(selectedCharacter->getPosition());
+                }
+
+                auto last = currentMovePath.back();
+                if (boardPos == last && currentMovePath.size() > 1) {
+                    auto finalPos = currentMovePath.back();
+                    std::cout << "Confirming move to (" << finalPos.first << ", " << finalPos.second << ")\n";
+                    for (std::pair<int,int> pos : currentMovePath) {
+                        auto moveStepCmd = std::make_unique<engine::Move>(selectedCharacter, pos);
+                        engine->addCommand(std::move(moveStepCmd));
+                        engine->executeCommand();
+                    }
+                    currentMovePath.clear();
+                    resetSelection();
+                    return;
+                }
+
+                int dx = std::abs(boardPos.first - last.first);
+                int dy = std::abs(boardPos.second - last.second);
+                if (std::max(dx, dy) != 1) {
+                    std::cout << "Invalid step: must be adjacent to previous step\n";
+                    return;
+                }
+
+                if (getCharacterAt(boardPos)) {
+                    std::cout << "Cannot step onto occupied tile\n";
+                    return;
+                }
+
+                int steps = static_cast<int>(currentMovePath.size());
+                if (steps >= selectedCharacter->getMovement() + 1) {
+                    std::cout << "Movement limit reached\n";
+                    return;
+                }
+
+                currentMovePath.push_back(boardPos);
+                std::cout << "Added step to (" << boardPos.first << ", " << boardPos.second << ") - path length " << currentMovePath.size()-1 << "\n";
                 return;
             }
 
@@ -275,7 +307,6 @@ namespace client {
                 break;
             case sf::Keyboard::Return:
                 if (!game) break;
-                // If in Setup, attempt to finish setup for current team
                 if (auto* setup = dynamic_cast<state::Setup*>(game->getCurrentState())) {
                     auto* team = game->getCurrentTeam();
                     if (team && setup->isValidSetup(*team)) {
@@ -287,14 +318,12 @@ namespace client {
                     break;
                 }
 
-                // Otherwise, if in PlayerTurn, signal end of turn
                 if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
                     pt->setEndTurn(true);
                     pt->update();
-                    // cleanup input state
                     pendingBlock.reset();
                     resetSelection();
-                    std::cout << "Pass turn: endTurn signaled to game state\n";
+                    std::cout << "End turn: endTurn signaled to game state\n";
                 } else {
                     std::cout << "Return key pressed: no action in current state (" << (game->getCurrentState()? game->getCurrentState()->getName() : "none") << ")\n";
                 }
@@ -320,6 +349,10 @@ namespace client {
 
     std::shared_ptr<state::Character> InputHandler::getSelectedCharacter() const {
         return selectedCharacter;
+    }
+
+    std::vector<std::pair<int,int>> InputHandler::getMovePath() const {
+        return currentMovePath;
     }
 
     void InputHandler::handleEvent(const sf::Event& event, sf::RenderWindow* window, const std::vector<sf::FloatRect>& diceBounds) {
