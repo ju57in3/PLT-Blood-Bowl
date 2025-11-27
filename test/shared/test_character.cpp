@@ -8,7 +8,7 @@ using namespace state;
 
 BOOST_AUTO_TEST_CASE(TestCharacter)
 {
-    Character human("Player 1", "human", 6, 3, 3, 8);
+    Character human(1,"Player 1", "human", 6, 3, 3, 8);
     BOOST_CHECK_EQUAL(human.getStatus(),bench);
     BOOST_CHECK(human.getPosition() == std::make_pair(-1,-1));
     BOOST_CHECK(not human.getHasBall());

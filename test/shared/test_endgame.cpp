@@ -13,9 +13,9 @@ BOOST_AUTO_TEST_CASE(TestEndGame)
     Team teamB(2, "Orcs", 2);
 
     // Dynamic allocation cause EndGame loop on Characers
-    auto cA1 = std::make_shared<Character>("H1", "Human", 6, 3, 3, 8);
-    auto cA2 = std::make_shared<Character>("H2", "Human", 6, 3, 3, 8);
-    auto cB1 = std::make_shared<Character>("O1", "Orc", 5, 3, 3, 9);
+    auto cA1 = std::make_shared<Character>(1,"H1", "Human", 6, 3, 3, 8);
+    auto cA2 = std::make_shared<Character>(2,"H2", "Human", 6, 3, 3, 8);
+    auto cB1 = std::make_shared<Character>(1,"O1", "Orc", 5, 3, 3, 9);
 
     cA1->setStatus(playable);
     cA2->setStatus(playable);

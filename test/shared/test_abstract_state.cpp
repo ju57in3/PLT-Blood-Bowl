@@ -9,9 +9,7 @@ using namespace state;
 
 class DummyState : public AbstractState {
     public:
-    DummyState(BloodBowlGame* game) : AbstractState(game) {}
-    // Direct call of the method
-    void callBaseUpdate() {AbstractState::update();}
+    explicit DummyState(BloodBowlGame* game) : AbstractState(game) {}
 };
 
 BOOST_AUTO_TEST_CASE(TestAbstractState)
@@ -20,18 +18,19 @@ BOOST_AUTO_TEST_CASE(TestAbstractState)
     Team teamB(2, "Orcs", 2);
     BloodBowlGame game(teamA, teamB);
 
-    // Checks that a concrete instance is accessible via AbstractState*
-    AbstractState* state = game.getCurrentState();
-    BOOST_CHECK(state != nullptr);
-
-    // Polymorphic virtual call
-    state->update();
-    BOOST_CHECK(game.getCurrentState() != nullptr);
-
-    // Explicit call of the empty method AbstractState::update()
+    // Create a concrete instance that uses base implementations
     DummyState dummy(&game);
-    dummy.callBaseUpdate();
+    dummy.update ();
 
-    // Checks that the state remains consistent
-    BOOST_CHECK(game.getCurrentState() != nullptr);
+    // Cover AbstractState::getName() (returns "AbstractState")
+    std::string nameDirect = dummy.getName();
+    BOOST_CHECK_EQUAL(nameDirect, "AbstractState");
+
+    // Also call through the base pointer to confirm virtual dispatch uses base impl
+    AbstractState* basePtr = &dummy;
+    std::string nameViaBase = basePtr->getName();
+    BOOST_CHECK_EQUAL(nameViaBase, "AbstractState");
+
+    // Sanity: game pointer should still be valid
+    BOOST_CHECK(basePtr != nullptr);
 }

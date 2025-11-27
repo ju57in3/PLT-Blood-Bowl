@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     BOOST_CHECK_EQUAL(teamA.getName(),"Humans Team");
 
     BOOST_CHECK_EQUAL(size(teamA.getCharacters()), 0);
-    auto human = std::make_shared<Character>("Player 1", "human", 6, 3, 3, 8);
+    auto human = std::make_shared<Character>(1,"Player 1", "human", 6, 3, 3, 8);
     human->setPosition({1,1});
     teamA.addCharacter(human);
     BOOST_CHECK_EQUAL(size(teamA.getCharacters()), 1);
