@@ -294,7 +294,7 @@ namespace client {
                     // cleanup input state
                     pendingBlock.reset();
                     resetSelection();
-                    std::cout << "Pass turn: endTurn signaled to game state\n";
+                    std::cout << "End of turn " << game->getTurnCounter() << "\n";
                 } else {
                     std::cout << "Return key pressed: no action in current state (" << (game->getCurrentState()? game->getCurrentState()->getName() : "none") << ")\n";
                 }
