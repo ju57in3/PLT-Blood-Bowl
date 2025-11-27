@@ -13,6 +13,32 @@ namespace state {
     Setup::Setup(BloodBowlGame *game) : AbstractState(game) {
     }
 
+    void Setup::update() {
+        if (teamSetupDone[0] && teamSetupDone[1]) {
+            game->setCurrentState(game->getStateList().at(KICKOFF).get());
+        }
+    }
+
+    std::string Setup::getName() const {
+        return "Setup";
+    }
+
+    bool Setup::isValidSetup(const Team& team) const {
+        int onBoard = nbCharacterOnBoard(team);
+        if (onBoard > 11) return false;
+
+        int onLine = nbCharacterOnLine(team);
+        if (onLine < 3) return false;
+
+        int onTop = nbCharacterOnTop(team);
+        if (onTop > 2) return false;
+
+        int onBottom = nbCharacterOnBottom(team);
+        if (onBottom > 2) return false;
+
+        return true;
+    }
+
     int Setup::nbCharacterOnBoard(const Team& team) const{
         int count = 0;
         for (const auto& pptr : team.getCharacters()) {
@@ -25,6 +51,7 @@ namespace state {
         }
         return count;
     }
+
 
     int Setup::nbCharacterOnLine(const Team& team) const {
 
@@ -84,29 +111,6 @@ namespace state {
         return count;
     }
 
-
-    bool Setup::isValidSetup(const Team& team) const {
-        int onBoard = nbCharacterOnBoard(team);
-        if (onBoard > 11) return false;
-
-        int onLine = nbCharacterOnLine(team);
-        if (onLine < 3) return false;
-
-        int onTop = nbCharacterOnTop(team);
-        if (onTop > 2) return false;
-
-        int onBottom = nbCharacterOnBottom(team);
-        if (onBottom > 2) return false;
-
-        return true;
-    }
-
-    void Setup::update() {
-        if (teamSetupDone[0] && teamSetupDone[1]) {
-            game->setCurrentState(game->getStateList().at(KICKOFF).get());
-        }
-    }
-
     void Setup::endSetup() {
         // mark current team as done
         if (game && game->getCurrentTeam()) {
@@ -119,10 +123,6 @@ namespace state {
         }
     }
 
-    Setup::~Setup() {
-
-    }
-
     bool Setup::getSetupEnded()
     {
         return teamSetupDone[0] && teamSetupDone[1];
@@ -133,8 +133,8 @@ namespace state {
         this->setupEnded = setupStatus;
     }
 
-    std::string Setup::getName() const {
-        return "Setup";
+    Setup::~Setup() {
+
     }
 
 
