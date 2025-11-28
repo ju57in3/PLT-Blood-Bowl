@@ -127,19 +127,19 @@ namespace client {
             }
         }
 
-        if (auto* setup = dynamic_cast<state::Kickoff*>(game->getCurrentState())) {
+        if (auto* kickoff = dynamic_cast<state::Kickoff*>(game->getCurrentState())) {
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
 
-            if (mouseButton.button == sf::Mouse::Left) {
-                auto team = game->getCurrentTeam();
-                if (team == &game->getTeamB()) {
-                    boardPos.first += utility::Constants::WINDOW_WIDTH/2;
-                }
+            if (!kickoff->isValidKickoffTarget(boardPos, *game->getCurrentTeam())) {
+                std::cout << "Invalid kickoff target at (" << boardPos.first << ", " << boardPos.second << ")\n";
+                return;
+            }
 
-                setup->setTarget(boardPos);
+            if (mouseButton.button == sf::Mouse::Left) {
+                kickoff->setTarget(boardPos);
                 std::cout << "Kickoff target set to (" << boardPos.first << ", " << boardPos.second << ")\n";
-                setup->setTargetSelected(true);
+                kickoff->setTargetSelected(true);
                 return;
             }
         }

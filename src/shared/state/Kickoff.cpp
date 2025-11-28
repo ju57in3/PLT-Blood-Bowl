@@ -84,5 +84,21 @@ namespace state {
         targetSelected = newValue;
     }
 
+    bool Kickoff::isValidKickoffTarget(std::pair<int, int> target, const Team& kickingTeam) const {
+        int minX = (kickingTeam.getTeamId() == 1) ? 0 : utility::Constants::BOARD_WIDTH / 2;
+        int maxX = (kickingTeam.getTeamId() == 1) ? (utility::Constants::BOARD_WIDTH / 2 - 1) : (utility::Constants::BOARD_WIDTH - 1);
+
+        if (target.first < minX || target.first > maxX) {
+            return false;
+        }
+
+        if (target.second < 0 || target.second >= utility::Constants::BOARD_HEIGHT) {
+            return false;
+        }
+
+        return true;
+    }
+
+
 
 }

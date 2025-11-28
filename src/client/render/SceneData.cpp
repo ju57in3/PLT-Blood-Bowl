@@ -42,6 +42,8 @@ namespace render{
 
     void SceneData::init(const std::shared_ptr<state::BloodBowlGame>& game)
     {
+        this->game = game;
+
         playersTextures_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
         playersTextures_TeamB.resize(Constants::MAX_PLAYERS_PER_TEAM);
         playersSprites_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
@@ -120,15 +122,15 @@ namespace render{
             window.draw(highlightRect);
         }
 
-        // Precompute pixel coords for playable positions
         std::vector<sf::Vector2f> playableCoords;
         playableCoords.reserve(playablePositions.size());
         for (const auto& p : playablePositions) {
             playableCoords.push_back(pos2Coords(p));
         }
 
+        const float tileSizeF = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
+
         for (const auto& coord : playableCoords) {
-            const float tileSizeF = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
             const float radius = tileSizeF * 0.45f;
             sf::CircleShape outline(radius);
             outline.setOrigin(radius, radius);
@@ -138,6 +140,20 @@ namespace render{
             outline.setOutlineThickness(2.0f);
             window.draw(outline);
         }
+
+
+        sf::Vector2f ballCoords;
+        ballCoords = pos2Coords(game->getBallPosition());
+
+        const float ballMarkerRadius = tileSizeF * 0.55f;
+
+        sf::CircleShape outline(ballMarkerRadius);
+        outline.setOrigin(ballMarkerRadius, ballMarkerRadius);
+        outline.setPosition(ballCoords.x + tileSizeF * 0.5f, ballCoords.y + tileSizeF * 0.5f);
+        outline.setFillColor(sf::Color::Transparent);
+        outline.setOutlineColor(sf::Color(255, 215, 0, 210));
+        outline.setOutlineThickness(2.0f);
+        window.draw(outline);
 
         if (!movePath.empty()) {
             sf::VertexArray va(sf::LinesStrip);
