@@ -2,6 +2,7 @@
 #include "utility/Constants.h"
 #include <filesystem>
 #include <iostream>
+#include <cmath>
 
 using namespace utility;
 
@@ -142,18 +143,7 @@ namespace render{
         }
 
 
-        sf::Vector2f ballCoords;
-        ballCoords = pos2Coords(game->getBallPosition());
 
-        const float ballMarkerRadius = tileSizeF * 0.55f;
-
-        sf::CircleShape outline(ballMarkerRadius);
-        outline.setOrigin(ballMarkerRadius, ballMarkerRadius);
-        outline.setPosition(ballCoords.x + tileSizeF * 0.5f, ballCoords.y + tileSizeF * 0.5f);
-        outline.setFillColor(sf::Color::Transparent);
-        outline.setOutlineColor(sf::Color(255, 215, 0, 210));
-        outline.setOutlineThickness(2.0f);
-        window.draw(outline);
 
         if (!movePath.empty()) {
             sf::VertexArray va(sf::LinesStrip);
@@ -231,6 +221,33 @@ namespace render{
             header.setPosition(8.0f, 4.0f);
             window.draw(header);
         }
+
+
+        sf::Vector2f ballCoords = pos2Coords(game->getBallPosition());
+
+        sf::ConvexShape star;
+        const int points = 10;
+        star.setPointCount(points);
+
+        float outerRadius = tileSizeF * 0.15f;
+        float innerRadius = outerRadius * 0.45f;
+        const float twoPi = 2.0f * static_cast<float>(M_PI);
+        const float startAngle = -static_cast<float>(M_PI) / 2.0f; // point up
+
+        for (int i = 0; i < points; ++i) {
+            float angle = startAngle + (twoPi * i) / points;
+            float r = (i % 2 == 0) ? outerRadius : innerRadius;
+            float x = std::cos(angle) * r;
+            float y = std::sin(angle) * r;
+            star.setPoint(static_cast<size_t>(i), sf::Vector2f(x, y));
+        }
+        star.setOrigin(0.f, 0.f);
+        star.setPosition(ballCoords.x + tileSizeF * 0.5f, ballCoords.y + tileSizeF * 0.5f);
+        star.setFillColor(sf::Color::Transparent);
+        star.setOutlineColor(sf::Color(255, 210, 0, 210));
+        star.setOutlineThickness(2.0f);
+        window.draw(star);
+
     }
 
     void SceneData::drawPreview(sf::RenderWindow& window, const std::pair<int,int>& previewPos, bool previewExists, bool legal)
@@ -244,9 +261,9 @@ namespace render{
         rect.setSize(sf::Vector2f(Constants::BOARD_TILE_PIXEL_SIZE, Constants::BOARD_TILE_PIXEL_SIZE));
         rect.setPosition(coord);
         if (legal) {
-            rect.setFillColor(sf::Color(0, 255, 0, 80)); // semi-transparent green
+            rect.setFillColor(sf::Color(0, 255, 0, 80));
         } else {
-            rect.setFillColor(sf::Color(255, 0, 0, 80)); // semi-transparent red
+            rect.setFillColor(sf::Color(255, 0, 0, 80));
         }
         window.draw(rect);
     }
@@ -269,7 +286,6 @@ namespace render{
                 playersSprites_TeamB.at(index).setPosition(pos2Coords(character->getPosition()));
             }
         }
-
     }
 
     const std::vector<sf::FloatRect>& SceneData::getDiceOptionBounds() const {
