@@ -1,9 +1,14 @@
-#include "Kickoff.h"
+#include <random>
 
 #include "Team.h"
 #include "BloodBowlGame.h"
 #include "utility/Constants.h"
+#include "Kickoff.h"
 
+#include <iostream>
+#include <ostream>
+
+static std::mt19937 rng(std::random_device{}());
 
 namespace state {
     Kickoff::Kickoff (BloodBowlGame* game) : AbstractState(game), target({-1,-1}), targetSelected(false){}
@@ -23,9 +28,15 @@ namespace state {
 
     void Kickoff::kickBall(std::pair<int,int> targetSquare)
     {
-        int direction=rand()%8;
-        int rebounds=rand()%6;
+        std::uniform_int_distribution<int> d8(1,8);
+        std::uniform_int_distribution<int> d3(1,3);
+
+        int direction = d8(rng);
+        int rebounds = d3(rng);
+        std::cout << rebounds << std::endl;
+
         std::pair<int,int> newTarget;
+
         switch (direction){
             case 0: //South
                 newTarget.first = targetSquare.first;

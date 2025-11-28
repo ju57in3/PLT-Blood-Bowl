@@ -116,7 +116,7 @@ namespace render{
 
         if (highlighted) {
             sf::RectangleShape highlightRect;
-            highlightRect.setFillColor(sf::Color(255, 255, 0, 80)); // semi-transparent yellow
+            highlightRect.setFillColor(sf::Color(255, 255, 0, 80));
             const auto pos = pos2Coords(highlighted->getPosition());
             highlightRect.setSize(sf::Vector2f(Constants::BOARD_TILE_PIXEL_SIZE, Constants::BOARD_TILE_PIXEL_SIZE));
             highlightRect.setPosition(pos);

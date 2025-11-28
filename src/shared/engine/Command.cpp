@@ -43,7 +43,6 @@ namespace engine {
     void Command::checkAndHandleTurnover(const std::shared_ptr<state::BloodBowlGame>& game) {
         if (!game) return;
 
-        // Signal turnover to state machine: mark turn over and request update to trigger state transition
         if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
             pt->setTurnOver(true);
             pt->update();

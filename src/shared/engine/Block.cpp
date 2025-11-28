@@ -83,14 +83,13 @@ namespace engine {
 
     Block::Block(std::shared_ptr<state::Character> attacker, std::shared_ptr<state::Character> defender)
     :attacker(std::move(attacker)), defender(std::move(defender)) {
-        // generate dice options but do not resolve them until UI chooses
         if (this->attacker && this->defender) {
             diceOptions = rollBlockDiceOptions(this->attacker, this->defender);
             choiceApplied = false;
             chosenDiceValue = 0;
         } else {
             diceOptions.clear();
-            choiceApplied = true; // nothing to choose
+            choiceApplied = true;
         }
     }
 
@@ -114,12 +113,10 @@ namespace engine {
         }
 
         if (diceOptions.empty()) {
-            // fallback
-            chosenDiceValue = 3; // neutral
+            chosenDiceValue = 3;
         } else if (chosenIndex >= 1 && chosenIndex <= static_cast<int>(diceOptions.size())) {
             chosenDiceValue = diceOptions[chosenIndex-1];
         } else {
-            // auto fallback: attacker picks best, defender picks worst
             if (attacker && defender && attacker->getStrength() >= defender->getStrength()) {
                 chosenDiceValue = *std::max_element(diceOptions.begin(), diceOptions.end());
             } else {
@@ -161,7 +158,6 @@ namespace engine {
     }
 
     void Block::choosePushedPositionNonInteractive() {
-        // default simple behavior: push defender one tile away along attacker->defender vector if possible
         if (!attacker || !defender) return;
         int attacker_x = attacker->getPosition().first;
         int attacker_y = attacker->getPosition().second;
@@ -187,9 +183,8 @@ namespace engine {
 
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)
     {
-        // ensure we have a resolved blockResult
         if (!choiceApplied) {
-            applyDiceChoice(-1); // auto-resolve
+            applyDiceChoice(-1);
         }
 
         if (blockResult == AttackerDown || blockResult == BothDown)
@@ -202,7 +197,6 @@ namespace engine {
         }
         if (blockResult == Pushed || blockResult == DefenderStumbles || blockResult == DefenderDown)
         {
-            // non-interactive fallback for pushed position
             choosePushedPositionNonInteractive();
         }
         if (blockResult == DefenderDown || blockResult == BothDown || blockResult == DefenderStumbles)
