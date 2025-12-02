@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <utility>
 #include <random>
-#include <chrono>
-#include "utility/Constants.h"
+
+#include "Engine.h"
+#include "PickUpBall.h" // added to attempt pickup when moving onto ball
 
 static std::mt19937 rng(std::random_device{}());
 
@@ -38,34 +39,9 @@ namespace engine {
             }
 
             if (!character->getHasBall() && game->getBallPosition() == position) {
-
-                int agi = character->getAgility();
-                std::uniform_int_distribution<int> d6(1, 6);
-                int roll = d6(rng);
-
-                if (roll <= agi) {
-                    character->setHasBall(true);
-                    game->setBallPosition(position);
-
-                } else {
-                    std::uniform_int_distribution<int> dirDist(-1, 1);
-                    std::pair<int,int> bounce;
-                    int attempts = 0;
-                    do {
-                        int dx = dirDist(rng);
-                        int dy = dirDist(rng);
-                        if (dx == 0 && dy == 0) continue;
-                        bounce = { position.first + dx, position.second + dy };
-                        attempts++;
-                    } while ((bounce.first < 0 || bounce.first >= utility::Constants::BOARD_WIDTH ||
-                              bounce.second < 0 || bounce.second >= utility::Constants::BOARD_HEIGHT) && attempts < 20);
-
-
-                    game->setBallPosition(bounce);
-                    checkAndHandleTurnover(game);
-                }
+                PickUpBall pickUpBallCmd(character);
+                pickUpBallCmd.execute(game);
             }
-
             checkAndHandleTouchdown(game);
 
             if (character->getStatus() == state::CharacterStatus::playable) {
