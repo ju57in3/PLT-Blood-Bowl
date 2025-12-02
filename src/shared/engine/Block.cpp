@@ -1,44 +1,23 @@
 #include "Block.h"
+#include "utility/GameUtils.h"
 #include <memory>
 
 #include <state/PlayerTurn.h>
-#include <iostream>
 #include <random>
 #include <utility>
 #include <algorithm>
 
-static std::mt19937 rng(std::random_device{}());
+using namespace utility;
 
 namespace engine {
-
-    // TODO : Fonction deja utliser dans Pass.cpp a generaliser !
-    static std::pair<int,int> scatterOnce(std::pair<int,int> from) {
-        std::uniform_int_distribution<int> d8(1,8);
-        int dir = d8(rng);
-        int dx = 0, dy = 0;
-        switch(dir) {
-            case 1: dy = 1; break;        // N
-            case 2: dx = 1; dy = 1; break;// NE
-            case 3: dx = 1; break;        // E
-            case 4: dx = 1; dy = -1; break;// SE
-            case 5: dy = -1; break;       // S
-            case 6: dx = -1; dy = -1; break;// SW
-            case 7: dx = -1; break;       // W
-            case 8: dx = -1; dy = 1; break; // NW
-            default: ;
-        }
-        int nx = from.first + dx;
-        int ny = from.second + dy;
-        return {nx, ny};
-    }
 
     static void resolveInjury(const std::shared_ptr<state::Character>& targetCharacter)
     {
         std::uniform_int_distribution<int> d12(2,12);
-        const int roll1 = d12(rng);
-        if (roll1>= targetCharacter->getArmor())
+        const int roll1 = d12(GameUtils::getRNG());
+        if (roll1 >= targetCharacter->getArmor())
         {
-            const int injuryRoll = d12(rng);
+            const int injuryRoll = d12(GameUtils::getRNG());
             if (injuryRoll <= 7) {
                 targetCharacter->setStatus(state::CharacterStatus::stunned);
             } else if (injuryRoll <= 9) {
@@ -56,9 +35,9 @@ namespace engine {
     static std::vector<int> rollBlockDiceOptions(const std::shared_ptr<state::Character>& attacker, const std::shared_ptr<state::Character>& defender) {
         std::vector<int> listOfDiceResult;
         std::uniform_int_distribution<int> d6(1,6);
-        const int roll1 = d6(rng);
-        const int roll2 = d6(rng);
-        const int roll3 = d6(rng);
+        const int roll1 = d6(GameUtils::getRNG());
+        const int roll2 = d6(GameUtils::getRNG());
+        const int roll3 = d6(GameUtils::getRNG());
 
         listOfDiceResult.push_back(roll1); // first always
 
@@ -191,6 +170,14 @@ namespace engine {
         {
             if (attacker) {
                 attacker->setStatus(state::CharacterStatus::knockedDown);
+                if (attacker->getHasBall()) {
+                    attacker->setHasBall(false);
+                    bool outOfBounds = false;
+                    GameUtils::handleBallBounce(game, attacker->getPosition(), outOfBounds);
+                    if (outOfBounds) {
+                        checkAndHandleTurnover(game);
+                    }
+                }
                 resolveInjury(attacker);
                 checkAndHandleTurnover(game);
             }
@@ -205,8 +192,11 @@ namespace engine {
                 defender->setStatus(state::CharacterStatus::knockedDown);
                 if (defender->getHasBall()) {
                     defender->setHasBall(false);
-                    game->setBallPosition(scatterOnce(defender->getPosition()));
-                    game->setBallIsHold(false);
+                    bool outOfBounds = false;
+                    GameUtils::handleBallBounce(game, defender->getPosition(), outOfBounds);
+                    if (outOfBounds) {
+                        checkAndHandleTurnover(game);
+                    }
                 }
                 resolveInjury(defender);
             }

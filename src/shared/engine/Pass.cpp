@@ -7,73 +7,10 @@
 #include <functional>
 #include <utility>
 #include <state/PlayerTurn.h>
-#include <random>
 
-#include "utility/Constants.h"
+using namespace utility;
 
 namespace engine {
-
-    // TODO: généralisation de countTackleZone
-    static int countTackleZones(const state::Character& target, const state::Team& opponent) {
-        auto pos = target.getPosition();
-        int cnt = 0;
-        for (auto& character : opponent.getCharacters()) {
-            if (!character) continue;
-            const auto& c = *character;
-            if (c.getStatus() == state::playable || c.getStatus() == state::played) {
-                auto oPos = c.getPosition();
-                int dx = std::abs(oPos.first - pos.first);
-                int dy = std::abs(oPos.second - pos.second);
-                if (dx <= 1 && dy <= 1 && (dx + dy) > 0) {
-                    cnt++;
-                }
-            }
-        }
-        return cnt;
-    }
-    // TODO : generalise agilityTarget
-    static int agilityTarget(int ag) {
-        if (ag <= 1) return 6;
-        if (ag == 2) return 5;
-        if (ag == 3) return 4;
-        if (ag == 4) return 3;
-        if (ag == 5) return 2;
-        return 2;
-    }
-
-    // TODO: generalise agilityTest
-    // TODO: Clarify lambda expression for roller
-    static bool agilityTest(int agility, int modifiers, std::function<int(int)> roller) {
-        int need = agilityTarget(agility);
-        int roll = roller(6); // D6
-        if (roll == 1) return false; // natural 1 échec auto
-        if (roll == 6) return true;  // natural 6 succès auto (sauf conditions extrêmes, ignorées ici)
-        int total = roll + modifiers;
-        return total >= need;
-    }
-
-    // TODO : generalise scatter
-    static std::pair<int,int> scatterOnce(std::pair<int,int> from) {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> d8(1,8);
-        int dir = d8(gen);
-        int dx = 0, dy = 0;
-        switch(dir) {
-            case 1: dy = 1; break;        // N
-            case 2: dx = 1; dy = 1; break;// NE
-            case 3: dx = 1; break;        // E
-            case 4: dx = 1; dy = -1; break;// SE
-            case 5: dy = -1; break;       // S
-            case 6: dx = -1; dy = -1; break;// SW
-            case 7: dx = -1; break;       // W
-            case 8: dx = -1; dy = 1; break; // NW
-            default: ;
-        }
-        int nx = from.first + dx;
-        int ny = from.second + dy;
-        return {nx, ny};
-    }
 
 
     Pass::Pass(std::shared_ptr<state::Character> passer, std::shared_ptr<state::Character> receiver)
@@ -178,7 +115,7 @@ namespace engine {
         }
         state::Team* opposingTeam = passerTeam == &teamA ? &teamB : &teamA;
 
-        int passerTZ = countTackleZones(*passer, *opposingTeam);
+        int passerTZ = GameUtils::countTackleZones(*passer, *opposingTeam);
 
         // Distance (Chebyshev)
         auto pPos = passer->getPosition();
@@ -209,7 +146,7 @@ namespace engine {
         bool passAccurate = false;
         if (!automaticFumble) {
             int passModifiers = rangeMod - passerTZ; // -1 par zone de tacle adverse sur passeur
-            passAccurate = agilityTest(passer->getAgility(), passModifiers, [&](int r){ return rand() % r; });
+            passAccurate = GameUtils::agilityTest(passer->getAgility(), passModifiers);
         }
 
         if (!passAccurate) {
@@ -217,7 +154,7 @@ namespace engine {
             game->setBallIsHold(false);
             auto dropPos = passer->getPosition();
             // Premier rebond
-            auto newPos = scatterOnce(dropPos);
+            auto newPos = GameUtils::scatterOnce(dropPos);
             game->setBallPosition(newPos);
             checkAndHandleTurnover(game);
             return;
@@ -226,9 +163,9 @@ namespace engine {
         // Tentative d'interception avant la réception
         if (chosenInterceptor) {
             // Modificateurs interception: -2 + zones de tacle (déjà inclus via countTackleZones sur inter par adversaires? Officiellement -2 et -1 par TZ adverse sur intercepteur). On ajoute -2 et - countTackleZones par équipe du passeur.
-            int interTZ = countTackleZones(*chosenInterceptor, *passerTeam);
+            int interTZ = GameUtils::countTackleZones(*chosenInterceptor, *passerTeam);
             int interceptionModifiers = -2 - interTZ;
-            bool interceptionSuccess = agilityTest(chosenInterceptor->getAgility(), interceptionModifiers, [&](int r){ return rand() % r; });
+            bool interceptionSuccess = GameUtils::agilityTest(chosenInterceptor->getAgility(), interceptionModifiers);
             if (interceptionSuccess) {
                 passer->setHasBall(false);
                 chosenInterceptor->setHasBall(true);
@@ -239,9 +176,9 @@ namespace engine {
             }
         }
 
-        int catcherTZ = countTackleZones(*receiver, *opposingTeam);
+        int catcherTZ = GameUtils::countTackleZones(*receiver, *opposingTeam);
         int catchModifiers = +1 /* accurate */ - catcherTZ;
-        bool catchSuccess = agilityTest(receiver->getAgility(), catchModifiers, [&](int r){ return rand() % r; });
+        bool catchSuccess = GameUtils::agilityTest(receiver->getAgility(), catchModifiers);
 
         passer->setHasBall(false);
         if (catchSuccess) {
@@ -250,7 +187,7 @@ namespace engine {
             game->setBallIsHold(true);
         } else {
             auto scatterPos = receiver->getPosition();
-            scatterPos = scatterOnce(scatterPos);
+            scatterPos = GameUtils::scatterOnce(scatterPos);
             game->setBallPosition(scatterPos);
             game->setBallIsHold(false);
             // Turnover
