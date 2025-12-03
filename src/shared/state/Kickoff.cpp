@@ -22,6 +22,7 @@ namespace state {
         if (targetSelected) {
             kickBall(target);
             game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
+            targetSelected = false;
         }
     }
 

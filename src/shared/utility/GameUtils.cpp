@@ -33,6 +33,7 @@ namespace utility {
 
         int nx = from.first + dx;
         int ny = from.second + dy;
+
         return {nx, ny};
     }
 
@@ -77,7 +78,6 @@ namespace utility {
             int dx = std::abs(oPos.first - pos.first);
             int dy = std::abs(oPos.second - pos.second);
 
-            // Adjacent square (but not same square)
             if (dx <= 1 && dy <= 1 && (dx + dy) > 0) {
                 count++;
             }
@@ -97,19 +97,43 @@ namespace utility {
                status != state::CharacterStatus::bench;
     }
 
+    std::shared_ptr<state::Character> GameUtils::getCharacterAt(const std::shared_ptr<state::BloodBowlGame>& game,
+                                                                  std::pair<int,int> position) {
+        if (!game) return nullptr;
+
+        // Check Team A
+        for (const auto& ch : game->getTeamA().getCharacters()) {
+            if (ch && ch->getPosition() == position) {
+                return ch;
+            }
+        }
+
+        // Check Team B
+        for (const auto& ch : game->getTeamB().getCharacters()) {
+            if (ch && ch->getPosition() == position) {
+                return ch;
+            }
+        }
+
+        return nullptr;
+    }
+
     void GameUtils::handleBallBounce(const std::shared_ptr<state::BloodBowlGame>& game,
                                      std::pair<int,int> startPosition,
-                                     bool& outOfBounds) {
+                                     bool& outOfBounds,
+                                     bool& turnover) {
         if (!game) {
             outOfBounds = true;
+            turnover = false;
             return;
         }
 
         std::pair<int,int> ballPos = startPosition;
         bool ballLanded = false;
-        int maxBounces = 20; // Safety limit to avoid infinite loops
+        int maxBounces = 50;
         int bounceCount = 0;
         outOfBounds = false;
+        turnover = false;
 
         while (!ballLanded && bounceCount < maxBounces) {
             ballPos = scatterOnce(ballPos);
@@ -120,37 +144,77 @@ namespace utility {
                 ballPos.second < 0 || ballPos.second >= utility::Constants::BOARD_HEIGHT) {
                 outOfBounds = true;
                 ballLanded = true;
+                turnover = true;
                 break;
             }
 
-            // Check if there's a standing character at this position
-            bool occupied = false;
+            auto characterAtPos = getCharacterAt(game, ballPos);
 
-            for (const auto& ch : game->getTeamA().getCharacters()) {
-                if (ch && ch->getPosition() == ballPos && isCharacterStanding(ch)) {
-                    occupied = true;
-                    break;
+            if (characterAtPos) {
+                if (characterAtPos->getStatus() == state::CharacterStatus::knockedDown ||
+                    characterAtPos->getStatus() == state::CharacterStatus::stunned) {
+                    // Ball continues to bounce
+                    continue;
                 }
-            }
 
-            if (!occupied) {
-                for (const auto& ch : game->getTeamB().getCharacters()) {
-                    if (ch && ch->getPosition() == ballPos && isCharacterStanding(ch)) {
-                        occupied = true;
-                        break;
+                if (characterAtPos->getStatus() == state::CharacterStatus::playable ||
+                    characterAtPos->getStatus() == state::CharacterStatus::played) {
+
+                    state::Team* opponentTeam = nullptr;
+                    bool isTeamA = false;
+
+                    for (const auto& ch : game->getTeamA().getCharacters()) {
+                        if (ch.get() == characterAtPos.get()) {
+                            isTeamA = true;
+                            opponentTeam = &game->getTeamB();
+                            break;
+                        }
                     }
-                }
-            }
+                    if (!isTeamA) {
+                        opponentTeam = &game->getTeamA();
+                    }
 
-            // If the square is not occupied by a standing player, the ball lands
-            if (!occupied) {
+                    int tackleZones = countTackleZones(*characterAtPos, *opponentTeam);
+
+                    int catchModifiers = -tackleZones;
+
+                    bool catchSuccess = agilityTest(characterAtPos->getAgility(), catchModifiers);
+
+                    if (catchSuccess) {
+                        characterAtPos->setHasBall(true);
+                        game->setBallPosition(ballPos);
+                        game->setBallIsHold(true);
+                        ballLanded = true;
+                        turnover = false;
+                    } else {
+                        ballPos = scatterOnce(ballPos);
+
+                        if (ballPos.first < 0 || ballPos.first >= utility::Constants::BOARD_WIDTH ||
+                            ballPos.second < 0 || ballPos.second >= utility::Constants::BOARD_HEIGHT) {
+                            outOfBounds = true;
+                            turnover = true;
+                        } else {
+                            outOfBounds = false;
+                            turnover = true;
+                        }
+
+                        game->setBallPosition(ballPos);
+                        game->setBallIsHold(false);
+                        ballLanded = true;
+                    }
+                } else {
+                    ballLanded = true;
+                }
+            } else {
                 ballLanded = true;
+                turnover = false;
             }
         }
 
-        game->setBallPosition(ballPos);
-        game->setBallIsHold(false);
+        if (!ballLanded) {
+            game->setBallPosition(ballPos);
+            game->setBallIsHold(false);
+        }
     }
 
-} // namespace engine
-
+} // namespace utility

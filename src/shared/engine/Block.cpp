@@ -22,8 +22,10 @@ namespace engine {
                 targetCharacter->setStatus(state::CharacterStatus::stunned);
             } else if (injuryRoll <= 9) {
                 targetCharacter->setStatus(state::CharacterStatus::ko);
+                targetCharacter->setPosition(std::make_pair(-1, -1));
             } else {
                 targetCharacter->setStatus(state::CharacterStatus::injured);
+                targetCharacter->setPosition(std::make_pair(-1, -1));
             }
         }
     }
@@ -136,7 +138,7 @@ namespace engine {
         blockResult = Pushed;
     }
 
-    void Block::choosePushedPositionNonInteractive() {
+    void Block::choosePushedPositionNonInteractive(std::shared_ptr<state::BloodBowlGame> game) {
         if (!attacker || !defender) return;
         int attacker_x = attacker->getPosition().first;
         int attacker_y = attacker->getPosition().second;
@@ -158,6 +160,11 @@ namespace engine {
             newPosition.second = defender_y + (Dy>0?1:-1);
         }
         defender->setPosition(newPosition);
+
+        // If defender has the ball, move it with them
+        if (game && defender->getHasBall()) {
+            game->setBallPosition(newPosition);
+        }
     }
 
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)
@@ -173,37 +180,38 @@ namespace engine {
                 if (attacker->getHasBall()) {
                     attacker->setHasBall(false);
                     bool outOfBounds = false;
-                    GameUtils::handleBallBounce(game, attacker->getPosition(), outOfBounds);
-                    if (outOfBounds) {
-                        checkAndHandleTurnover(game);
-                    }
+                    bool ballTurnover = false;
+                    GameUtils::handleBallBounce(game, attacker->getPosition(), outOfBounds, ballTurnover);
                 }
                 resolveInjury(attacker);
                 checkAndHandleTurnover(game);
             }
         }
+
         if (blockResult == Pushed || blockResult == DefenderStumbles || blockResult == DefenderDown)
         {
-            choosePushedPositionNonInteractive();
+            choosePushedPositionNonInteractive(game);
         }
-        if (blockResult == DefenderDown || blockResult == BothDown || blockResult == DefenderStumbles)
+
+        if (blockResult == DefenderDown || blockResult == BothDown)
         {
             if (defender) {
                 defender->setStatus(state::CharacterStatus::knockedDown);
                 if (defender->getHasBall()) {
                     defender->setHasBall(false);
                     bool outOfBounds = false;
-                    GameUtils::handleBallBounce(game, defender->getPosition(), outOfBounds);
-                    if (outOfBounds) {
+                    bool ballTurnover = false;
+                    GameUtils::handleBallBounce(game, defender->getPosition(), outOfBounds, ballTurnover);
+                    if (ballTurnover) {
                         checkAndHandleTurnover(game);
                     }
                 }
                 resolveInjury(defender);
             }
         }
-        // TODO : Implémenter la différence entre DefenderStumbles et DefenderDown (besoin de la capacité esquive).
 
-        // If attacker survived and was playable, mark them as played
+        // TODO: Implement Dodge test - if defender has Dodge skill and test succeeds, they stay standing
+
         if (attacker && attacker->getStatus() == state::CharacterStatus::playable) {
             attacker->setStatus(state::CharacterStatus::played);
         }

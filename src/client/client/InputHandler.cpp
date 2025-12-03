@@ -206,11 +206,24 @@ namespace client {
                 if (boardPos == last && currentMovePath.size() > 1) {
                     auto finalPos = currentMovePath.back();
                     std::cout << "Confirming move to (" << finalPos.first << ", " << finalPos.second << ")\n";
+
+                    // Execute movement step by step and check for turnover after each step
                     for (std::pair<int,int> pos : currentMovePath) {
                         auto moveStepCmd = std::make_unique<engine::Move>(selectedCharacter, pos);
                         engine->addCommand(std::move(moveStepCmd));
                         engine->executeCommand();
+
+                        // Check if a turnover occurred after this step
+                        if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+                            if (pt->getTurnOver()) {
+                                std::cout << "Turnover occurred during movement - stopping at current position\n";
+                                currentMovePath.clear();
+                                resetSelection();
+                                return;
+                            }
+                        }
                     }
+
                     currentMovePath.clear();
                     resetSelection();
                     return;

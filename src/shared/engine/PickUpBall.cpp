@@ -25,23 +25,19 @@ void PickUpBall::execute(std::shared_ptr<state::BloodBowlGame> game) {
     auto ballPos = game->getBallPosition();
     auto charPos = character->getPosition();
 
-    // Only allow pickup if character is on the ball's square
     if (ballPos != charPos) return;
 
-    // Perform agility test: no modifiers for now
     bool success = GameUtils::agilityTest(character->getAgility(), 0);
 
     if (success) {
-        // Successful pickup: character holds the ball and game state updated
         character->setHasBall(true);
         game->setBallPosition(charPos);
         game->setBallIsHold(true);
         checkAndHandleTouchdown(game);
     } else {
-        // Failed pickup: ball scatters to adjacent square and turnover
-        auto scatterPos = GameUtils::scatterOnce(ballPos);
-        game->setBallPosition(scatterPos);
-        game->setBallIsHold(false);
+        bool outOfBounds = false;
+        bool ballTurnover = false;
+        GameUtils::handleBallBounce(game, ballPos, outOfBounds, ballTurnover);
         checkAndHandleTurnover(game);
     }
 

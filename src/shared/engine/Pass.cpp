@@ -153,16 +153,14 @@ namespace engine {
             passer->setHasBall(false);
             game->setBallIsHold(false);
             auto dropPos = passer->getPosition();
-            // Premier rebond
-            auto newPos = GameUtils::scatterOnce(dropPos);
-            game->setBallPosition(newPos);
+            bool outOfBounds = false;
+            bool ballTurnover = false;
+            GameUtils::handleBallBounce(game, dropPos, outOfBounds, ballTurnover);
             checkAndHandleTurnover(game);
             return;
         }
 
-        // Tentative d'interception avant la réception
         if (chosenInterceptor) {
-            // Modificateurs interception: -2 + zones de tacle (déjà inclus via countTackleZones sur inter par adversaires? Officiellement -2 et -1 par TZ adverse sur intercepteur). On ajoute -2 et - countTackleZones par équipe du passeur.
             int interTZ = GameUtils::countTackleZones(*chosenInterceptor, *passerTeam);
             int interceptionModifiers = -2 - interTZ;
             bool interceptionSuccess = GameUtils::agilityTest(chosenInterceptor->getAgility(), interceptionModifiers);
@@ -187,16 +185,14 @@ namespace engine {
             game->setBallIsHold(true);
         } else {
             auto scatterPos = receiver->getPosition();
-            scatterPos = GameUtils::scatterOnce(scatterPos);
-            game->setBallPosition(scatterPos);
-            game->setBallIsHold(false);
-            // Turnover
+            bool outOfBounds = false;
+            bool ballTurnover = false;
+            GameUtils::handleBallBounce(game, scatterPos, outOfBounds, ballTurnover);
             checkAndHandleTurnover(game);
          }
 
          checkAndHandleTouchdown(game);
 
-        // Mark passer as played if it was playable
         if (passer->getStatus() == state::CharacterStatus::playable) {
             passer->setStatus(state::CharacterStatus::played);
         }
