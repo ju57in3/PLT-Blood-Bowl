@@ -1,52 +1,63 @@
-//
-// Created by justine on 28/11/2025.
-//
 #include "RandomAI.h"
-#include "state/BloodBowlGame.h"
-#include "engine/Command.h"
+#include <cstdlib>
+#include <ctime>
+#include <utility>
+#include <utility/Constants.h>
 
 namespace ai {
-    RandomAI::RandomAI(engine::Command *engine, std::shared_ptr<state::BloodBowlGame> game, int teamId) : AI(engine, std::move(game), teamId){
-        std::random_device rd;
-        rng = std::mt19937(rd());
+
+    RandomAI::RandomAI(engine::Engine* engine, std::shared_ptr<state::BloodBowlGame> game, int teamId)
+    : AI(engine, std::move(game), teamId) {
     }
-    RandomAI::~RandomAI() = default;
+
+
+    RandomAI::~RandomAI() {}
 
     bool RandomAI::runAI() {
-        if (!engine || !game) {
-            return false;
-        }
-        std::vector<std::shared_ptr<::engine::Command>> possibleCommands;
+        // Randomly decide whether to play a player or end turn
 
-        if (possibleCommands.empty()) {
-            return false;
-        }
-
-        auto cmd = chooseRandomCommand(possibleCommands);
-        if (!cmd) {
-            return false;
+        std::uniform_int_distribution<int> d2(0,1);
+        bool isEndTurn = d2(utility::GameUtils::getRNG());
+        if (isEndTurn) {
+            return false; // End turn
         }
 
-        engine->executeCommand(*cmd);
-
-        return true;
-    }
-
-    std::shared_ptr<engine::Command>
-    RandomAI::chooseRandomCommand(const std::vector<std::shared_ptr<engine::Command>> &cmds) {
-        if (cmds.empty()) {
-            return nullptr;
+        state::Team *aiTeam = nullptr;
+        if (game->getTeamA().getTeamId() == teamId) {
+            aiTeam = &game->getTeamA();;
+        } else {
+            aiTeam = &game->getTeamB();
         }
-        std::uniform_int_distribution<std::size_t> dist(0, cmds.size() - 1);
-        std::size_t index = dist(rng);
-        return cmds[index];
+
+        // TODO : continue !
+
+        // Randomly choose a player and an action
+        // Placeholder logic for player and action selection
+        int playerIndex = std::rand() % game->getPlayers().size();
+        auto player = game->getPlayers()[playerIndex];
+
+        int action = std::rand() % 3; // 0: Move, 1: Block, 2: Pass
+        switch (action) {
+            case 0:
+                if (player.canMove()) {
+                    player.move();
+                }
+                break;
+            case 1:
+                if (player.canBlock()) {
+                    player.block();
+                }
+                break;
+            case 2:
+                if (player.canPass()) {
+                    player.pass();
+                }
+                break;
+            default:
+                break;
+        }
+
+        return true; // Continue turn
     }
 
-    const std::mt19937 &RandomAI::getRng() const {
-        return rng;
-    }
-
-    void RandomAI::setRng(const std::mt19937 &rng) {
-        RandomAI::rng = rng;
-    }
-}
+} // namespace ai
