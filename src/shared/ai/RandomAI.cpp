@@ -29,14 +29,17 @@ namespace ai {
             aiTeam = &game->getTeamB();
         }
 
-        // TODO : continue !
-
         // Randomly choose a player and an action
         // Placeholder logic for player and action selection
-        int playerIndex = std::rand() % game->getPlayers().size();
-        auto player = game->getPlayers()[playerIndex];
+        int teamSize = aiTeam->getCharacters().size();
+        std::uniform_int_distribution<int> dsize(0,teamSize-1);
+        int playerIndex = dsize(utility::GameUtils::getRNG());
+        auto player = aiTeam->getCharacters()[playerIndex];
 
-        int action = std::rand() % 3; // 0: Move, 1: Block, 2: Pass
+
+        std::uniform_int_distribution<int> daction(0,2);
+        int action = daction(utility::GameUtils::getRNG()); // 0: Move, 1: Block, 2: Pass
+        // TODO : continue !
         switch (action) {
             case 0:
                 if (player.canMove()) {
