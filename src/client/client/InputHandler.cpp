@@ -12,6 +12,7 @@
 #include <iostream>
 #include <utility>
 #include <algorithm>
+#include <unistd.h>
 #include <vector>
 
 #include "state/Kickoff.h"
@@ -166,9 +167,6 @@ namespace client {
                 if (isCharacterPlayable(character)) {
                     selectedCharacter = character;
                     currentMode = InputMode::Selected_Character;
-                    std::cout << "Character selected: " << character->getName()
-                              << " at (" << character->getPosition().first
-                              << ", " << character->getPosition().second << ")\n";
                 } else {
                     std::cout << "Cannot select this character (not playable)\n";
                 }
@@ -204,10 +202,6 @@ namespace client {
 
                 auto last = currentMovePath.back();
                 if (boardPos == last && currentMovePath.size() > 1) {
-                    auto finalPos = currentMovePath.back();
-                    std::cout << "Confirming move to (" << finalPos.first << ", " << finalPos.second << ")\n";
-
-                    // Execute movement step by step and check for turnover after each step
                     for (std::pair<int,int> pos : currentMovePath) {
                         auto moveStepCmd = std::make_unique<engine::Move>(selectedCharacter, pos);
                         engine->addCommand(std::move(moveStepCmd));
@@ -222,6 +216,7 @@ namespace client {
                                 return;
                             }
                         }
+                        sleep(0.5);
                     }
 
                     currentMovePath.clear();
@@ -248,7 +243,6 @@ namespace client {
                 }
 
                 currentMovePath.push_back(boardPos);
-                std::cout << "Added step to (" << boardPos.first << ", " << boardPos.second << ") - path length " << currentMovePath.size()-1 << "\n";
                 return;
             }
 
@@ -275,7 +269,6 @@ namespace client {
             // enemy -> block
             pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
             auto options = pendingBlock->getDiceOptions();
-            std::cout << "Block initiated against " << targetCharacter->getName() << ". ";
         }
     }
 
@@ -370,7 +363,6 @@ namespace client {
         pendingBlock->applyDiceChoice(chosenIndex);
         engine->addCommand(std::move(pendingBlock));
         engine->executeCommand();
-        std::cout << "Block executed with chosen die index " << chosenIndex << "\n";
         resetSelection();
     }
 
@@ -427,6 +419,11 @@ namespace client {
         if (!currentTeam) return false;
         for (const auto& c : currentTeam->getCharacters()) {
             if (c == target) return false;
+        }
+
+        if (target->getStatus() != state::CharacterStatus::playable ||
+            target->getStatus() != state::CharacterStatus::played) {
+            return false;
         }
 
         auto a = selectedCharacter->getPosition();

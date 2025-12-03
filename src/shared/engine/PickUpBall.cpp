@@ -35,9 +35,6 @@ void PickUpBall::execute(std::shared_ptr<state::BloodBowlGame> game) {
         game->setBallIsHold(true);
         checkAndHandleTouchdown(game);
     } else {
-        bool outOfBounds = false;
-        bool ballTurnover = false;
-        GameUtils::handleBallBounce(game, ballPos, outOfBounds, ballTurnover);
         checkAndHandleTurnover(game);
     }
 

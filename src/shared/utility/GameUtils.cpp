@@ -6,6 +6,7 @@
 #include "utility/Constants.h"
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 namespace utility {
 
@@ -136,14 +137,13 @@ namespace utility {
         turnover = false;
 
         while (!ballLanded && bounceCount < maxBounces) {
+            std::cout << "Ball Bouncing : bounce : " << bounceCount << " at position (" << ballPos.first << ", " << ballPos.second << ")\n";
             ballPos = scatterOnce(ballPos);
             bounceCount++;
 
-            // Check if ball is out of bounds
             if (ballPos.first < 0 || ballPos.first >= utility::Constants::BOARD_WIDTH ||
                 ballPos.second < 0 || ballPos.second >= utility::Constants::BOARD_HEIGHT) {
                 outOfBounds = true;
-                ballLanded = true;
                 turnover = true;
                 break;
             }
@@ -153,7 +153,6 @@ namespace utility {
             if (characterAtPos) {
                 if (characterAtPos->getStatus() == state::CharacterStatus::knockedDown ||
                     characterAtPos->getStatus() == state::CharacterStatus::stunned) {
-                    // Ball continues to bounce
                     continue;
                 }
 
@@ -186,35 +185,28 @@ namespace utility {
                         game->setBallIsHold(true);
                         ballLanded = true;
                         turnover = false;
-                    } else {
-                        ballPos = scatterOnce(ballPos);
-
-                        if (ballPos.first < 0 || ballPos.first >= utility::Constants::BOARD_WIDTH ||
-                            ballPos.second < 0 || ballPos.second >= utility::Constants::BOARD_HEIGHT) {
-                            outOfBounds = true;
-                            turnover = true;
-                        } else {
-                            outOfBounds = false;
-                            turnover = true;
-                        }
-
-                        game->setBallPosition(ballPos);
-                        game->setBallIsHold(false);
-                        ballLanded = true;
+                        std::cout << "Ball caught by " << characterAtPos->getName() << " at position (" << ballPos.first << ", " << ballPos.second << ")\n";
                     }
                 } else {
                     ballLanded = true;
+                    std::cout << "Ball landed on non-playable character at (" << ballPos.first << ", " << ballPos.second << ")\n";
                 }
             } else {
                 ballLanded = true;
                 turnover = false;
+                game->setBallPosition(ballPos);
+                game->setBallIsHold(false);
+                std::cout << "Ball landed on empty tile at (" << ballPos.first << ", " << ballPos.second << ")\n";
             }
         }
+
+
 
         if (!ballLanded) {
             game->setBallPosition(ballPos);
             game->setBallIsHold(false);
         }
     }
+
 
 } // namespace utility

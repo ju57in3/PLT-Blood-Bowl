@@ -6,6 +6,7 @@
 #include <random>
 #include <utility>
 #include <algorithm>
+#include <iostream>
 
 using namespace utility;
 
@@ -20,12 +21,15 @@ namespace engine {
             const int injuryRoll = d12(GameUtils::getRNG());
             if (injuryRoll <= 7) {
                 targetCharacter->setStatus(state::CharacterStatus::stunned);
+                std::cout << "Stunned!" << std::endl;
             } else if (injuryRoll <= 9) {
                 targetCharacter->setStatus(state::CharacterStatus::ko);
                 targetCharacter->setPosition(std::make_pair(-1, -1));
+                std::cout << "KO!" << std::endl;
             } else {
                 targetCharacter->setStatus(state::CharacterStatus::injured);
                 targetCharacter->setPosition(std::make_pair(-1, -1));
+                std::cout << "Injured!" << std::endl;
             }
         }
     }
@@ -202,9 +206,6 @@ namespace engine {
                     bool outOfBounds = false;
                     bool ballTurnover = false;
                     GameUtils::handleBallBounce(game, defender->getPosition(), outOfBounds, ballTurnover);
-                    if (ballTurnover) {
-                        checkAndHandleTurnover(game);
-                    }
                 }
                 resolveInjury(defender);
             }

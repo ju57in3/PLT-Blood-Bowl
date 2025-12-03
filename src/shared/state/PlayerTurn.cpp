@@ -40,6 +40,7 @@ namespace state {
         if (scored) {
             // After a touchdown we go to setup for the next kickoff/setup
             game->setCurrentState(game->getStateList().at(SETUP).get());
+            isTouchDown = false;
             return;
         }
         if (tc == Constants::HALF_TIME_TURN) {

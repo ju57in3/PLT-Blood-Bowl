@@ -17,7 +17,7 @@ namespace engine {
     void Command::checkAndHandleTouchdown(const std::shared_ptr<state::BloodBowlGame>& game) {
         if (!game) return;
 
-        int tdColumnTeamA = utility::Constants::BOARD_WIDTH;
+        int tdColumnTeamA = utility::Constants::BOARD_WIDTH - 1;
         int tdColumnTeamB = 0;
 
         auto ballPos = game->getBallPosition();
@@ -25,17 +25,14 @@ namespace engine {
         if (ballPos.first == tdColumnTeamA) {
             game->getTeamA().setScore(game->getTeamA().getScore() + 1);
 
-            // Signal touchdown to state machine
             if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
                 pt->setTouchDown(true);
-                pt->update();
             }
         } else if (ballPos.first == tdColumnTeamB) {
             game->getTeamB().setScore(game->getTeamB().getScore() + 1);
 
             if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
                 pt->setTouchDown(true);
-                pt->update();
             }
         }
     }
@@ -45,7 +42,6 @@ namespace engine {
 
         if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
             pt->setTurnOver(true);
-            pt->update();
         }
     }
 
