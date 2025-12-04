@@ -28,27 +28,31 @@ namespace ai {
             aiTeam = &game->getTeamB();
         }
 
-        int teamSize = aiTeam->getCharacters().size();
-        std::uniform_int_distribution<int> dsize(0,teamSize-1);
-        int playerIndex = dsize(utility::GameUtils::getRNG());
-        auto player = aiTeam->getCharacters()[playerIndex];
+        for (auto character : aiTeam->getCharacters()) {
+            bool playCharacter = d2(utility::GameUtils::getRNG());
+            if (playCharacter) {
+               break; // skip Character
+            }
 
+            std::uniform_int_distribution<int> daction(0,2);
+            int action = daction(utility::GameUtils::getRNG()); // 0: Move, 1: Block, 2: Pass
+            switch (action) {
+                case 0:
 
-        std::uniform_int_distribution<int> daction(0,2);
-        int action = daction(utility::GameUtils::getRNG()); // 0: Move, 1: Block, 2: Pass
-        switch (action) {
-            case 0:
+                    break;
+                case 1:
 
-                break;
-            case 1:
+                    break;
+                case 2:
 
-                break;
-            case 2:
-
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+            }
         }
+
+
+
 
         return true; // Continue turn
     }
