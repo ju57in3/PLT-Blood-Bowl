@@ -39,7 +39,7 @@ namespace ai {
             std::uniform_int_distribution<int> dAction(0,2);
             int action = dAction(utility::GameUtils::getRNG()); // 0: Move, 1: Block, 2: Pass
             switch (action) {
-                case 0:
+                case 0: {
                     std::uniform_int_distribution<int> dMove(1,character->getMovement());
                     int maxMove = dMove(utility::GameUtils::getRNG());
                     for (int i = 0; i < maxMove; i++) {
@@ -48,8 +48,8 @@ namespace ai {
                         engine->addCommand(std::move(moveStepCmd));
                     }
                     break;
-
-                case 1:
+                }
+                case 1: {
                     auto blockableCharacters = utility::GameUtils::blockableCharacters(character,*opponentTeam);
                     if (blockableCharacters.empty()) {
                         break;
@@ -59,9 +59,12 @@ namespace ai {
                     auto blockCmd =  std::make_unique<engine::Block>(character, blockableCharacters[blockIndex]);
                     engine->addCommand(std::move(blockCmd));
                     break;
-                case 2:
+                }
+                case 2: {
 
                     break;
+                }
+
                 default:
                     break;
             }
