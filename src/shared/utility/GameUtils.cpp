@@ -87,6 +87,37 @@ namespace utility {
         return count;
     }
 
+    std::vector<std::shared_ptr<state::Character>> GameUtils::blockableCharacters(const std::shared_ptr<state::Character>& by, state::Team& opponentTeam) {
+        std::vector<std::shared_ptr<state::Character>> blockableCharacters;
+
+        if (!by) return blockableCharacters;
+
+        auto pos = by->getPosition();
+
+        for (const auto& opponent : opponentTeam.getCharacters()) {
+            if (!opponent) continue;
+
+            // Vérifier si le joueur est debout
+            if (opponent->getStatus() != state::CharacterStatus::playable &&
+                opponent->getStatus() != state::CharacterStatus::played)
+                {
+                continue;
+                }
+
+            auto oPos = opponent->getPosition();
+            int dx = std::abs(oPos.first - pos.first);
+            int dy = std::abs(oPos.second - pos.second);
+
+            // Vérifier l'adjacence (distance <= 1, mais pas sur la même case)
+            if (dx <= 1 && dy <= 1 && (dx + dy) > 0) {
+                blockableCharacters.push_back(opponent);
+            }
+        }
+
+        return blockableCharacters;
+    }
+
+
     bool GameUtils::isCharacterStanding(const std::shared_ptr<state::Character>& character) {
         if (!character) return false;
 
