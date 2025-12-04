@@ -3,10 +3,35 @@
 #include <filesystem>
 #include <iostream>
 #include <cmath>
+#include "../../shared/state/CharacterStatus.h"
 
 using namespace utility;
 
 namespace render{
+
+    const char* statusToFile(state::CharacterStatus status) {
+        switch (status) {
+            case state::stunned:     return "human_stu";
+            case state::ko:          return "human_ko";
+            case state::played:      return "human_up";
+            case state::bench:       return "human_up";
+            default:          return "unknown";
+        }
+    }
+
+    std::string buildCharacterTexturePath(const std::string& dir,
+                                      const state::Character& character,
+                                      const std::string& color)
+    {
+        std::string base = dir + character.getType() + "_" + color + ".png";
+
+        std::string alt = dir + statusToFile(character.getStatus()) + ".png";
+
+        if (std::filesystem::exists(alt))
+            return alt;
+
+        return base;
+    }
 
     static bool loadTextureFromFile(const std::string& path, sf::Texture& texture) {
         if (!std::filesystem::exists(path)) {
@@ -61,10 +86,14 @@ namespace render{
             std::cerr << "Error: characters directory does not exist: " << charactersDir << std::endl;
         }
 
-        for ( const auto& character : game->getTeamA().getCharacters()) {
-            const std::string texturePath = charactersDir + character->getType() + "_"+ colorA + ".png";
+        for (const auto& character : game->getTeamA().getCharacters()) {
             const auto index = static_cast<size_t>(character->getId());
-            if (index < Constants::MAX_PLAYERS_PER_TEAM && loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
+            if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
+
+            const std::string texturePath =
+                buildCharacterTexturePath(charactersDir, *character, colorA);
+
+            if (loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
                 playersSprites_TeamA.at(index).setTexture(playersTextures_TeamA.at(index));
                 playersSprites_TeamA.at(index).setPosition(pos2Coords(character->getPosition()));
             } else {
@@ -72,10 +101,14 @@ namespace render{
             }
         }
 
-        for ( const auto& character : game->getTeamB().getCharacters()) {
-            const std::string texturePath = charactersDir + character->getType() + "_"+ colorB + ".png";
+        for (const auto& character : game->getTeamB().getCharacters()) {
             const auto index = static_cast<size_t>(character->getId());
-            if (index < Constants::MAX_PLAYERS_PER_TEAM && loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
+            if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
+
+            const std::string texturePath =
+                buildCharacterTexturePath(charactersDir, *character, colorB);
+
+            if (loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
                 playersSprites_TeamB.at(index).setTexture(playersTextures_TeamB.at(index));
                 playersSprites_TeamB.at(index).setPosition(pos2Coords(character->getPosition()));
             } else {
@@ -273,17 +306,39 @@ namespace render{
             return;
         }
 
+        const std::string charactersDir = "../res/characters/";
+
         for (const auto& character : game->getTeamA().getCharacters()) {
-            const auto index = static_cast<size_t>(character->getId());
-            if (index < Constants::MAX_PLAYERS_PER_TEAM) {
-                playersSprites_TeamA.at(index).setPosition(pos2Coords(character->getPosition()));
+
+            const size_t index = static_cast<size_t>(character->getId());
+            if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
+
+            const std::string texturePath =
+                buildCharacterTexturePath(charactersDir, *character, colorA);
+
+            if (loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
+                auto& sprite = playersSprites_TeamA.at(index);
+                sprite.setTexture(playersTextures_TeamA.at(index));
+                sprite.setPosition(pos2Coords(character->getPosition()));
+            } else {
+                std::cerr << "[Render] Error loading " << texturePath << std::endl;
             }
         }
 
         for (const auto& character : game->getTeamB().getCharacters()) {
-            const auto index = static_cast<size_t>(character->getId());
-            if (index < Constants::MAX_PLAYERS_PER_TEAM) {
-                playersSprites_TeamB.at(index).setPosition(pos2Coords(character->getPosition()));
+
+            const size_t index = static_cast<size_t>(character->getId());
+            if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
+
+            const std::string texturePath =
+                buildCharacterTexturePath(charactersDir, *character, colorB);
+
+            if (loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
+                auto& sprite = playersSprites_TeamB.at(index);
+                sprite.setTexture(playersTextures_TeamB.at(index));
+                sprite.setPosition(pos2Coords(character->getPosition()));
+            } else {
+                std::cerr << "[Render] Error loading " << texturePath << std::endl;
             }
         }
     }
