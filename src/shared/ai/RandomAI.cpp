@@ -8,7 +8,7 @@
 
 namespace ai {
 
-    RandomAI::RandomAI(engine::Engine* engine, std::shared_ptr<state::BloodBowlGame> game, int teamId)
+    RandomAI::RandomAI(engine::Engine engine, std::shared_ptr<state::BloodBowlGame> game, int teamId)
     : AI(engine, std::move(game), teamId) {
     }
 
@@ -45,7 +45,7 @@ namespace ai {
                     for (int i = 0; i < maxMove; i++) {
                         std::pair<int,int> newPosition = utility::GameUtils::scatterOnce(character->getPosition());
                         auto moveStepCmd = std::make_unique<engine::Move>(character, newPosition);
-                        engine->addCommand(std::move(moveStepCmd));
+                        engine.addCommand(std::move(moveStepCmd));
                     }
                     break;
                 }
@@ -57,7 +57,7 @@ namespace ai {
                     std::uniform_int_distribution<size_t> dblock(0,blockableCharacters.size()-1);
                     size_t blockIndex = dblock(utility::GameUtils::getRNG());
                     auto blockCmd =  std::make_unique<engine::Block>(character, blockableCharacters[blockIndex]);
-                    engine->addCommand(std::move(blockCmd));
+                    engine.addCommand(std::move(blockCmd));
                     break;
                 }
                 case 2: {
