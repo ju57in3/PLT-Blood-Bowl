@@ -120,19 +120,6 @@ namespace  state {
     void BloodBowlGame::setBallPosition(std::pair<int, int> position) {
         if (position.first >= 0 && position.first <= 25 && position.second >= 0 && position.second <= 14) {
             ballPosition = position;
-        } else {
-            if (currentState == stateList.at(KICKOFF).get() || (currentState == stateList.at(PLAYERTURN).get())) {
-                currentTeam = (currentTeam == &teamA) ? &teamB : &teamA;
-                unsigned long teamSize = getCurrentTeam()->getPlayableCharacter().size();
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_int_distribution<unsigned long> dis(0, teamSize - 1);
-                unsigned long i = dis(gen);
-
-                ballPosition = getCurrentTeam()->getPlayableCharacter()[i]->getPosition();
-                ballIsHold = true;
-                getCurrentTeam()->getPlayableCharacter()[i]->setHasBall(true);
-            }
         }
     }
 
