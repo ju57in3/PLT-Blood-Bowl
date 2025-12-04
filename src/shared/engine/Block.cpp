@@ -34,11 +34,11 @@ namespace engine {
 
     static void resolveInjury(const std::shared_ptr<state::Character>& targetCharacter)
     {
-        std::uniform_int_distribution<int> d12(2,12);
-        const int roll1 = d12(rng);
+        std::uniform_int_distribution<int> d6(1,6);
+        const int roll1 = d6(rng) + d6(rng);
         if (roll1>= targetCharacter->getArmor())
         {
-            const int injuryRoll = d12(rng);
+            const int injuryRoll = d6(rng) + d6(rng);
             if (injuryRoll <= 7) {
                 targetCharacter->setStatus(state::CharacterStatus::stunned);
             } else if (injuryRoll <= 9) {
@@ -108,13 +108,7 @@ namespace engine {
     }
 
     void Block::applyDiceChoice(int chosenIndex) {
-        if (diceOptions.empty()) {
-            generateDiceOptions();
-        }
-
-        if (diceOptions.empty()) {
-            chosenDiceValue = 3;
-        } else if (chosenIndex >= 1 && chosenIndex <= static_cast<int>(diceOptions.size())) {
+         if (chosenIndex >= 1 && chosenIndex <= static_cast<int>(diceOptions.size())) {
             chosenDiceValue = diceOptions[chosenIndex-1];
         } else {
             if (attacker && defender && attacker->getStrength() >= defender->getStrength()) {
@@ -157,8 +151,9 @@ namespace engine {
         blockResult = Pushed;
     }
 
-    void Block::choosePushedPositionNonInteractive() {
-        if (!attacker || !defender) return;
+    std::vector<std::pair<int,int>> Block::getPushedPositionOptions() {
+        std::vector<std::pair<int,int>> positionOptions;
+
         int attacker_x = attacker->getPosition().first;
         int attacker_y = attacker->getPosition().second;
         int defender_x = defender->getPosition().first;
@@ -167,19 +162,53 @@ namespace engine {
         int Dx = defender_x - attacker_x;
         int Dy = defender_y - attacker_y;
 
-        std::pair<int,int> newPosition = defender->getPosition();
+        std::pair<int,int> newPosition1;
+        std::pair<int,int> newPosition2;
+        std::pair<int,int> newPosition3;
+
         if (Dx == 0) {
-            newPosition.first = defender_x;
-            newPosition.second = defender_y + (Dy>0?1:-1);
+            newPosition1.first = defender_x - 1;
+            newPosition1.second = defender_y + Dy;
+
+            newPosition2.first = defender_x;
+            newPosition2.second = attacker_y + Dy;
+
+            newPosition3.first = defender_x + 1;
+            newPosition3.second = attacker_y + Dy;
         } else if (Dy == 0) {
-            newPosition.first = defender_x + (Dx>0?1:-1);
-            newPosition.second = defender_y;
+            newPosition1.first = defender_x + Dx;
+            newPosition1.second = defender_y + 1;
+
+            newPosition2.first = defender_x + Dx;
+            newPosition2.second = attacker_y;
+
+            newPosition3.first = defender_x + Dx;
+            newPosition3.second = attacker_y - 1;
         } else {
-            newPosition.first = defender_x + (Dx>0?1:-1);
-            newPosition.second = defender_y + (Dy>0?1:-1);
+            newPosition1.first = defender_x;
+            newPosition1.second = defender_y + Dy;
+
+            newPosition2.first = defender_x + Dx;
+            newPosition2.second = attacker_y + Dy;
+
+            newPosition3.first = defender_x + Dx;
+            newPosition3.second = attacker_y;
         }
-        defender->setPosition(newPosition);
+
+        positionOptions.push_back(newPosition1);
+        positionOptions.push_back(newPosition2);
+        positionOptions.push_back(newPosition3);
+
+        return positionOptions;
     }
+
+    void Block::applyPushedPositionChoice(std::pair<int, int> targetPosition)
+    {
+        std::pair<int, int> holdPosition = defender->getPosition(); //Keep the value of the defender position
+
+        defender->setPosition(targetPosition);
+    }
+
 
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)
     {
@@ -197,7 +226,7 @@ namespace engine {
         }
         if (blockResult == Pushed || blockResult == DefenderStumbles || blockResult == DefenderDown)
         {
-            choosePushedPositionNonInteractive();
+
         }
         if (blockResult == DefenderDown || blockResult == BothDown || blockResult == DefenderStumbles)
         {

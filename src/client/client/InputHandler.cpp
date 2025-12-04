@@ -145,7 +145,27 @@ namespace client {
         }
 
         if (mouseButton.button == sf::Mouse::Left) {
-            if (pendingBlock && !diceBounds.empty()) {
+
+            if (pendingBlock && pendingPush)
+            {
+                sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
+                std::pair<int,int> targetPos = screenToBoard(mousePos);
+
+                std::vector<std::pair<int,int>> positionOptions = pendingBlock->getPushedPositionOptions();
+
+                if (std::find(positionOptions.begin(), positionOptions.end(), targetPos) != positionOptions.end())
+                {
+                    pendingBlock->applyPushedPositionChoice(targetPos);
+                    std::cout << "You have pushed the ennemy character.\n";
+                }
+                else
+                {
+                    std::cout << "You cannot pushed the ennemy character on this squarre! \n";
+                    return;
+                }
+            }
+
+            else if (pendingBlock && !diceBounds.empty()) {
                 auto mx = static_cast<float>(mouseButton.x);
                 auto my = static_cast<float>(mouseButton.y);
                 for (size_t i = 0; i < diceBounds.size(); ++i) {
@@ -259,10 +279,12 @@ namespace client {
                 return;
             }
 
-            // enemy -> block
-            pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
-            auto options = pendingBlock->getDiceOptions();
-            std::cout << "Block initiated against " << targetCharacter->getName() << ". ";
+            if (isBlockLegal(targetCharacter))
+            {
+                pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
+                auto options = pendingBlock->getDiceOptions();
+                std::cout << "Block initiated against " << targetCharacter->getName() << ".\n";
+            }
         }
     }
 
@@ -347,8 +369,15 @@ namespace client {
                 }
                 break;
 
-            default:
-                break;
+        case sf::Keyboard::Y:
+            if (pendingPush)
+            {
+                attackerFollows = true;
+            }
+            break;
+
+        default:
+            break;
         }
     }
 
