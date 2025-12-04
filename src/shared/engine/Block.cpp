@@ -209,6 +209,13 @@ namespace engine {
         defender->setPosition(targetPosition);
     }
 
+    void Block::applyFollowingChoice(bool attackerFollows)
+    {
+        if (attackerFollows)
+        {
+
+        }
+    }
 
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)
     {

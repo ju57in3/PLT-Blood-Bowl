@@ -145,7 +145,7 @@ namespace client {
         }
 
         if (mouseButton.button == sf::Mouse::Left) {
-
+            //pendingPush = pendingBlock->ennemyPushed;
             if (pendingBlock && pendingPush)
             {
                 sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
@@ -372,7 +372,7 @@ namespace client {
         case sf::Keyboard::Y:
             if (pendingPush)
             {
-                attackerFollows = true;
+                pendingBlock->applyFollowingChoice(attackerFollows);
             }
             break;
 
