@@ -46,7 +46,7 @@ namespace ai {
                     for (int i = 0; i < maxMove; i++) {
                         std::pair<int,int> newPosition = utility::GameUtils::scatterOnce(character->getPosition());
                         auto moveStepCmd = std::make_unique<engine::Move>(character, newPosition);
-                        this->engine->addCommand(std::move(moveStepCmd));
+                        this->engine.addCommand(std::move(moveStepCmd));
                     }
                     break;
                 }
@@ -58,7 +58,7 @@ namespace ai {
                     std::uniform_int_distribution<size_t> dblock(0,blockableCharacters.size()-1);
                     size_t blockIndex = dblock(utility::GameUtils::getRNG());
                     auto blockCmd =  std::make_unique<engine::Block>(character, blockableCharacters[blockIndex]);
-                    this->engine->addCommand(std::move(blockCmd));
+                    this->engine.addCommand(std::move(blockCmd));
                     break;
                 }
                 case 2: {

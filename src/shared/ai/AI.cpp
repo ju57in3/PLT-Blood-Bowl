@@ -24,35 +24,12 @@ namespace ai {
     //For the right team (teamId == 2), we place the 3 players at x = 13
     constexpr int MID_X_RIGHT = 13;
 
-    AI::AI(engine::Engine* engine, std::shared_ptr<state::BloodBowlGame> game, int teamId) : engine(engine), game(std::move(game)), teamId(teamId) {
+    AI::AI(engine::Engine* engine, std::shared_ptr<state::BloodBowlGame> game, int teamId) : engine(*engine), game(std::move(game)), teamId(teamId) {
 
     }
 
-    // Getters
-    engine::Engine* AI::getEngine() const {
-        return engine;
-    }
+    AI::~AI() = default;
 
-    const std::shared_ptr<state::BloodBowlGame> &AI::getGame() const {
-        return game;
-    }
-
-    int AI::getTeamId() const {
-        return teamId;
-    }
-
-    //Setters
-    void AI::setEngine(engine::Engine* newEngine) {
-        engine = newEngine;
-    }
-
-    void AI::setGame(const std::shared_ptr<state::BloodBowlGame>& newGame) {
-        game = newGame;
-    }
-
-    void AI::setTeamId(int newTeamId) {
-        teamId = newTeamId;
-    }
 
     void AI::placePlayers() {
         if (!game) {
