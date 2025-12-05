@@ -14,10 +14,18 @@
 #include <algorithm>
 #include <unistd.h>
 #include <vector>
+#include <bits/fs_fwd.h>
 
 #include "state/Kickoff.h"
 
 namespace client {
+
+    bool isKnockdown(const std::shared_ptr<state::Character> character) {
+        if (character->getStatus() == state::CharacterStatus::knockedDown) {
+            return true;
+        }
+        return false;
+    }
 
     bool belongsToCurrentTeam(const std::shared_ptr<state::Character>& ch, const std::shared_ptr<state::BloodBowlGame>& game) {
         if (!ch || !game) return false;
@@ -164,10 +172,11 @@ namespace client {
 
             auto character = getCharacterAt(boardPos);
             if (character) {
-                if (isCharacterPlayable(character)) {
+                if (isCharacterPlayable(character) or isKnockdown(character)) {
                     selectedCharacter = character;
                     currentMode = InputMode::Selected_Character;
-                } else {
+                }
+                else {
                     std::cout << "Cannot select this character (not playable)\n";
                 }
             } else {
@@ -226,6 +235,11 @@ namespace client {
 
                 int dx = std::abs(boardPos.first - last.first);
                 int dy = std::abs(boardPos.second - last.second);
+                if (isKnockdown(selectedCharacter)) {
+                    std::cout << "This caracter is knockdown, click on him to get him up (cost 3 movements)\n";
+                    return;
+                }
+
                 if (std::max(dx, dy) != 1) {
                     std::cout << "Invalid step: must be adjacent to previous step\n";
                     return;
@@ -237,7 +251,13 @@ namespace client {
                 }
 
                 int steps = static_cast<int>(currentMovePath.size());
-                if (steps >= selectedCharacter->getMovement() + 1) {
+
+                int range = selectedCharacter->getMovement();
+                if (selectedCharacter->gotUp) {
+                    range = range - 3;
+                }
+
+                if (steps >= range + 1) {
                     std::cout << "Movement limit reached\n";
                     return;
                 }
@@ -247,8 +267,20 @@ namespace client {
             }
 
             if (targetCharacter == selectedCharacter) {
-                std::cout << "Right-clicked the selected character; no action\n";
-                return;
+                if (isKnockdown(selectedCharacter)) {
+                    selectedCharacter->setStatus(state::CharacterStatus::playable);
+                    selectedCharacter->gotUp = true;
+                    std::cout << "Got up !\n";
+                    return;
+                } else if (selectedCharacter->gotUp){
+                    selectedCharacter->setStatus(state::CharacterStatus::played);
+                    resetSelection();
+                    return;
+                }
+                else {
+                    std::cout << "Right-clicked the selected character; no action\n";
+                    return;
+                }
             }
 
             if (belongsToCurrentTeam(targetCharacter, game)) {

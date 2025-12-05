@@ -65,6 +65,7 @@ namespace state {
         for (auto& pptr : game->getCurrentTeam()->getCharacters()) {
             if (pptr != nullptr) {
                 Character& character = *pptr;
+                character.gotUp = false;
                 if (character.getStatus() == played) {
                     character.setStatus(playable);
                 } else if (character.getStatus() == stunned) {
