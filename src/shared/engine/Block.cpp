@@ -121,19 +121,19 @@ namespace engine {
         if (diceResult == 3 || diceResult == 4)
         {
             blockResult = Pushed;
-            ennemyPushed = true;
+            enemyPushed = true;
             return;
         }
         if (diceResult == 5)
         {
             blockResult = DefenderStumbles;
-            ennemyPushed = true;
+            enemyPushed = true;
             return;
         }
         if (diceResult == 6)
         {
             blockResult = DefenderDown;
-            ennemyPushed = true;
+            enemyPushed = true;
             return;
         }
         blockResult = Pushed;
@@ -272,6 +272,6 @@ namespace engine {
     }//
 
     bool Block::getEnemyPushed() const{
-        return ennemyPushed;
+        return enemyPushed;
     }
 };
