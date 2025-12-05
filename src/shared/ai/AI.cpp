@@ -9,6 +9,8 @@
 #include "state/BloodBowlGame.h"
 #include "engine/Engine.h"
 #include "utility/GameUtils.h"
+#include "state/Team.h"
+#include "state/Character.h"
 
 namespace ai {
     // Fixed field size (26 x 15)
@@ -24,6 +26,10 @@ namespace ai {
     constexpr int MID_X_LEFT = 12;
     //For the right team (teamId == 2), we place the 3 players at x = 13
     constexpr int MID_X_RIGHT = 13;
+
+    // Upper third and lower third of half the field
+    constexpr int TOP_ZONE_Y_MAX = 4;
+    constexpr int BOTTOM_ZONE_Y_MIN = 10;
 
     AI::AI(engine::Engine& engine, const std::shared_ptr<state::BloodBowlGame>& game, int teamId) : engine(engine), game(game), teamId(teamId) {
 
@@ -52,6 +58,18 @@ namespace ai {
 
         // All the cells already occupied
         std::set<std::pair<int, int>> occupied;
+
+        // Counter for upper and lower third of half the field
+        int topZoneCount = 0;
+        int bottomZoneCount = 0;
+
+        auto updateZoneCount = [&](int y) {
+            if (y <= TOP_ZONE_Y_MAX) {
+                ++topZoneCount;
+            } else if (y >= BOTTOM_ZONE_Y_MIN) {
+                ++bottomZoneCount;
+            }
+        };
 
         // Determine the center line column for this team
         const int midX = (teamId == 1) ? MID_X_LEFT : MID_X_RIGHT;
@@ -105,13 +123,39 @@ namespace ai {
             }
 
             std::pair<int, int> pos;
+            int attempts = 0;
             do {
                 pos.first = distX(rng);
                 pos.second = distY(rng);
-            } while (occupied.count(pos) > 0);
+                ++attempts;
 
-            occupied.insert(pos);
+                bool inTopZone = (pos.second <= TOP_ZONE_Y_MAX);
+                bool inBottomZone = (pos.second >= BOTTOM_ZONE_Y_MIN);
+
+                if (occupied.count(pos) > 0) {
+                    continue;
+                }
+
+                if (inTopZone && topZoneCount >= 2) {
+                    continue;
+                }
+
+                if (inBottomZone && bottomZoneCount >= 2) {
+                    continue;
+                }
+
+                break;
+            } while (attempts < 1000);
+
             character->setPosition(pos);
+            occupied.insert(pos);
+
+            if (pos.second <= TOP_ZONE_Y_MAX) {
+                ++topZoneCount;
+            } else if (pos.second >= BOTTOM_ZONE_Y_MIN) {
+                ++bottomZoneCount;
+            }
+
             ++playerIndex;
         }
     }
