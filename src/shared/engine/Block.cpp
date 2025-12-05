@@ -110,7 +110,7 @@ namespace engine {
     void Block::applyDiceChoice(int chosenIndex) {
          if (chosenIndex >= 1 && chosenIndex <= static_cast<int>(diceOptions.size())) {
             chosenDiceValue = diceOptions[chosenIndex-1];
-        } else {
+        } else {  //Automatic selection of the dice
             if (attacker && defender && attacker->getStrength() >= defender->getStrength()) {
                 chosenDiceValue = *std::max_element(diceOptions.begin(), diceOptions.end());
             } else {
@@ -136,16 +136,19 @@ namespace engine {
         if (diceResult == 3 || diceResult == 4)
         {
             blockResult = Pushed;
+            ennemyPushed = true;
             return;
         }
         if (diceResult == 5)
         {
             blockResult = DefenderStumbles;
+            ennemyPushed = true;
             return;
         }
         if (diceResult == 6)
         {
             blockResult = DefenderDown;
+            ennemyPushed = true;
             return;
         }
         blockResult = Pushed;
@@ -204,8 +207,7 @@ namespace engine {
 
     void Block::applyPushedPositionChoice(std::pair<int, int> targetPosition)
     {
-        std::pair<int, int> holdPosition = defender->getPosition(); //Keep the value of the defender position
-
+        holdDefenderPosition = defender->getPosition();
         defender->setPosition(targetPosition);
     }
 
@@ -213,7 +215,7 @@ namespace engine {
     {
         if (attackerFollows)
         {
-
+            attacker->setPosition(holdDefenderPosition);
         }
     }
 
@@ -223,10 +225,30 @@ namespace engine {
             applyDiceChoice(-1);
         }
 
-        if (blockResult == AttackerDown || blockResult == BothDown)
+        if (blockResult == AttackerDown)
         {
             if (attacker) {
                 attacker->setStatus(state::CharacterStatus::knockedDown);
+
+                int xA = attacker->getPosition().first;
+                int yA = attacker->getPosition().second;
+                int xD = defender->getPosition().first;
+                int yD = defender->getPosition().second;
+                std::pair<int,int> newPosition1;
+                newPosition1.first = xA + (xA - xD);
+                newPosition1.second = yA + (yA - yD);
+                attacker->setPosition(newPosition1);
+
+                resolveInjury(attacker);
+                checkAndHandleTurnover(game);
+            }
+        }
+
+        if (blockResult == BothDown)
+        {
+            if (attacker) {
+                attacker->setStatus(state::CharacterStatus::knockedDown);
+
                 resolveInjury(attacker);
                 checkAndHandleTurnover(game);
             }
@@ -253,5 +275,10 @@ namespace engine {
         if (attacker && attacker->getStatus() == state::CharacterStatus::playable) {
             attacker->setStatus(state::CharacterStatus::played);
         }
+    }//
+
+    bool Block::getEnemyPushed() const{
+        return ennemyPushed;
     }
+
 };
