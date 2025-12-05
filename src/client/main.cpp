@@ -17,6 +17,7 @@ void testSFML() {
 #include <state.h>
 #include <render.h>
 #include <engine.h>
+#include <ai/RandomAI.h>
 
 using namespace std;
 using namespace client;
@@ -145,6 +146,10 @@ int main(int argc, char* argv[]) {
     // Create Engine
     engine::Engine eng(gamePtr);
 
+    ai::RandomAI randomAI(&eng, gamePtr, 2);
+
+    bool aiPlayedThisTurn = false;
+
     sf::RenderWindow window(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl");
     render::Scene scene(render::SceneId::MENU, gamePtr);
 
@@ -189,6 +194,19 @@ int main(int argc, char* argv[]) {
 
         if (gamePtr && gamePtr->getCurrentState()) {
             gamePtr->getCurrentState()->update();
+        }
+
+        if (gamePtr) {
+            state::Team* currentTeam = gamePtr->getCurrentTeam();
+
+            if (currentTeam && currentTeam->getTeamId() == 2) {
+                if (!aiPlayedThisTurn) {
+                    randomAI.runAI();
+                    aiPlayedThisTurn = true;
+                }
+            } else {
+                aiPlayedThisTurn = false;
+            }
         }
 
         std::vector<std::pair<int,int>> playablePositions;
