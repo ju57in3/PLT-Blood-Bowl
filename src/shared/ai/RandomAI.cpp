@@ -9,10 +9,9 @@
 
 namespace ai {
 
-    RandomAI::RandomAI(engine::Engine* engine, std::shared_ptr<state::BloodBowlGame> game, int teamId)
-    : AI(engine, std::move(game), teamId) {
+    RandomAI::RandomAI(engine::Engine& engine, const std::shared_ptr<state::BloodBowlGame>& game, int teamId)
+    : AI(engine, game, teamId) {
     }
-
 
     RandomAI::~RandomAI() {}
 
@@ -31,11 +30,11 @@ namespace ai {
             opponentTeam = &game->getTeamA();
         }
 
-        for (auto character : aiTeam->getCharacters()) {
-            bool playCharacter = d2(utility::GameUtils::getRNG());
-            if (!playCharacter || character->getStatus() != state::playable) {
-               break; // skip Character
-            }
+        for (const auto& character : aiTeam->getCharacters()) {
+             bool playCharacter = d2(utility::GameUtils::getRNG());
+             if (!playCharacter || character->getStatus() != state::playable) {
+                break; // skip Character
+             }
 
             std::uniform_int_distribution<int> dAction(0,2);
             int action = dAction(utility::GameUtils::getRNG()); // 0: Move, 1: Block, 2: Pass

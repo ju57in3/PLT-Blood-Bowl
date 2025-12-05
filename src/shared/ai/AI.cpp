@@ -4,6 +4,7 @@
 #include "AI.h"
 
 #include <set>
+#include <random>
 
 #include "state/BloodBowlGame.h"
 #include "engine/Engine.h"
@@ -24,7 +25,7 @@ namespace ai {
     //For the right team (teamId == 2), we place the 3 players at x = 13
     constexpr int MID_X_RIGHT = 13;
 
-    AI::AI(engine::Engine* engine, std::shared_ptr<state::BloodBowlGame> game, int teamId) : engine(*engine), game(std::move(game)), teamId(teamId) {
+    AI::AI(engine::Engine& engine, const std::shared_ptr<state::BloodBowlGame>& game, int teamId) : engine(engine), game(game), teamId(teamId) {
 
     }
 
@@ -64,7 +65,7 @@ namespace ai {
 
         std::size_t playerIndex = 0;
 
-        for (std:: size_t i = 0; i < losPositions.size() && playerIndex < maxPlayers; ++i) {
+        for (std::size_t i = 0; i < losPositions.size() && playerIndex < maxPlayers; ++i) {
             auto& character = characters[playerIndex];
             if (!character) {
                 ++playerIndex;

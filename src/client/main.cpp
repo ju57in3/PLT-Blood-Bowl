@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
     // Create Engine
     engine::Engine eng(gamePtr);
 
-    ai::RandomAI randomAI(&eng, gamePtr, 2);
+    ai::RandomAI randomAI(eng, gamePtr, 2);
 
     bool aiPlayedThisTurn = false;
 
