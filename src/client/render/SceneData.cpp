@@ -13,7 +13,7 @@ namespace render{
         switch (status) {
             case state::stunned:     return "human_stu";
             case state::ko:          return "human_ko";
-            case state::played:      return "human_up";
+            //case state::played:      return "human_up";
             case state::bench:       return "human_up";
             default:          return "unknown";
         }

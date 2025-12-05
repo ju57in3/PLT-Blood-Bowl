@@ -178,7 +178,8 @@ int main(int argc, char* argv[]) {
                         break;
 
                     case sf::Keyboard::L:
-                        cout << "Ball position : "<< gamePtr->getBallPosition().first << "," << gamePtr->getBallPosition().second << "\n";
+                        cout << teamA << endl;
+                        cout << teamB << endl;
                         break;
 
                     default:
