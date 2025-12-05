@@ -8,9 +8,6 @@
 #include "PickUpBall.h"
 #include "state/PlayerTurn.h" // Added to check for turnover
 
-static std::mt19937 rng(std::random_device{}());
-using namespace utility;
-
 namespace engine {
 
     Move::Move(const std::shared_ptr<state::Character>& character, std::pair<int, int> targetPosition)
@@ -32,17 +29,6 @@ namespace engine {
     }
 
     void Move::execute(std::shared_ptr<state::BloodBowlGame> game) {
-
-        /*
-        std::uniform_int_distribution<int> d6(1,6);
-        if (character->getStatus() == state::knockedDown) {
-            const int roll = d6(GameUtils::getRNG());
-            if ((character->getMovement() < 3) and (roll < 4) ) {
-                return;
-            }
-            character->setStatus(state::playable);
-        }
-        */
         if (std::find(range.begin(), range.end(), position) != range.end()) {
             character->setPosition(position);
 
