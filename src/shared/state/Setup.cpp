@@ -16,6 +16,8 @@ namespace state {
     void Setup::update() {
         if (teamSetupDone[0] && teamSetupDone[1]) {
             game->setCurrentState(game->getStateList().at(KICKOFF).get());
+            teamSetupDone = {false, false};
+            std::cout << "Both teams completed setup. Moving to Kickoff phase.\n";
         }
     }
 

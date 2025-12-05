@@ -3,6 +3,7 @@
 #include <memory>
 
 // The following lines are here to check that SFML is installed and working
+#include <unistd.h>
 #include <SFML/Graphics.hpp>
 
 #include "utility/Constants.h"

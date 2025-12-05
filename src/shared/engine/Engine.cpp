@@ -4,6 +4,7 @@
 #include "Engine.h"
 #include <memory>
 #include <utility>
+#include "state/PlayerTurn.h"
 
 namespace engine {
 
@@ -47,5 +48,4 @@ namespace engine {
         }
         commandHistory.push_back(std::move(cmd_ptr));
     }
-
 } // namespace engine

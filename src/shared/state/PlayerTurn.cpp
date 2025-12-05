@@ -40,13 +40,20 @@ namespace state {
         if (scored) {
             // After a touchdown we go to setup for the next kickoff/setup
             game->setCurrentState(game->getStateList().at(SETUP).get());
-        } else if (tc == Constants::HALF_TIME_TURN) {
-            game->setCurrentState(game->getStateList().at(HALFTIME).get());
-        } else if (tc == Constants::END_GAME_TURN) {
-            game->setCurrentState(game->getStateList().at(ENDGAME).get());
-        } else {
-            game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
+            isTouchDown = false;
+            return;
         }
+        if (tc == Constants::HALF_TIME_TURN) {
+            game->setCurrentState(game->getStateList().at(HALFTIME).get());
+            return;
+        }
+        if (tc == Constants::END_GAME_TURN) {
+            game->setCurrentState(game->getStateList().at(ENDGAME).get());
+            return;
+        }
+
+        game->setCurrentState(game->getStateList().at(PLAYERTURN).get());
+
 
         isTurnOver = false;
         isTouchDown = false;
@@ -58,6 +65,7 @@ namespace state {
         for (auto& pptr : game->getCurrentTeam()->getCharacters()) {
             if (pptr != nullptr) {
                 Character& character = *pptr;
+                character.gotUp = false;
                 if (character.getStatus() == played) {
                     character.setStatus(playable);
                 } else if (character.getStatus() == stunned) {

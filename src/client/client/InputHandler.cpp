@@ -12,11 +12,20 @@
 #include <iostream>
 #include <utility>
 #include <algorithm>
+#include <unistd.h>
 #include <vector>
+#include <bits/fs_fwd.h>
 
 #include "state/Kickoff.h"
 
 namespace client {
+
+    bool isKnockdown(const std::shared_ptr<state::Character> character) {
+        if (character->getStatus() == state::CharacterStatus::knockedDown) {
+            return true;
+        }
+        return false;
+    }
 
     bool belongsToCurrentTeam(const std::shared_ptr<state::Character>& ch, const std::shared_ptr<state::BloodBowlGame>& game) {
         if (!ch || !game) return false;
@@ -195,13 +204,11 @@ namespace client {
 
             auto character = getCharacterAt(boardPos);
             if (character) {
-                if (isCharacterPlayable(character)) {
+                if (isCharacterPlayable(character) or isKnockdown(character)) {
                     selectedCharacter = character;
                     currentMode = InputMode::Selected_Character;
-                    std::cout << "Character selected: " << character->getName()
-                              << " at (" << character->getPosition().first
-                              << ", " << character->getPosition().second << ")\n";
-                } else {
+                }
+                else {
                     std::cout << "Cannot select this character (not playable)\n";
                 }
             } else {
@@ -236,13 +243,23 @@ namespace client {
 
                 auto last = currentMovePath.back();
                 if (boardPos == last && currentMovePath.size() > 1) {
-                    auto finalPos = currentMovePath.back();
-                    std::cout << "Confirming move to (" << finalPos.first << ", " << finalPos.second << ")\n";
                     for (std::pair<int,int> pos : currentMovePath) {
                         auto moveStepCmd = std::make_unique<engine::Move>(selectedCharacter, pos);
                         engine->addCommand(std::move(moveStepCmd));
                         engine->executeCommand();
+
+                        // Check if a turnover occurred after this step
+                        if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+                            if (pt->getTurnOver()) {
+                                std::cout << "Turnover occurred during movement - stopping at current position\n";
+                                currentMovePath.clear();
+                                resetSelection();
+                                return;
+                            }
+                        }
+                        sleep(0.5);
                     }
+
                     currentMovePath.clear();
                     resetSelection();
                     return;
@@ -250,6 +267,11 @@ namespace client {
 
                 int dx = std::abs(boardPos.first - last.first);
                 int dy = std::abs(boardPos.second - last.second);
+                if (isKnockdown(selectedCharacter)) {
+                    std::cout << "This caracter is knockdown, click on him to get him up (cost 3 movements)\n";
+                    return;
+                }
+
                 if (std::max(dx, dy) != 1) {
                     std::cout << "Invalid step: must be adjacent to previous step\n";
                     return;
@@ -261,19 +283,36 @@ namespace client {
                 }
 
                 int steps = static_cast<int>(currentMovePath.size());
-                if (steps >= selectedCharacter->getMovement() + 1) {
+
+                int range = selectedCharacter->getMovement();
+                if (selectedCharacter->gotUp) {
+                    range = range - 3;
+                }
+
+                if (steps >= range + 1) {
                     std::cout << "Movement limit reached\n";
                     return;
                 }
 
                 currentMovePath.push_back(boardPos);
-                std::cout << "Added step to (" << boardPos.first << ", " << boardPos.second << ") - path length " << currentMovePath.size()-1 << "\n";
                 return;
             }
 
             if (targetCharacter == selectedCharacter) {
-                std::cout << "Right-clicked the selected character; no action\n";
-                return;
+                if (isKnockdown(selectedCharacter)) {
+                    selectedCharacter->setStatus(state::CharacterStatus::playable);
+                    selectedCharacter->gotUp = true;
+                    std::cout << "Got up !\n";
+                    return;
+                } else if (selectedCharacter->gotUp){
+                    selectedCharacter->setStatus(state::CharacterStatus::played);
+                    resetSelection();
+                    return;
+                }
+                else {
+                    std::cout << "Right-clicked the selected character; no action\n";
+                    return;
+                }
             }
 
             if (belongsToCurrentTeam(targetCharacter, game)) {
@@ -427,7 +466,7 @@ namespace client {
         pendingBlock->applyPushedPositionChoice(targetPos);
         engine->addCommand(std::move(pendingBlock));
         engine->executeCommand();
-        std::cout << "Push executed: Youpi!!\n";
+        std::cout << "Push executed: Nice!!\n";
         resetSelection();
     }
 
@@ -484,6 +523,11 @@ namespace client {
         if (!currentTeam) return false;
         for (const auto& c : currentTeam->getCharacters()) {
             if (c == target) return false;
+        }
+
+        if (target->getStatus() != state::CharacterStatus::playable ||
+            target->getStatus() != state::CharacterStatus::played) {
+            return false;
         }
 
         auto a = selectedCharacter->getPosition();

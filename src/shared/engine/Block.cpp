@@ -1,50 +1,35 @@
 #include "Block.h"
+#include "utility/GameUtils.h"
 #include <memory>
 
 #include <state/PlayerTurn.h>
-#include <iostream>
 #include <random>
 #include <utility>
 #include <algorithm>
+#include <iostream>
 
-static std::mt19937 rng(std::random_device{}());
+using namespace utility;
 
 namespace engine {
-
-    // TODO : Fonction deja utliser dans Pass.cpp a generaliser !
-    static std::pair<int,int> scatterOnce(std::pair<int,int> from) {
-        std::uniform_int_distribution<int> d8(1,8);
-        int dir = d8(rng);
-        int dx = 0, dy = 0;
-        switch(dir) {
-            case 1: dy = 1; break;        // N
-            case 2: dx = 1; dy = 1; break;// NE
-            case 3: dx = 1; break;        // E
-            case 4: dx = 1; dy = -1; break;// SE
-            case 5: dy = -1; break;       // S
-            case 6: dx = -1; dy = -1; break;// SW
-            case 7: dx = -1; break;       // W
-            case 8: dx = -1; dy = 1; break; // NW
-            default: ;
-        }
-        int nx = from.first + dx;
-        int ny = from.second + dy;
-        return {nx, ny};
-    }
 
     static void resolveInjury(const std::shared_ptr<state::Character>& targetCharacter)
     {
         std::uniform_int_distribution<int> d6(1,6);
-        const int roll1 = d6(rng) + d6(rng);
+        const int roll1 = d6(GameUtils::getRNG()) + d6(GameUtils::getRNG());
         if (roll1>= targetCharacter->getArmor())
         {
-            const int injuryRoll = d6(rng) + d6(rng);
+            const int injuryRoll = d6(GameUtils::getRNG()) + d6(GameUtils::getRNG());
             if (injuryRoll <= 7) {
                 targetCharacter->setStatus(state::CharacterStatus::stunned);
+                std::cout << "Stunned!" << std::endl;
             } else if (injuryRoll <= 9) {
                 targetCharacter->setStatus(state::CharacterStatus::ko);
+                targetCharacter->setPosition(std::make_pair(-1, -1));
+                std::cout << "KO!" << std::endl;
             } else {
                 targetCharacter->setStatus(state::CharacterStatus::injured);
+                targetCharacter->setPosition(std::make_pair(-1, -1));
+                std::cout << "Injured!" << std::endl;
             }
         }
     }
@@ -56,9 +41,9 @@ namespace engine {
     static std::vector<int> rollBlockDiceOptions(const std::shared_ptr<state::Character>& attacker, const std::shared_ptr<state::Character>& defender) {
         std::vector<int> listOfDiceResult;
         std::uniform_int_distribution<int> d6(1,6);
-        const int roll1 = d6(rng);
-        const int roll2 = d6(rng);
-        const int roll3 = d6(rng);
+        const int roll1 = d6(GameUtils::getRNG());
+        const int roll2 = d6(GameUtils::getRNG());
+        const int roll3 = d6(GameUtils::getRNG());
 
         listOfDiceResult.push_back(roll1); // first always
 
@@ -209,6 +194,7 @@ namespace engine {
     {
         holdDefenderPosition = defender->getPosition();
         defender->setPosition(targetPosition);
+        //TODO: Mouvement du ballon avec le défenseur
     }
 
     void Block::applyFollowingChoice(bool attackerFollows)
@@ -248,30 +234,38 @@ namespace engine {
         {
             if (attacker) {
                 attacker->setStatus(state::CharacterStatus::knockedDown);
-
+                if (attacker->getHasBall()) {
+                    attacker->setHasBall(false);
+                    bool outOfBounds = false;
+                    bool ballTurnover = false;
+                    GameUtils::handleBallBounce(game, attacker->getPosition(), outOfBounds, ballTurnover);
+                }
                 resolveInjury(attacker);
                 checkAndHandleTurnover(game);
             }
         }
+
         if (blockResult == Pushed || blockResult == DefenderStumbles || blockResult == DefenderDown)
         {
-
+            //TODO: Gestion esquive -> différentiation des cas de poussée
         }
-        if (blockResult == DefenderDown || blockResult == BothDown || blockResult == DefenderStumbles)
+
+        if (blockResult == DefenderDown || blockResult == BothDown)
         {
             if (defender) {
                 defender->setStatus(state::CharacterStatus::knockedDown);
                 if (defender->getHasBall()) {
                     defender->setHasBall(false);
-                    game->setBallPosition(scatterOnce(defender->getPosition()));
-                    game->setBallIsHold(false);
+                    bool outOfBounds = false;
+                    bool ballTurnover = false;
+                    GameUtils::handleBallBounce(game, defender->getPosition(), outOfBounds, ballTurnover);
                 }
                 resolveInjury(defender);
             }
         }
-        // TODO : Implémenter la différence entre DefenderStumbles et DefenderDown (besoin de la capacité esquive).
 
-        // If attacker survived and was playable, mark them as played
+        // TODO: Implement Dodge test - if defender has Dodge skill and test succeeds, they stay standing
+
         if (attacker && attacker->getStatus() == state::CharacterStatus::playable) {
             attacker->setStatus(state::CharacterStatus::played);
         }
@@ -280,5 +274,4 @@ namespace engine {
     bool Block::getEnemyPushed() const{
         return ennemyPushed;
     }
-
 };
