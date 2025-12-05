@@ -148,6 +148,8 @@ int main(int argc, char* argv[]) {
 
     ai::RandomAI randomAI(eng, gamePtr, 2);
 
+    randomAI.placePlayers();
+
     bool aiPlayedThisTurn = false;
 
     sf::RenderWindow window(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl");
@@ -195,6 +197,7 @@ int main(int argc, char* argv[]) {
         if (gamePtr && gamePtr->getCurrentState()) {
             gamePtr->getCurrentState()->update();
         }
+
 
         if (gamePtr) {
             state::Team* currentTeam = gamePtr->getCurrentTeam();

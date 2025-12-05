@@ -117,7 +117,6 @@ namespace ai {
     }
 
     bool AI::runAI() {
-        // Placeholder implementation
-        return true;
+        return false;
     }
 }

@@ -70,7 +70,7 @@ namespace ai {
             }
         }
 
-        return false; // EndTurn
+        return true; // EndTurn
     }
 
 } // namespace ai

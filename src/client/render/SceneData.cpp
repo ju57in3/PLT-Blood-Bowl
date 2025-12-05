@@ -56,7 +56,7 @@ namespace render{
             std::cerr << "Error loading res/board.png" << std::endl;
         }
 
-        const std::string charactersDir = "../res/characters/";
+        const std::string charactersDir = "../res/characters/TODO/";
         if (!std::filesystem::exists(charactersDir) || !std::filesystem::is_directory(charactersDir)) {
             std::cerr << "Error: characters directory does not exist: " << charactersDir << std::endl;
         }
