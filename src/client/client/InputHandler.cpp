@@ -417,7 +417,7 @@ namespace client {
         else
         {
             diceChosen = true;
-            std::cout << "Block required \n";
+            std::cout << "Pushed Position Choice required \n";
         }
     }
 
@@ -427,7 +427,7 @@ namespace client {
         pendingBlock->applyPushedPositionChoice(targetPos);
         engine->addCommand(std::move(pendingBlock));
         engine->executeCommand();
-        std::cout << "Push executed: Youpi!!\n";
+        std::cout << "Push executed \n";
         resetSelection();
     }
 
