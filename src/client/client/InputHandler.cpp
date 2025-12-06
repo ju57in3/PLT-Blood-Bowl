@@ -329,7 +329,13 @@ namespace client {
                 resetSelection();
                 return;
             }
-
+            //Test debug problème blocage
+            int x_selected = targetCharacter->getPosition().first;
+            int y_selected = targetCharacter->getPosition().second;
+            std::cout << "On a sélectionné le joueur adverse situé à: (" << x_selected << ", " << y_selected << ")\n";
+            bool test = isBlockLegal(targetCharacter);   // Le Problème vient d'ici
+            std::cout << "Test Block: " << test;
+            //
             if (isBlockLegal(targetCharacter))
             {
                 pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
@@ -525,8 +531,8 @@ namespace client {
             if (c == target) return false;
         }
 
-        if (target->getStatus() != state::CharacterStatus::playable ||
-            target->getStatus() != state::CharacterStatus::played) {
+        if (target->getStatus() != state::CharacterStatus::playable || target->getStatus() != state::CharacterStatus::played) // Problème avec le status des joueurs. Mattéo? Relevé des joueurs?
+        {
             return false;
         }
 
@@ -534,7 +540,10 @@ namespace client {
         auto b = target->getPosition();
         int dx = std::abs(a.first - b.first);
         int dy = std::abs(a.second - b.second);
-        if (dx <= 1 && dy <= 1) return true;
+        if (dx <= 1 && dy <= 1)
+        {
+            return true;
+        }
 
         return false;
     }
