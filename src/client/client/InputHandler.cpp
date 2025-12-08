@@ -153,19 +153,51 @@ namespace client {
             }
         }
 
-        if (mouseButton.button == sf::Mouse::Left) {
-            if (pendingBlock && !diceBounds.empty()) {
-                auto mx = static_cast<float>(mouseButton.x);
-                auto my = static_cast<float>(mouseButton.y);
-                for (size_t i = 0; i < diceBounds.size(); ++i) {
-                    if (diceBounds[i].contains(mx, my)) {
-                        // apply choice (1-based index)
-                        applyPendingBlockChoice(static_cast<int>(i + 1));
+        if (mouseButton.button == sf::Mouse::Left)
+        {
+            if (pendingBlock)
+            {
+                if (!diceChosen && !diceBounds.empty()) {
+                    auto mx = static_cast<float>(mouseButton.x);
+                    auto my = static_cast<float>(mouseButton.y);
+                    for (size_t i = 0; i < diceBounds.size(); ++i) {
+                        if (diceBounds[i].contains(mx, my)) {
+                            // apply choice (1-based index)
+                            diceChosen = true;
+                            applyPendingBlockChoice(static_cast<int>(i + 1));
+                            return;
+                        }
+                    }
+                    return;
+                }
+
+                if (diceChosen && pendingPush)
+                {
+                    sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
+                    std::pair<int,int> targetPos = screenToBoard(mousePos);
+
+                    std::vector<std::pair<int,int>> positionOptions = pendingBlock->getPushedPositionOptions();
+                    if (getCharacterAt(targetPos))
+                    {
+                        std::cout << "You cannot pushed the enemy character in this squarre because it is occupied! \n";
+                        return;
+                    }
+
+                    if (std::find(positionOptions.begin(), positionOptions.end(), targetPos) != positionOptions.end())
+                    {
+                        applyPendingPushChoice(targetPos);
+                        diceChosen = false;
+                        pendingPush = false;
+                        return;
+                    }
+                    else
+                    {
+                        std::cout << "You cannot pushed the enemy character on this square because it is too far! \n";
                         return;
                     }
                 }
-                return;
             }
+
 
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
@@ -297,10 +329,19 @@ namespace client {
                 resetSelection();
                 return;
             }
-
-            // enemy -> block
-            pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
-            auto options = pendingBlock->getDiceOptions();
+            //Test debug problème blocage
+            int x_selected = targetCharacter->getPosition().first;
+            int y_selected = targetCharacter->getPosition().second;
+            std::cout << "On a sélectionné le joueur adverse situé à: (" << x_selected << ", " << y_selected << ")\n";
+            bool test = isBlockLegal(targetCharacter);   // Le Problème vient d'ici
+            std::cout << "Test Block: " << test;
+            //
+            if (isBlockLegal(targetCharacter))
+            {
+                pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
+                auto options = pendingBlock->getDiceOptions();
+                std::cout << "Block initiated against " << targetCharacter->getName() << ".\n";
+            }
         }
     }
 
@@ -385,16 +426,53 @@ namespace client {
                 }
                 break;
 
-            default:
-                break;
+        case sf::Keyboard::Y:
+            if (pendingPush)
+            {
+                attackerFollows = true;
+                pendingBlock->applyFollowingChoice(attackerFollows);
+                attackerFollows = false;
+            }
+            break;
+
+        case sf::Keyboard::N:
+            if (pendingPush)
+            {
+                attackerFollows = false;
+                pendingBlock->applyFollowingChoice(attackerFollows);
+            }
+            break;
+
+        default:
+            break;
         }
     }
 
     void InputHandler::applyPendingBlockChoice(int chosenIndex) {
         if (!pendingBlock || !engine) return;
         pendingBlock->applyDiceChoice(chosenIndex);
+        pendingPush = pendingBlock->getEnemyPushed();
+        if (!pendingPush)
+        {
+            engine->addCommand(std::move(pendingBlock));
+            engine->executeCommand();
+            std::cout << "Block executed with chosen dice index " << chosenIndex << "\n";
+            resetSelection();
+        }
+        else
+        {
+            diceChosen = true;
+            std::cout << "Block required \n";
+        }
+    }
+
+    void InputHandler::applyPendingPushChoice(std::pair<int,int> targetPos)
+    {
+        if (!pendingPush || !engine) return;
+        pendingBlock->applyPushedPositionChoice(targetPos);
         engine->addCommand(std::move(pendingBlock));
         engine->executeCommand();
+        std::cout << "Push executed: Nice!!\n";
         resetSelection();
     }
 
@@ -453,8 +531,8 @@ namespace client {
             if (c == target) return false;
         }
 
-        if (target->getStatus() != state::CharacterStatus::playable ||
-            target->getStatus() != state::CharacterStatus::played) {
+        if (target->getStatus() != state::CharacterStatus::playable || target->getStatus() != state::CharacterStatus::played) // Problème avec le status des joueurs. Mattéo? Relevé des joueurs?
+        {
             return false;
         }
 
@@ -462,7 +540,10 @@ namespace client {
         auto b = target->getPosition();
         int dx = std::abs(a.first - b.first);
         int dy = std::abs(a.second - b.second);
-        if (dx <= 1 && dy <= 1) return true;
+        if (dx <= 1 && dy <= 1)
+        {
+            return true;
+        }
 
         return false;
     }
