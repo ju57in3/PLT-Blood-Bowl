@@ -174,28 +174,28 @@ namespace engine {
             newPosition1.second = defender_y + Dy;
 
             newPosition2.first = defender_x;
-            newPosition2.second = attacker_y + Dy;
+            newPosition2.second = defender_y + Dy;
 
             newPosition3.first = defender_x + 1;
-            newPosition3.second = attacker_y + Dy;
+            newPosition3.second = defender_y + Dy;
         } else if (Dy == 0) {
             newPosition1.first = defender_x + Dx;
             newPosition1.second = defender_y + 1;
 
             newPosition2.first = defender_x + Dx;
-            newPosition2.second = attacker_y;
+            newPosition2.second = defender_y;
 
             newPosition3.first = defender_x + Dx;
-            newPosition3.second = attacker_y - 1;
+            newPosition3.second = defender_y - 1;
         } else {
             newPosition1.first = defender_x;
             newPosition1.second = defender_y + Dy;
 
             newPosition2.first = defender_x + Dx;
-            newPosition2.second = attacker_y + Dy;
+            newPosition2.second = defender_y + Dy;
 
             newPosition3.first = defender_x + Dx;
-            newPosition3.second = attacker_y;
+            newPosition3.second = defender_y;
         }
 
         positionOptions.push_back(newPosition1);
