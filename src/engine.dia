@@ -1088,7 +1088,7 @@
                 <dia:string>#game#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#const std::shared_ptr&lt;state::BloodBowlGame&gt;&amp;#</dia:string>
+                <dia:string>#std::shared_ptr&lt;state::BloodBowlGame&gt;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>

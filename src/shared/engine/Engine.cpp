@@ -2,7 +2,10 @@
 // Created by guilhem on 13/11/2025.
 //
 #include "Engine.h"
+
+#include <iostream>
 #include <memory>
+#include <ostream>
 #include <utility>
 #include "state/PlayerTurn.h"
 

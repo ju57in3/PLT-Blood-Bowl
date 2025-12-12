@@ -1,4 +1,7 @@
 #include "Command.h"
+
+#include <ostream>
+
 #include "state/PlayerTurn.h"
 #include "utility/Constants.h"
 
