@@ -37,50 +37,51 @@ namespace state {
         std::uniform_int_distribution<int> d6(1,6);
 
         int direction = d8(rng);
-        int rebounds = d6(rng);
-        std::cout << rebounds << std::endl;
+        int first_rebounds = d6(rng);
+        std::cout   << "Nombre des premiers rebonds : " << first_rebounds << std::endl
+                    << "Dans la direction : " << direction << std::endl;
 
         std::pair<int,int> newTarget;
 
         switch (direction){
             case 0: //South
                 newTarget.first = targetSquare.first;
-                newTarget.second = targetSquare.second - rebounds;
+                newTarget.second = targetSquare.second - first_rebounds;
                 break;
 
             case 1: //South-East
-                newTarget.first = targetSquare.first + rebounds;
-                newTarget.second = targetSquare.second - rebounds;
+                newTarget.first = targetSquare.first + first_rebounds;
+                newTarget.second = targetSquare.second - first_rebounds;
                 break;
 
             case 2: //East
-                newTarget.first = targetSquare.first + rebounds;
+                newTarget.first = targetSquare.first + first_rebounds;
                 newTarget.second = targetSquare.second;
                 break;
 
             case 3:  //North-East
-                newTarget.first = targetSquare.first + rebounds;
-                newTarget.second = targetSquare.second + rebounds;
+                newTarget.first = targetSquare.first + first_rebounds;
+                newTarget.second = targetSquare.second + first_rebounds;
                 break;
 
             case 4: //North
                 newTarget.first = targetSquare.first;
-                newTarget.second = targetSquare.second + rebounds;
+                newTarget.second = targetSquare.second + first_rebounds;
                 break;
 
             case 5: //North-West
-                newTarget.first = targetSquare.first - rebounds;
-                newTarget.second = targetSquare.second + rebounds;
+                newTarget.first = targetSquare.first - first_rebounds;
+                newTarget.second = targetSquare.second + first_rebounds;
                 break;
 
             case 6: //West
-                newTarget.first = targetSquare.first - rebounds;
+                newTarget.first = targetSquare.first - first_rebounds;
                 newTarget.second = targetSquare.second;
                 break;
 
             case 7: //South-West
-                newTarget.first = targetSquare.first - rebounds;
-                newTarget.second = targetSquare.second - rebounds;
+                newTarget.first = targetSquare.first - first_rebounds;
+                newTarget.second = targetSquare.second - first_rebounds;
                 break;
 
             default:
