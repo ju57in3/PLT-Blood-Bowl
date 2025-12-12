@@ -87,9 +87,7 @@ namespace engine {
         return result;
     }
 
-    void Pass::execute(std::shared_ptr<state::BloodBowlGame>& game) {
-        std::cout << "In execute of Pass command" << std::endl;
-
+    void Pass::execute(std::shared_ptr<state::BloodBowlGame> game) {
         if (!game || !passer || !receiver) {
             return;
         }

@@ -38,15 +38,11 @@ namespace engine {
             return;
         }
 
-        std::cout << "Command history NOT empty" << std::endl;
-
         auto cmd = std::move(commandHistory.front());
         commandHistory.pop_front();
         if (cmd) {
-            std::cout << "cmd exists" << std::endl;
             cmd->execute(game);
         }
-        std::cout << "End of exeutCommand" << std::endl;
     }
 
     void Engine::addCommand(std::unique_ptr<Command> cmd_ptr)
