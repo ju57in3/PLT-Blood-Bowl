@@ -18,6 +18,7 @@ void testSFML() {
 #include <render.h>
 #include <engine.h>
 #include <ai/RandomAI.h>
+#include <ai/HeuristicAI.h>
 
 using namespace std;
 using namespace client;
@@ -146,9 +147,10 @@ int main(int argc, char* argv[]) {
     // Create Engine
     engine::Engine eng(gamePtr);
 
-    ai::RandomAI randomAI(eng, gamePtr, 2);
+    //ai::RandomAI randomAI(eng, gamePtr, 2);
+    ai::HeuristicAI heuristicAI(eng, gamePtr, 2);
 
-    randomAI.placePlayers();
+    heuristicAI.placePlayers();
 
     bool aiPlayedThisTurn = false;
 
@@ -204,7 +206,8 @@ int main(int argc, char* argv[]) {
 
             if (currentTeam && currentTeam->getTeamId() == 2) {
                 if (!aiPlayedThisTurn) {
-                    randomAI.runAI();
+                    //randomAI.runAI();
+                    heuristicAI.runAI();
                     aiPlayedThisTurn = true;
                 }
             } else {

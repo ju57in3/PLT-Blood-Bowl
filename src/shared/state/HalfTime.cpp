@@ -12,7 +12,7 @@ namespace state {
 
     void HalfTime::update() {
         checkKO(game);
-        std::cout << "[HALFTIME] Resetting positions for second half setup.\n";
+        /*std::cout << "[HALFTIME] Resetting positions for second half setup.\n";
 
         auto resetTeamPositions = [](state::Team& team) {
             for (auto& c : team.getCharacters()) {
@@ -26,7 +26,7 @@ namespace state {
         };
         resetTeamPositions(game->getTeamA());
         resetTeamPositions(game->getTeamB());
-        game->setCurrentTeam(&game->getTeamA());
+        game->setCurrentTeam(&game->getTeamA());*/
         game->setCurrentState(game->getStateList().at(SETUP).get());
     }
 
