@@ -5,6 +5,7 @@
 #include "state/Team.h"
 #include <cmath>
 #include <functional>
+#include <iostream>
 #include <utility>
 #include <state/PlayerTurn.h>
 
@@ -86,7 +87,9 @@ namespace engine {
         return result;
     }
 
-    void Pass::execute(const std::shared_ptr<state::BloodBowlGame>& game) {
+    void Pass::execute(std::shared_ptr<state::BloodBowlGame>& game) {
+        std::cout << "In execute of Pass command" << std::endl;
+
         if (!game || !passer || !receiver) {
             return;
         }

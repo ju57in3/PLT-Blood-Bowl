@@ -284,6 +284,14 @@ namespace client {
             }
 
             if (belongsToCurrentTeam(targetCharacter, game)) {
+                std::cout << "COMMAND LANCE PAR LE JOUEUR: "
+                          << selectedCharacter->getName()
+                          << " | hasBall=" << selectedCharacter->getHasBall()
+                          << std::endl;
+                std::cout << "COMMAND RECU PAR LE JOUEUR: "
+                          << targetCharacter->getName()
+                          << " | hasBall=" << targetCharacter->getHasBall()
+                          << std::endl;
                 // teammate -> pass
                 if (!dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
                     std::cout << "Cannot pass: not in PlayerTurn state\n";

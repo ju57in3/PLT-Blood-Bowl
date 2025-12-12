@@ -1088,7 +1088,7 @@
                 <dia:string>#game#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#const std::shared_ptr&lt;state::BloodBowlGame&gt;&amp;#</dia:string>
+                <dia:string>#std::shared_ptr&lt;state::BloodBowlGame&gt;&amp;#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -2032,7 +2032,7 @@
         <dia:point val="-72.0339,66.0705"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-77.8964,65.1103;-71.9839,66.7103"/>
+        <dia:rectangle val="-77.8964,64.9503;-71.9839,66.5503"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -2885,7 +2885,7 @@
         <dia:point val="-50.4377,36.0168"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-58.7393,35.1668;-50.3877,37.0894"/>
+        <dia:rectangle val="-58.7393,35.1668;-50.3877,36.9294"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
