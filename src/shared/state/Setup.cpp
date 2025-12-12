@@ -1,7 +1,8 @@
 #include "Setup.h"
 
 #include <iostream>
-
+#include <random>
+#include <set>
 
 #include "Kickoff.h"
 #include "BloodBowlGame.h"

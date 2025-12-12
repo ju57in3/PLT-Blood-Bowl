@@ -212,6 +212,8 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        eng.executeCommand();
+
         std::vector<std::pair<int,int>> playablePositions;
         if (gamePtr) {
             for (const auto& c : gamePtr->getTeamA().getCharacters()) {
