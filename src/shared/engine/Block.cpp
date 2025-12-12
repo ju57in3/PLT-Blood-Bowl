@@ -198,7 +198,7 @@ namespace engine {
         //TODO: Mouvement du ballon avec le défenseur
     }
 
-    std::pair<int,int> Block::getHoldDefenderPosition()
+    std::pair<int,int> Block::getHoldDefenderPosition() const
     {
         return holdDefenderPosition;
     }
