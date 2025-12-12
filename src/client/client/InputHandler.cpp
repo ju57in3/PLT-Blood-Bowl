@@ -531,7 +531,7 @@ namespace client {
             if (c == target) return false;
         }
 
-        if (target->getStatus() != state::CharacterStatus::playable || target->getStatus() != state::CharacterStatus::played) // Problème avec le status des joueurs. Mattéo? Relevé des joueurs?
+        if (target->getStatus() != state::CharacterStatus::playable && target->getStatus() != state::CharacterStatus::played) // Problème avec le status des joueurs. Mattéo? Relevé des joueurs?
         {
             return false;
         }
