@@ -31,7 +31,6 @@ namespace engine {
     void Engine::executeCommand()
     {
         if (commandHistory.empty()) {
-            std::cout << "Command history empty" << std::endl;
             return;
         }
         if (!game) {
