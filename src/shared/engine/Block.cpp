@@ -6,6 +6,7 @@
 #include <random>
 #include <utility>
 #include <algorithm>
+#include "Move.h"
 
 static std::mt19937 rng(std::random_device{}());
 
@@ -211,12 +212,9 @@ namespace engine {
         defender->setPosition(targetPosition);
     }
 
-    void Block::applyFollowingChoice(bool attackerFollows)
+    std::pair<int,int> Block::getHoldDefenderPosition()
     {
-        if (attackerFollows)
-        {
-            attacker->setPosition(holdDefenderPosition);
-        }
+        return holdDefenderPosition;
     }
 
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)

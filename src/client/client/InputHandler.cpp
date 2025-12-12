@@ -382,19 +382,26 @@ namespace client {
                 break;
 
         case sf::Keyboard::Y:
-            if (pendingPush)
+            if (pendingFollow)
             {
-                attackerFollows = true;
-                pendingBlock->applyFollowingChoice(attackerFollows);
-                attackerFollows = false;
+                pendingFollow =false;
+                auto followPath = std::make_unique<engine::Move>(selectedCharacter, pendingBlock->getHoldDefenderPosition());
+                engine->addCommand(std::move(followPath));
+
+                engine->addCommand(std::move(pendingBlock));
+                engine->executeCommand();
+                resetSelection();
             }
             break;
 
         case sf::Keyboard::N:
-            if (pendingPush)
+            if (pendingFollow)
             {
-                attackerFollows = false;
-                pendingBlock->applyFollowingChoice(attackerFollows);
+                pendingFollow = false;
+
+                engine->addCommand(std::move(pendingBlock));
+                engine->executeCommand();
+                resetSelection();
             }
             break;
 
@@ -425,10 +432,9 @@ namespace client {
     {
         if (!pendingPush || !engine) return;
         pendingBlock->applyPushedPositionChoice(targetPos);
-        engine->addCommand(std::move(pendingBlock));
-        engine->executeCommand();
         std::cout << "Push executed \n";
-        resetSelection();
+        pendingFollow = true;
+        std::cout << "Following Choice Required: tap Y to Follow or N to not Follow.\n";
     }
 
     InputMode InputHandler::getCurrentMode() const {
