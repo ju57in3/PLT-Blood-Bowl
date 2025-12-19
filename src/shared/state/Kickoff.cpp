@@ -88,11 +88,13 @@ namespace state {
                 break;
         }
 
+        /*
         // Clamp to board bounds
         if (newTarget.first < 0) newTarget.first = 0;
         if (newTarget.first >= utility::Constants::BOARD_WIDTH) newTarget.first = utility::Constants::BOARD_WIDTH - 1;
         if (newTarget.second < 0) newTarget.second = 0;
         if (newTarget.second >= utility::Constants::BOARD_HEIGHT) newTarget.second = utility::Constants::BOARD_HEIGHT - 1;
+        */
 
         int receiverId = -1;
         if (game->getCurrentTeam()) receiverId = game->getCurrentTeam()->getTeamId();
@@ -155,6 +157,14 @@ namespace state {
         if (target.second < 0 || target.second >= utility::Constants::BOARD_HEIGHT) {
             return false;
         }
+
+        if (target.first < 0 ||
+            target.first >= utility::Constants::BOARD_WIDTH ||
+            target.second < 0 ||
+            target.second >= utility::Constants::BOARD_HEIGHT)
+                {
+                    return false;
+                }
 
         return true;
     }
