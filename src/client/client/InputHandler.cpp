@@ -187,7 +187,6 @@ namespace client {
                     {
                         applyPendingPushChoice(targetPos);
                         diceChosen = false;
-                        pendingPush = false;
                         return;
                     }
                     else
@@ -329,15 +328,14 @@ namespace client {
                 resetSelection();
                 return;
             }
-            //Test debug problème blocage
+
+            //Sinon joueur ennemi sélectionné pour Blocage
             int x_selected = targetCharacter->getPosition().first;
             int y_selected = targetCharacter->getPosition().second;
             std::cout << "On a sélectionné le joueur adverse situé à: (" << x_selected << ", " << y_selected << ")\n";
-            bool test = isBlockLegal(targetCharacter);   // Le Problème vient d'ici
-            std::cout << "Test Block: " << test;
-            //
-            if (isBlockLegal(targetCharacter))
+            if (isBlockLegal(targetCharacter) && !blockSelected)
             {
+                blockSelected = true;
                 pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
                 auto options = pendingBlock->getDiceOptions();
                 std::cout << "Block initiated against " << targetCharacter->getName() << ".\n";
@@ -429,7 +427,8 @@ namespace client {
         case sf::Keyboard::Y:
             if (pendingFollow)
             {
-                pendingFollow =false;
+                pendingFollow = false;
+                blockSelected = false;
                 auto followPath = std::make_unique<engine::Move>(selectedCharacter, pendingBlock->getHoldDefenderPosition());
                 engine->addCommand(std::move(followPath));
 
@@ -443,7 +442,7 @@ namespace client {
             if (pendingFollow)
             {
                 pendingFollow = false;
-
+                blockSelected = false;
                 engine->addCommand(std::move(pendingBlock));
                 engine->executeCommand();
                 resetSelection();
@@ -461,6 +460,7 @@ namespace client {
         pendingPush = pendingBlock->getEnemyPushed();
         if (!pendingPush)
         {
+            blockSelected = false;
             engine->addCommand(std::move(pendingBlock));
             engine->executeCommand();
             std::cout << "Block executed with chosen dice index " << chosenIndex << "\n";
@@ -468,15 +468,15 @@ namespace client {
         }
         else
         {
-            diceChosen = true;
             std::cout << "Pushed Position Choice required \n";
         }
     }
 
     void InputHandler::applyPendingPushChoice(std::pair<int,int> targetPos)
     {
-        if (!pendingPush || !engine) return;
+        if (!engine) return;
         pendingBlock->applyPushedPositionChoice(targetPos);
+        pendingPush = false;
         std::cout << "Push executed \n";
         pendingFollow = true;
         std::cout << "Following Choice Required: tap Y to Follow or N to not Follow.\n";
