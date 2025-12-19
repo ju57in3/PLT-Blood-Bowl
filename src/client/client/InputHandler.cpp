@@ -432,6 +432,7 @@ namespace client {
                 auto followPath = std::make_unique<engine::Move>(selectedCharacter, pendingBlock->getHoldDefenderPosition());
                 engine->addCommand(std::move(followPath));
                 engine->executeCommand();
+
                 engine->addCommand(std::move(pendingBlock));
                 engine->executeCommand();
                 resetSelection();
