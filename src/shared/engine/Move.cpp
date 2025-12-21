@@ -1,6 +1,8 @@
 // C++
 #include "Move.h"
 #include <algorithm>
+#include <iostream>
+#include <ostream>
 #include <utility>
 #include <random>
 
