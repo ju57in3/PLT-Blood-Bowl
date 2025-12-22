@@ -9,7 +9,7 @@ namespace render {
     Scene::~Scene() = default;
 
 
-    void Scene::drawScene (sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool previewLegal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions, const std::vector<std::pair<int,int>>& movePath, const std::string& stateName, int currentTeamId) {
+    void Scene::drawScene (sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool previewLegal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions, const std::vector<std::pair<int,int>>& movePath) {
         if (!game || !window.isOpen()) {
             return;
         }
@@ -21,12 +21,9 @@ namespace render {
         window.clear(sf::Color::Black);
         sceneData.updatePositions(game);
 
-        std::string sName = "";
         int tId = -1;
-        if (game) {
-            if (game->getCurrentState()) sName = game->getCurrentState()->getName();
-            if (game->getCurrentTeam()) tId = game->getCurrentTeam()->getTeamId();
-        }
+        const std::string sName = (game && game->getCurrentState()) ? game->getCurrentState()->getName() : std::string();
+        if (game && game->getCurrentTeam()) tId = game->getCurrentTeam()->getTeamId();
 
         sceneData.draw(window, highlighted, previewPos, previewExists, previewLegal, diceOptions, showDice, playablePositions, movePath, sName, tId);
         window.display();
@@ -45,15 +42,15 @@ namespace render {
         return game;
     }
 
-    void Scene::setGame(std::shared_ptr<state::BloodBowlGame>& newGame) {
+    void Scene::setGame(const std::shared_ptr<state::BloodBowlGame>& newGame) {
         game = newGame;
     }
 
-    SceneData Scene::getSceneData() const {
+    const SceneData& Scene::getSceneData() const {
         return sceneData;
     }
 
-    void Scene::setSceneData(SceneData& newSceneData) {
+    void Scene::setSceneData(const SceneData& newSceneData) {
         sceneData = newSceneData;
     }
 
