@@ -98,6 +98,27 @@ namespace utility {
                status != state::CharacterStatus::bench;
     }
 
+    std::shared_ptr<state::Character> GameUtils::getCharacterAt(state::BloodBowlGame *game, std::pair<int, int> pos) {
+        if (!game) return nullptr;
+
+        // Check Team A
+        for (const auto& ch : game->getTeamA().getCharacters()) {
+            if (ch && ch->getPosition() == pos) {
+                return ch;
+            }
+        }
+
+        // Check Team B
+        for (const auto& ch : game->getTeamB().getCharacters()) {
+            if (ch && ch->getPosition() == pos) {
+                return ch;
+            }
+        }
+
+        return nullptr;
+    }
+
+
     std::shared_ptr<state::Character> GameUtils::getCharacterAt(const std::shared_ptr<state::BloodBowlGame>& game,
                                                                   std::pair<int,int> position) {
         if (!game) return nullptr;

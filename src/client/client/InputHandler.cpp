@@ -66,30 +66,6 @@ namespace client {
         return {boardX, boardY};
     }
 
-    std::shared_ptr<state::Character> InputHandler::getCharacterAt(const std::pair<int, int>& boardPos) const {
-        if (!game) return nullptr;
-
-        auto* currentTeam = game->getCurrentTeam();
-        if (!currentTeam) {
-            return nullptr;
-        }
-
-        for (const auto& character : currentTeam->getCharacters()) {
-            if (character->getPosition() == boardPos) {
-                return character;
-            }
-        }
-
-        auto& opponentTeam = (currentTeam == &game->getTeamA()) ? game->getTeamB() : game->getTeamA();
-        for (const auto& character : opponentTeam.getCharacters()) {
-            if (character->getPosition() == boardPos) {
-                return character;
-            }
-        }
-
-        return nullptr;
-    }
-
     void InputHandler::resetSelection() {
         selectedCharacter = nullptr;
         currentMode = InputMode::Idle;
@@ -106,7 +82,7 @@ namespace client {
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
             if (mouseButton.button == sf::Mouse::Left) {
-                if (getCharacterAt(boardPos)) {
+                if (utility::GameUtils::getCharacterAt(game, boardPos)) {
                     std::cout << "Tile occupied, cannot place character here\n";
                     return;
                 }
@@ -122,7 +98,7 @@ namespace client {
                 std::cout << "No bench character available to place for team " << team->getTeamId() << "\n";
                 return;
             } if (mouseButton.button == sf::Mouse::Right) {
-                auto ch = getCharacterAt(boardPos);
+                auto ch = utility::GameUtils::getCharacterAt(game, boardPos);
                 if (ch && ch->getStatus() != state::CharacterStatus::bench) {
                     if (game->getCurrentTeam() && belongsToCurrentTeam(ch, game)) {
                         ch->setPosition(std::make_pair(-1, -1));
@@ -140,16 +116,25 @@ namespace client {
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
 
+            /*
             if (!kickoff->isValidKickoffTarget(boardPos, *game->getCurrentTeam())) {
                 std::cout << "Invalid kickoff target at (" << boardPos.first << ", " << boardPos.second << ")\n";
                 return;
             }
+            */
 
             if (mouseButton.button == sf::Mouse::Left) {
                 kickoff->setTarget(boardPos);
                 std::cout << "Kickoff target set to (" << boardPos.first << ", " << boardPos.second << ")\n";
                 kickoff->setTargetSelected(true);
                 return;
+            }
+
+            if (auto targetPlayer = utility::GameUtils::getCharacterAt(game, game->getBallPosition())) {
+
+            }
+            else {
+
             }
         }
 
@@ -177,7 +162,7 @@ namespace client {
                     std::pair<int,int> targetPos = screenToBoard(mousePos);
 
                     std::vector<std::pair<int,int>> positionOptions = pendingBlock->getPushedPositionOptions();
-                    if (getCharacterAt(targetPos))
+                    if (utility::GameUtils::getCharacterAt(game, targetPos))
                     {
                         std::cout << "You cannot pushed the enemy character in this squarre because it is occupied! \n";
                         return;
@@ -202,7 +187,7 @@ namespace client {
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
 
-            auto character = getCharacterAt(boardPos);
+            auto character = utility::GameUtils::getCharacterAt(game, boardPos);
             if (character) {
                 if (isCharacterPlayable(character) or isKnockdown(character)) {
                     selectedCharacter = character;
@@ -219,7 +204,7 @@ namespace client {
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
 
-            auto targetCharacter = getCharacterAt(boardPos);
+            auto targetCharacter = utility::GameUtils::getCharacterAt(game, boardPos);
 
             if (!selectedCharacter) {
                 std::cout << "No character selected. Left click to select a character first.\n";
@@ -277,7 +262,7 @@ namespace client {
                     return;
                 }
 
-                if (getCharacterAt(boardPos)) {
+                if (utility::GameUtils::getCharacterAt(game, boardPos)) {
                     std::cout << "Cannot step onto occupied tile\n";
                     return;
                 }
@@ -375,7 +360,7 @@ namespace client {
         auto boardPos = screenToBoard(mousePos);
         previewBoardPos = boardPos;
         previewExists = true;
-        previewCharacter = getCharacterAt(boardPos);
+        previewCharacter = utility::GameUtils::getCharacterAt(game, boardPos);
         previewIsLegal = false;
 
         if (!selectedCharacter) {
@@ -520,7 +505,7 @@ namespace client {
         if (dest.first < 0 || dest.first >= utility::Constants::BOARD_WIDTH) return false;
         if (dest.second < 0 || dest.second >= utility::Constants::BOARD_HEIGHT) return false;
 
-        auto occ = getCharacterAt(dest);
+        auto occ = utility::GameUtils::getCharacterAt(game, dest);
         if (occ) return false;
 
         return true;
