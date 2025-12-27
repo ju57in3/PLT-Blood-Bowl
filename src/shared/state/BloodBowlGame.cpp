@@ -150,4 +150,10 @@ namespace  state {
         os << "==================\n";
         return os;
     }
+
+    bool BloodBowlGame::isInsideBoard(std::pair<int, int> position) const {
+        return position.first >= 0 && position.first <= 25 &&
+           position.second >= 0 && position.second <= 14;
+    }
+
 }
