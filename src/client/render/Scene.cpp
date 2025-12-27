@@ -38,10 +38,6 @@ namespace render {
         id = idValue;
     }
 
-    std::shared_ptr<state::BloodBowlGame> Scene::getGame() const {
-        return game;
-    }
-
     void Scene::setGame(const std::shared_ptr<state::BloodBowlGame>& newGame) {
         game = newGame;
     }
