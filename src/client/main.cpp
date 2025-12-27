@@ -2,8 +2,7 @@
 #include <string>
 #include <memory>
 
-// The following lines are here to check that SFML is installed and working
-#include <unistd.h>
+// The following line is here to check that SFML is installed and working
 #include <SFML/Graphics.hpp>
 
 #include "utility/Constants.h"
@@ -13,10 +12,18 @@ void testSFML() {
 }
 // end of test SFML
 
-#include <client.h>
-#include <state.h>
-#include <render.h>
-#include <engine.h>
+#include "client.h"
+#include "state.h"
+#include "render.h"
+#include "engine.h"
+
+#include "screen/SceneManager.h"
+#include "screen/ResourceManager.h"
+#include "screen/HomeScreen.h"
+#include "screen/TeamCreationScreen.h"
+#include "screen/MatchCreationScreen.h"
+#include "screen/GameScreen.h"
+#include "screen/EndGameScreen.h"
 
 using namespace std;
 using namespace client;
@@ -146,13 +153,24 @@ int main(int argc, char* argv[]) {
     engine::Engine eng(gamePtr);
 
     sf::RenderWindow window(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl");
-    render::Scene scene(render::SceneId::MENU, gamePtr);
 
+    // NEW: screen manager + resources
+    screen::ResourceManager resources("../res/");
+    screen::SceneManager scenes(&window, &resources);
+    scenes.setGame(gamePtr);
+    scenes.setEngine(&eng);
+
+    // register screens
+    scenes.registerScreen(std::make_unique<screen::HomeScreen>());
+    scenes.registerScreen(std::make_unique<screen::TeamCreationScreen>());
+    scenes.registerScreen(std::make_unique<screen::MatchCreationScreen>());
+    scenes.registerScreen(std::make_unique<screen::GameScreen>());
+    scenes.registerScreen(std::make_unique<screen::EndGameScreen>());
+
+    scenes.switchTo(render::SceneId::HOME);
+
+    // If you still want an InputHandler for game scene, create it and keep it available
     client::InputHandler inputHandler(gamePtr, &eng);
-
-    // Create and add commands
-    cout << "\n=== TESTING COMMANDS ===\n";
-    cout << "Position initiale de hum1: (" << hum1->getPosition().first << ", " << hum1->getPosition().second << ")\n";
 
     cout << "\n=== INTERACTIVE MODE ===\n";
     cout << "Controls:\n";
@@ -169,7 +187,8 @@ int main(int argc, char* argv[]) {
                 window.close();
             }
 
-            inputHandler.handleEvent(event, &window, scene.getDiceOptionBounds());
+            // delegate to scenes
+            scenes.handleEvent(event,window);
 
             if (event.type == sf::Event::KeyReleased) {
                 switch (event.key.code) {
@@ -188,21 +207,14 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // update game state if needed
         if (gamePtr && gamePtr->getCurrentState()) {
             gamePtr->getCurrentState()->update();
         }
 
-        std::vector<std::pair<int,int>> playablePositions;
-        if (gamePtr) {
-            for (const auto& c : gamePtr->getTeamA().getCharacters()) {
-                if (c->getStatus() == playable) playablePositions.push_back(c->getPosition());
-            }
-            for (const auto& c : gamePtr->getTeamB().getCharacters()) {
-                if (c->getStatus() == playable) playablePositions.push_back(c->getPosition());
-            }
-        }
-
-        scene.drawScene(window, inputHandler.getSelectedCharacter(), inputHandler.getPreviewPosition(), inputHandler.hasPreviewPosition(), inputHandler.isPreviewLegal(), inputHandler.getPendingBlockDiceOptions(), inputHandler.hasPendingBlock(), playablePositions, inputHandler.getMovePath(), "", -1);
+        // scenes update/draw
+        scenes.update(1.f/60.f);
+        scenes.draw(window);
     }
     return 0;
 }
