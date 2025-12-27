@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
             }
 
             // delegate to scenes
-            scenes.handleEvent(event);
+            scenes.handleEvent(event,window);
 
             if (event.type == sf::Event::KeyReleased) {
                 switch (event.key.code) {
@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
 
         // scenes update/draw
         scenes.update(1.f/60.f);
-        scenes.draw();
+        scenes.draw(window);
     }
     return 0;
 }
