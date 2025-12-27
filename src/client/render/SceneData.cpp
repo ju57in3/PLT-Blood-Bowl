@@ -7,25 +7,24 @@
 
 using namespace utility;
 
-namespace render{
-
-    const char* statusToFile(state::CharacterStatus status) {
+namespace render {
+    const char *statusToFile(state::CharacterStatus status) {
         switch (status) {
-            case state::stunned:     return "human_stu";
-            case state::ko:          return "human_ko";
-            //case state::played:      return "human_up";
-            case state::bench:       return "human_up";
-            default:          return "unknown";
+            case state::stunned: return "_stu";
+            case state::ko: return "_ko";
+            case state::played: return "_up";
+            case state::playable: return "_up";
+            case state::bench: return "_up";
+            default: return "unknown";
         }
     }
 
-    std::string buildCharacterTexturePath(const std::string& dir,
-                                      const state::Character& character,
-                                      const std::string& color)
-    {
+    std::string buildCharacterTexturePath(const std::string &dir,
+                                          const state::Character &character,
+                                          const std::string &color) {
         std::string base = dir + character.getType() + "_" + color + ".png";
 
-        std::string alt = dir + statusToFile(character.getStatus()) + ".png";
+        std::string alt = dir + character.getType() + "_" + color + statusToFile(character.getStatus()) + ".png";
 
         if (std::filesystem::exists(alt))
             return alt;
@@ -33,7 +32,7 @@ namespace render{
         return base;
     }
 
-    static bool loadTextureFromFile(const std::string& path, sf::Texture& texture) {
+    static bool loadTextureFromFile(const std::string &path, sf::Texture &texture) {
         if (!std::filesystem::exists(path)) {
             return false;
         }
@@ -43,7 +42,7 @@ namespace render{
         return true;
     }
 
-    static sf::Vector2f pos2Coords(const std::pair<int,int> &pos) {
+    static sf::Vector2f pos2Coords(const std::pair<int, int> &pos) {
         const int stride = Constants::BOARD_TILE_PIXEL_SIZE + Constants::BOARD_TILE_SPACING;
         const int x = Constants::BOARD_OFFSET_X + stride * pos.first;
         const int y = Constants::BOARD_OFFSET_Y + stride * pos.second;
@@ -51,8 +50,7 @@ namespace render{
     }
 
     SceneData::SceneData(std::string colorA, std::string colorB)
-    : colorA(std::move(colorA)), colorB(std::move(colorB))
-    {
+        : colorA(std::move(colorA)), colorB(std::move(colorB)) {
         diceTextures.clear();
         diceSprites.clear();
         if (!defaultFont.loadFromFile("../res/fonts/bloodbowl_italic.ttf")) {
@@ -66,8 +64,7 @@ namespace render{
         return boardTexture.getSize().x > 0 && boardTexture.getSize().y > 0;
     }
 
-    void SceneData::init(const std::shared_ptr<state::BloodBowlGame>& game)
-    {
+    void SceneData::init(const std::shared_ptr<state::BloodBowlGame> &game) {
         this->game = game;
 
         playersTextures_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
@@ -75,23 +72,23 @@ namespace render{
         playersSprites_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
         playersSprites_TeamB.resize(Constants::MAX_PLAYERS_PER_TEAM);
 
-        if (loadTextureFromFile("../res/board.png", boardTexture)) {
+        if (loadTextureFromFile("../res/Board2.0.png", boardTexture)) {
             board.setTexture(boardTexture);
         } else {
-            std::cerr << "Error loading res/board.png" << std::endl;
+            std::cerr << "Error loading res/Board2.0.png" << std::endl;
         }
 
-        const std::string charactersDir = "../res/characters/TODO/";
+        const std::string charactersDir = "../res/characters/";
         if (!std::filesystem::exists(charactersDir) || !std::filesystem::is_directory(charactersDir)) {
             std::cerr << "Error: characters directory does not exist: " << charactersDir << std::endl;
         }
 
-        for (const auto& character : game->getTeamA().getCharacters()) {
+        for (const auto &character: game->getTeamA().getCharacters()) {
             const auto index = static_cast<size_t>(character->getId());
             if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
 
             const std::string texturePath =
-                buildCharacterTexturePath(charactersDir, *character, colorA);
+                    buildCharacterTexturePath(charactersDir, *character, colorA);
 
             if (loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
                 playersSprites_TeamA.at(index).setTexture(playersTextures_TeamA.at(index));
@@ -101,12 +98,12 @@ namespace render{
             }
         }
 
-        for (const auto& character : game->getTeamB().getCharacters()) {
+        for (const auto &character: game->getTeamB().getCharacters()) {
             const auto index = static_cast<size_t>(character->getId());
             if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
 
             const std::string texturePath =
-                buildCharacterTexturePath(charactersDir, *character, colorB);
+                    buildCharacterTexturePath(charactersDir, *character, colorB);
 
             if (loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
                 playersSprites_TeamB.at(index).setTexture(playersTextures_TeamB.at(index));
@@ -123,11 +120,11 @@ namespace render{
         // TODO : Peut mieux faire ?
         const std::vector<std::string> id2DiceName = {
             "AttackerDown.png", // face 1
-            "BothDown.png",     // face 2
-            "Pushed.png",       // face 3
-            "Pushed.png",       // face 4 (same as 3)
+            "BothDown.png", // face 2
+            "Pushed.png", // face 3
+            "Pushed.png", // face 4 (same as 3)
             "DefenderStumbles.png", // face 5
-            "DefenderDown.png"  // face 6
+            "DefenderDown.png" // face 6
         };
 
         for (int face = 1; face <= 6; ++face) {
@@ -139,32 +136,31 @@ namespace render{
         }
     }
 
-    void SceneData::draw(sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool legal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions,const std::vector<std::pair<int,int>>& movePath, const std::string& stateName, int currentTeamId)
-    {
+    void SceneData::draw(sf::RenderWindow &window, const GameRenderData& renderData) {
         window.draw(board);
 
-        if (previewExists) {
-            drawPreview(window, previewPos, previewExists, legal);
+        if (renderData.previewExists) {
+            drawPreview(window, renderData.previewPosition, renderData.previewExists, renderData.previewLegal);
         }
 
-        if (highlighted) {
+        if (renderData.highlightedCharacter) {
             sf::RectangleShape highlightRect;
             highlightRect.setFillColor(sf::Color(255, 255, 0, 80));
-            const auto pos = pos2Coords(highlighted->getPosition());
+            const auto pos = pos2Coords(renderData.highlightedCharacter->getPosition());
             highlightRect.setSize(sf::Vector2f(Constants::BOARD_TILE_PIXEL_SIZE, Constants::BOARD_TILE_PIXEL_SIZE));
             highlightRect.setPosition(pos);
             window.draw(highlightRect);
         }
 
         std::vector<sf::Vector2f> playableCoords;
-        playableCoords.reserve(playablePositions.size());
-        for (const auto& p : playablePositions) {
+        playableCoords.reserve(renderData.playablePosition.size());
+        for (const auto &p: renderData.playablePosition) {
             playableCoords.push_back(pos2Coords(p));
         }
 
         const float tileSizeF = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
 
-        for (const auto& coord : playableCoords) {
+        for (const auto &coord: playableCoords) {
             const float radius = tileSizeF * 0.45f;
             sf::CircleShape outline(radius);
             outline.setOrigin(radius, radius);
@@ -176,11 +172,9 @@ namespace render{
         }
 
 
-
-
-        if (!movePath.empty()) {
+        if (!renderData.movePath.empty()) {
             sf::VertexArray va(sf::LinesStrip);
-            for (const auto& p : movePath) {
+            for (const auto &p: renderData.movePath) {
                 auto c = pos2Coords(p);
                 // center
                 c.x += Constants::BOARD_TILE_PIXEL_SIZE * 0.5f;
@@ -188,7 +182,7 @@ namespace render{
                 va.append(sf::Vertex(c, sf::Color::Yellow));
             }
             if (va.getVertexCount() > 1) window.draw(va);
-            for (const auto& p : movePath) {
+            for (const auto &p: renderData.movePath) {
                 auto c = pos2Coords(p);
                 c.x += Constants::BOARD_TILE_PIXEL_SIZE * 0.5f;
                 c.y += Constants::BOARD_TILE_PIXEL_SIZE * 0.5f;
@@ -200,26 +194,24 @@ namespace render{
             }
         }
 
-        for (auto& s : playersSprites_TeamA) {
+        for (auto &s: playersSprites_TeamA) {
             window.draw(s);
         }
-        for (auto& s : playersSprites_TeamB) {
+        for (auto &s: playersSprites_TeamB) {
             window.draw(s);
         }
 
-        if (showDice && !diceOptions.empty()) {
-            // TODO : MAGIC NUMBER
+        if (renderData.showDice && !renderData.diceOptions.empty()) {
             const float padding = 8.0f;
             const float size = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
-            const size_t n = diceOptions.size();
+            const size_t n = renderData.diceOptions.size();
 
             float firstX = padding;
             float y = padding;
-            diceOptionBounds.clear();
 
             for (size_t i = 0; i < n; ++i) {
                 float x = firstX + i * (size + padding);
-                int faceIndex = diceOptions[i] - 1;
+                int faceIndex = renderData.diceOptions[i] - 1;
                 if (faceIndex >= 0 && static_cast<size_t>(faceIndex) < diceSprites.size() && diceSprites[faceIndex].getTexture()) {
                     const auto bounds = diceSprites[faceIndex].getLocalBounds();
                     float sx = size / bounds.width;
@@ -228,28 +220,13 @@ namespace render{
                     diceSprites[faceIndex].setPosition(x, y);
                     window.draw(diceSprites[faceIndex]);
                 }
-                diceOptionBounds.emplace_back(x, y, size, size);
             }
-
-            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            for (size_t i = 0; i < diceOptionBounds.size(); ++i) {
-                const auto& r = diceOptionBounds[i];
-                if (r.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-                    sf::RectangleShape outline(sf::Vector2f(r.width, r.height));
-                    outline.setPosition(r.left, r.top);
-                    outline.setFillColor(sf::Color(0,0,0,0));
-                    outline.setOutlineThickness(3.0f);
-                    outline.setOutlineColor(sf::Color(255, 255, 0, 160));
-                    window.draw(outline);
-                    break;
-                }
-            }
-         } else {
-             diceOptionBounds.clear();
-         }
+        }
 
         if (!defaultFont.getInfo().family.empty()) {
-            sf::Text header(stateName + " - Team: " + (currentTeamId>=0?std::to_string(currentTeamId):std::string("-")), defaultFont, 16);
+            sf::Text header(
+                renderData.stateName + " - Team: " + (renderData.currentTeamId >= 0 ? std::to_string(renderData.currentTeamId) : std::string("-")),
+                defaultFont, 16);
             header.setFillColor(sf::Color::White);
             header.setPosition(8.0f, 4.0f);
             window.draw(header);
@@ -280,11 +257,10 @@ namespace render{
         star.setOutlineColor(sf::Color(255, 210, 0, 210));
         star.setOutlineThickness(2.0f);
         window.draw(star);
-
     }
 
-    void SceneData::drawPreview(sf::RenderWindow& window, const std::pair<int,int>& previewPos, bool previewExists, bool legal)
-    {
+    void SceneData::drawPreview(sf::RenderWindow &window, const std::pair<int, int> &previewPos, bool previewExists,
+                                bool legal) {
         if (!previewExists) {
             return;
         }
@@ -301,23 +277,22 @@ namespace render{
         window.draw(rect);
     }
 
-    void SceneData::updatePositions(const std::shared_ptr<state::BloodBowlGame>& game) {
+    void SceneData::updatePositions(const std::shared_ptr<state::BloodBowlGame> &game) {
         if (!game) {
             return;
         }
 
         const std::string charactersDir = "../res/characters/";
 
-        for (const auto& character : game->getTeamA().getCharacters()) {
-
+        for (const auto &character: game->getTeamA().getCharacters()) {
             const size_t index = static_cast<size_t>(character->getId());
             if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
 
             const std::string texturePath =
-                buildCharacterTexturePath(charactersDir, *character, colorA);
+                    buildCharacterTexturePath(charactersDir, *character, colorA);
 
             if (loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
-                auto& sprite = playersSprites_TeamA.at(index);
+                auto &sprite = playersSprites_TeamA.at(index);
                 sprite.setTexture(playersTextures_TeamA.at(index));
                 sprite.setPosition(pos2Coords(character->getPosition()));
             } else {
@@ -325,16 +300,15 @@ namespace render{
             }
         }
 
-        for (const auto& character : game->getTeamB().getCharacters()) {
-
+        for (const auto &character: game->getTeamB().getCharacters()) {
             const size_t index = static_cast<size_t>(character->getId());
             if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
 
             const std::string texturePath =
-                buildCharacterTexturePath(charactersDir, *character, colorB);
+                    buildCharacterTexturePath(charactersDir, *character, colorB);
 
             if (loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
-                auto& sprite = playersSprites_TeamB.at(index);
+                auto &sprite = playersSprites_TeamB.at(index);
                 sprite.setTexture(playersTextures_TeamB.at(index));
                 sprite.setPosition(pos2Coords(character->getPosition()));
             } else {
@@ -343,8 +317,25 @@ namespace render{
         }
     }
 
-    const std::vector<sf::FloatRect>& SceneData::getDiceOptionBounds() const {
-        return diceOptionBounds;
-    }
+    std::vector<sf::FloatRect> SceneData::computeDiceBounds(const std::vector<int>& diceOptions) {
+        std::vector<sf::FloatRect> bounds;
 
+        if (diceOptions.empty()) {
+            return bounds;
+        }
+
+        const float padding = 8.0f;
+        const float size = static_cast<float>(utility::Constants::BOARD_TILE_PIXEL_SIZE);
+        const size_t n = diceOptions.size();
+
+        float firstX = padding;
+        float y = padding;
+
+        for (size_t i = 0; i < n; ++i) {
+            float x = firstX + i * (size + padding);
+            bounds.emplace_back(x, y, size, size);
+        }
+
+        return bounds;
+    }
 }

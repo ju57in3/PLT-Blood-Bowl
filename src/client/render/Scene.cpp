@@ -9,7 +9,7 @@ namespace render {
     Scene::~Scene() = default;
 
 
-    void Scene::drawScene (sf::RenderWindow& window, const std::shared_ptr<state::Character>& highlighted, const std::pair<int,int>& previewPos, bool previewExists, bool previewLegal, const std::vector<int>& diceOptions, bool showDice, const std::vector<std::pair<int,int>>& playablePositions, const std::vector<std::pair<int,int>>& movePath) {
+    void Scene::drawScene (sf::RenderWindow& window, const GameRenderData& renderData) {
         if (!game || !window.isOpen()) {
             return;
         }
@@ -20,12 +20,7 @@ namespace render {
 
         window.clear(sf::Color::Black);
         sceneData.updatePositions(game);
-
-        int tId = -1;
-        const std::string sName = (game && game->getCurrentState()) ? game->getCurrentState()->getName() : std::string();
-        if (game && game->getCurrentTeam()) tId = game->getCurrentTeam()->getTeamId();
-
-        sceneData.draw(window, highlighted, previewPos, previewExists, previewLegal, diceOptions, showDice, playablePositions, movePath, sName, tId);
+        sceneData.draw(window, renderData);
         window.display();
     }
 
@@ -50,8 +45,8 @@ namespace render {
         sceneData = newSceneData;
     }
 
-    const std::vector<sf::FloatRect> &Scene::getDiceOptionBounds() const {
-        return sceneData.getDiceOptionBounds();
+    std::vector<sf::FloatRect> Scene::computeDiceBounds(const std::vector<int>& diceOptions) {
+        return sceneData.computeDiceBounds(diceOptions);
     }
 
 
