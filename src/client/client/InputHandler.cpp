@@ -479,9 +479,9 @@ namespace client {
         return currentMovePath;
     }
 
-    void InputHandler::handleEvent(const sf::Event& event, sf::RenderWindow* window, const std::vector<sf::FloatRect>& diceBounds) {
+    void InputHandler::handleEvent(const sf::Event& event, sf::RenderWindow* window) {
         if (event.type == sf::Event::MouseButtonPressed) {
-            this->handleMouseClick(event.mouseButton, window, diceBounds);
+            this->handleMouseClick(event.mouseButton, window);
         } else if (event.type == sf::Event::MouseMoved) {
             if (window) {
                 sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);

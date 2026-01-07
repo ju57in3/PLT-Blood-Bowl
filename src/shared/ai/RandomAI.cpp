@@ -37,8 +37,6 @@ namespace ai {
             return false; // EndTurn
         }
 
-        int actionCount = 0;
-
         for (const auto& character : aiTeam->getCharacters()) {
             if (!character) {
                 std::cout << "[AI] Characters non existent, skip.\n";
