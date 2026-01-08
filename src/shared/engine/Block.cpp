@@ -201,6 +201,12 @@ namespace engine {
         holdDefenderPosition = defender->getPosition();
     }
 
+    void Block::applyPushedPositionChoice(std::pair<int, int> targetPosition)
+    {
+        setHoldDefenderPosition();
+        defender->setPosition(targetPosition);
+    }
+
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)
     {
         if (!choiceApplied) {
