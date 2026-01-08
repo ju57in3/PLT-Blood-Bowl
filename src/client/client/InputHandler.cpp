@@ -78,7 +78,8 @@ namespace client {
             return;
         }
 
-        if (auto* setup = dynamic_cast<state::Setup*>(game->getCurrentState())) {
+        auto* setup = dynamic_cast<state::Setup*>(game->getCurrentState());
+        if (setup != nullptr) {
             sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
             auto boardPos = screenToBoard(mousePos);
             if (mouseButton.button == sf::Mouse::Left) {
@@ -481,7 +482,7 @@ namespace client {
 
     void InputHandler::handleEvent(const sf::Event& event, sf::RenderWindow* window) {
         if (event.type == sf::Event::MouseButtonPressed) {
-            this->handleMouseClick(event.mouseButton, window);
+            this->handleMouseClick(event.mouseButton, window, {});
         } else if (event.type == sf::Event::MouseMoved) {
             if (window) {
                 sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);

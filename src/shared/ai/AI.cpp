@@ -63,14 +63,6 @@ namespace ai {
         int topZoneCount = 0;
         int bottomZoneCount = 0;
 
-        auto updateZoneCount = [&](int y) {
-            if (y <= TOP_ZONE_Y_MAX) {
-                ++topZoneCount;
-            } else if (y >= BOTTOM_ZONE_Y_MIN) {
-                ++bottomZoneCount;
-            }
-        };
-
         // Determine the center line column for this team
         const int midX = (teamId == 1) ? MID_X_LEFT : MID_X_RIGHT;
 
