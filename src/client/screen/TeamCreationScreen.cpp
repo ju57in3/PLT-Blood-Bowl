@@ -14,10 +14,21 @@ namespace screen {
         try { font = resources->getFont("fonts/bloodbowl.ttf"); } catch (...) {
         }
         title.setFont(font);
-        title.setString("Creation d'equipe - Construisez votre equipe");
+        title.setString("Creation d'equipe");
         title.setCharacterSize(36);
         title.setFillColor(sf::Color::White);
-        title.setPosition(utility::Constants::WINDOW_WIDTH / 2 - 160, 40);
+        sf::FloatRect titleBounds = title.getLocalBounds();
+        title.setOrigin(titleBounds.width / 2, 0);
+        title.setPosition(utility::Constants::WINDOW_WIDTH / 2.f, 40);
+
+        // Deuxième ligne du titre - centrée
+        subtitle.setFont(font);
+        subtitle.setString("Construisez votre equipe");
+        subtitle.setCharacterSize(36);
+        subtitle.setFillColor(sf::Color::White);
+        sf::FloatRect subtitleBounds = subtitle.getLocalBounds();
+        subtitle.setOrigin(subtitleBounds.width / 2, 0);
+        subtitle.setPosition(utility::Constants::WINDOW_WIDTH / 2.f, 85);
 
         backButton.setSize({140, 40});
         backButton.setFillColor(sf::Color(70, 70, 70));
@@ -46,6 +57,7 @@ namespace screen {
     void TeamCreationScreen::draw(sf::RenderWindow &window) {
         window.clear(sf::Color(30, 30, 30));
         window.draw(title);
+        window.draw(subtitle);
         window.draw(backButton);
         window.draw(backText);
     }

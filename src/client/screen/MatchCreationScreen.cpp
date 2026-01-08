@@ -15,10 +15,21 @@ namespace screen {
         }
 
         title.setFont(font);
-        title.setString("Creation de match - Choisissez les equipes et options");
+        title.setString("Creation de match");
         title.setCharacterSize(36);
         title.setFillColor(sf::Color::White);
-        title.setPosition(utility::Constants::WINDOW_WIDTH / 2 - 160, 40);
+        sf::FloatRect titleBounds = title.getLocalBounds();
+        title.setOrigin(titleBounds.width / 2, 0);
+        title.setPosition(utility::Constants::WINDOW_WIDTH / 2.f, 40);
+
+        // Deuxième ligne du titre - centrée
+        subtitle.setFont(font);
+        subtitle.setString("Choisissez les equipes et options");
+        subtitle.setCharacterSize(36);
+        subtitle.setFillColor(sf::Color::White);
+        sf::FloatRect subtitleBounds = subtitle.getLocalBounds();
+        subtitle.setOrigin(subtitleBounds.width / 2, 0);
+        subtitle.setPosition(utility::Constants::WINDOW_WIDTH / 2.f, 85);
 
         backButton.setSize({140, 40});
         backButton.setFillColor(sf::Color(70, 70, 70));
@@ -29,15 +40,18 @@ namespace screen {
         backText.setFillColor(sf::Color::White);
         backText.setPosition(30, utility::Constants::WINDOW_HEIGHT - 55);
 
-        // start button
-        startButton.setSize({180, 50});
+
+        startButton.setSize({200, 50});
         startButton.setFillColor(sf::Color(80, 120, 80));
-        startButton.setPosition(utility::Constants::WINDOW_WIDTH / 2 - 90, utility::Constants::WINDOW_HEIGHT - 120);
+        startButton.setPosition(utility::Constants::WINDOW_WIDTH / 2.f - 100, utility::Constants::WINDOW_HEIGHT - 120);
+
         startText.setFont(font);
         startText.setString("Demarrer le match");
         startText.setCharacterSize(18);
         startText.setFillColor(sf::Color::White);
-        startText.setPosition(startButton.getPosition().x + 10, startButton.getPosition().y + 12);
+        sf::FloatRect startTextBounds = startText.getLocalBounds();
+        startText.setOrigin(startTextBounds.width / 2, 0);
+        startText.setPosition(utility::Constants::WINDOW_WIDTH / 2.f, utility::Constants::WINDOW_HEIGHT - 108);
     }
 
     void MatchCreationScreen::setManager(SceneManager *mgr) { manager = mgr; }
@@ -60,6 +74,7 @@ namespace screen {
     void MatchCreationScreen::draw(sf::RenderWindow &window) {
         window.clear(sf::Color(25, 25, 40));
         window.draw(title);
+        window.draw(subtitle);
         window.draw(backButton);
         window.draw(backText);
         window.draw(startButton);
