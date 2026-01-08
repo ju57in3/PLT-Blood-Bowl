@@ -1,6 +1,7 @@
 #include "HomeScreen.h"
 #include "ResourceManager.h"
 #include "SceneManager.h"
+#include "LayoutHelper.h"
 #include "../../shared/utility/Constants.h"
 
 namespace screen {
@@ -23,34 +24,44 @@ namespace screen {
     void HomeScreen::setManager(SceneManager *mgr) { this->manager = mgr; }
 
     void HomeScreen::setupUI() {
+        const float windowWidth = utility::Constants::WINDOW_WIDTH;
+        const float windowHeight = utility::Constants::WINDOW_HEIGHT;
+
+        // Titre principal - centré en haut
         title.setFont(font);
         title.setString("BloodBowl");
         title.setCharacterSize(48);
         title.setFillColor(sf::Color::White);
-        title.setPosition(utility::Constants::WINDOW_WIDTH * 0.5f - 120.0f, 30.0f);
+        LayoutHelper::setRelativeY(title, windowHeight, 0.05f);
+        LayoutHelper::centerHorizontally(title, windowWidth);
 
         buttonTexts.clear();
         buttonRects.clear();
 
         std::vector<std::string> labels = {"Nouvelle equipe", "Creer match", "Quitter"};
-        int y = 160;
-        for (const auto &lbl: labels) {
+
+        // Positions relatives pour les boutons (centrés verticalement)
+        const float buttonWidth = 300.f;
+        const float buttonHeight = 50.f;
+        const float buttonSpacing = 0.1f; // 10% de la hauteur d'écran entre chaque bouton
+        const float startY = 0.25f; // Commence à 25% de la hauteur
+
+        for (size_t i = 0; i < labels.size(); ++i) {
             // Create button rectangle
-            sf::RectangleShape rect({300, 50});
+            sf::RectangleShape rect({buttonWidth, buttonHeight});
             rect.setFillColor(sf::Color(70, 70, 70));
-            rect.setPosition(utility::Constants::WINDOW_WIDTH * 0.5f - 150.0f, static_cast<float>(y));
+            LayoutHelper::setRelativeY(rect, windowHeight, startY + i * buttonSpacing);
+            LayoutHelper::centerHorizontally(rect, windowWidth);
             buttonRects.push_back(rect);
 
-            // Create button text
+            // Create button text - centré dans le bouton
             sf::Text text;
             text.setFont(font);
-            text.setString(lbl);
+            text.setString(labels[i]);
             text.setCharacterSize(20);
             text.setFillColor(sf::Color::White);
-            text.setPosition(rect.getPosition().x + 20, rect.getPosition().y + 10);
+            LayoutHelper::centerTextInRect(text, rect);
             buttonTexts.push_back(text);
-
-            y += 80;
         }
     }
 
