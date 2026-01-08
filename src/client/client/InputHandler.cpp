@@ -476,7 +476,11 @@ namespace client {
     void InputHandler::applyPendingPushChoice(std::pair<int,int> targetPos)
     {
         if (!engine) return;
-        pendingBlock->applyPushedPositionChoice(targetPos);
+        pendingBlock->setHoldDefenderPosition();
+        auto followPath = std::make_unique<engine::Move>(selectedCharacter, pendingBlock->getHoldDefenderPosition());
+        engine->addCommand(std::move(followPath));
+        engine->executeCommand();
+
         pendingPush = false;
         std::cout << "Push executed \n";
         pendingFollow = true;

@@ -22,15 +22,15 @@ namespace engine {
             const int injuryRoll = d6(GameUtils::getRNG()) + d6(GameUtils::getRNG());
             if (injuryRoll <= 7) {
                 targetCharacter->setStatus(state::CharacterStatus::stunned);
-                std::cout << "Stunned!" << std::endl;
+                std::cout << "Stunned!";
             } else if (injuryRoll <= 9) {
                 targetCharacter->setStatus(state::CharacterStatus::ko);
                 targetCharacter->setPosition(std::make_pair(-1, -1));
-                std::cout << "KO!" << std::endl;
+                std::cout << "KO!";
             } else {
                 targetCharacter->setStatus(state::CharacterStatus::injured);
                 targetCharacter->setPosition(std::make_pair(-1, -1));
-                std::cout << "Injured!" << std::endl;
+                std::cout << "Injured!";
             }
         }
     }
@@ -191,16 +191,14 @@ namespace engine {
         return positionOptions;
     }
 
-    void Block::applyPushedPositionChoice(std::pair<int, int> targetPosition)
-    {
-        holdDefenderPosition = defender->getPosition();
-        defender->setPosition(targetPosition);
-        //TODO: Mouvement du ballon avec le défenseur
-    }
-
     std::pair<int,int> Block::getHoldDefenderPosition() const
     {
         return holdDefenderPosition;
+    }
+
+    void Block::setHoldDefenderPosition()
+    {
+        holdDefenderPosition = defender->getPosition();
     }
 
     void Block::execute(std::shared_ptr<state::BloodBowlGame> game)
