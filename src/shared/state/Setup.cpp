@@ -11,8 +11,7 @@
 constexpr std::pair<int, int> HORS_TABLEAU = {-1, -1};
 
 namespace state {
-    Setup::Setup(BloodBowlGame *game) : AbstractState(game) {
-    }
+    Setup::Setup(BloodBowlGame *game) : AbstractState(game) {}
 
     void Setup::update() {
         if (teamSetupDone[0] && teamSetupDone[1]) {

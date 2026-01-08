@@ -6,12 +6,6 @@
 #include <SFML/Graphics.hpp>
 
 #include "utility/Constants.h"
-
-void testSFML() {
-    sf::Texture texture;
-}
-// end of test SFML
-
 #include "client.h"
 #include "state.h"
 #include "render.h"

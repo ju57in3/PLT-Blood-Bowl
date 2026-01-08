@@ -7,8 +7,7 @@
 constexpr std::pair<int,int> HORS_TAB = {-1, -1};
 
 namespace state {
-    HalfTime::HalfTime(BloodBowlGame *game) : AbstractState(game) {
-    }
+    HalfTime::HalfTime(BloodBowlGame *game) : AbstractState(game) {}
 
     void HalfTime::update() {
         checkKO(game);

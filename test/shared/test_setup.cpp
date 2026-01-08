@@ -23,14 +23,20 @@ BOOST_AUTO_TEST_CASE(TestSetup)
 
     // Initializing game with two different teams
     BloodBowlGame game(teamA, teamB);
-    Setup setup(&game);
+    Setup* setup = dynamic_cast<Setup*>(game.getStateList()[SETUP].get());
+    BOOST_REQUIRE(setup != nullptr);
 
-    BOOST_CHECK(setup.isValidSetup(teamA));
-    BOOST_CHECK_EQUAL(setup.nbCharacterOnBoard(teamA), 11);
-    BOOST_CHECK_EQUAL(setup.nbCharacterOnLine(teamA), 3);
-    BOOST_CHECK_EQUAL(setup.nbCharacterOnTop(teamA), 2);
-    BOOST_CHECK_EQUAL(setup.nbCharacterOnBottom(teamA), 0);
+    BOOST_CHECK(setup->isValidSetup(teamA));
+    BOOST_CHECK_EQUAL(setup->nbCharacterOnBoard(teamA), 11);
+    BOOST_CHECK_EQUAL(setup->nbCharacterOnLine(teamA), 3);
+    BOOST_CHECK_EQUAL(setup->nbCharacterOnTop(teamA), 2);
+    BOOST_CHECK_EQUAL(setup->nbCharacterOnBottom(teamA), 0);
 
-    setup.endSetup();
-    BOOST_CHECK(setup.getSetupEnded());
+    setup->endSetup();
+    // After one team finishes, setup is not ended yet (need both teams)
+    BOOST_CHECK(!setup->getSetupEnded());
+
+    // Now finish setup for the second team
+    setup->endSetup();
+    BOOST_CHECK(setup->getSetupEnded());
 }
