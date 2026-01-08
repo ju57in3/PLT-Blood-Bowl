@@ -2808,7 +2808,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#std::vector&lt;Character*&gt;#</dia:string>
+            <dia:string>#std::vector&lt;std::shared_ptr&lt;Character&gt;&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>

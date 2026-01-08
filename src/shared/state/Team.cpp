@@ -25,16 +25,14 @@ namespace state {
         return score;
     }
 
-    std::vector<Character*> Team::getPlayableCharacter() {
-        std::vector<Character*> playableChars;
-        for (auto & characterPtr : characters)
-        {
-            if (characterPtr->getStatus() == playable)
-            {
-                playableChars.push_back(characterPtr.get());
+    std::vector<std::shared_ptr<Character>> Team::getPlayableCharacter() {
+        std::vector<std::shared_ptr<Character>> res;
+        for (auto& c : characters) {
+            if (c && c->getStatus() == state::CharacterStatus::playable) {
+                res.push_back(c);
             }
         }
-        return playableChars;
+        return res;
     }
 
     int Team::getTeamId() const{

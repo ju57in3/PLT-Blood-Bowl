@@ -75,7 +75,7 @@ namespace engine {
         auto opposingPlayable = opposingTeamPtr->getPlayableCharacter();
         std::vector<std::shared_ptr<state::Character>> result;
 
-        for (auto* character : opposingPlayable) {
+        for (std::shared_ptr<state::Character> character : opposingPlayable) {
             auto charPos = character->getPosition();
             for (const auto& linePos : linePositions) {
                 if (charPos == linePos) { result.emplace_back(character); break; }
