@@ -4,6 +4,7 @@
 #include "../render/Scene.h"
 #include "../client/InputHandler.h"
 #include <engine/Engine.h>
+#include <state/Setup.h>
 
 namespace screen {
     GameScreen::GameScreen() = default;
@@ -58,6 +59,23 @@ namespace screen {
         // update game or input-based logic if necessary
         if (game && game->getCurrentState()) {
             game->getCurrentState()->update();
+
+            // Gérer l'IA selon l'état actuel
+            if (manager && manager->getEngine()) {
+                auto* currentState = game->getCurrentState();
+
+                // Détection de l'état Setup
+                if (auto* setupState = dynamic_cast<state::Setup*>(currentState)) {
+                    // L'IA place ses joueurs pendant le setup
+                    manager->getEngine()->runAISetupIfNeeded(setupState);
+                } else {
+                    // Phase de jeu normale
+                    manager->getEngine()->runAITurnIfNeeded();
+                }
+
+                // Exécuter les commandes en attente
+                manager->getEngine()->executeCommand();
+            }
 
             // Vérifier si on est passé à l'état EndGame
             if (game->getCurrentState()->getName() == "EndGame" && !endRequested) {
