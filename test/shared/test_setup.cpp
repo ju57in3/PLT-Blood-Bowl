@@ -38,16 +38,6 @@ BOOST_AUTO_TEST_CASE(TestSetup)
     BOOST_CHECK_EQUAL(setup->nbCharacterOnTop(teamA), 2);
     BOOST_CHECK_EQUAL(setup->nbCharacterOnBottom(teamA), 2);
 
-
-    /*
-    // Test setSetupEnded
-    setup->setSetupEnded(true);
-    BOOST_CHECK(setup->getSetupEnded());
-    setup->setSetupEnded(false);
-    BOOST_CHECK(not setup->getSetupEnded());
-    */
-
-
     setup->endSetup();
     // After one team finishes, setup is not ended yet (need both teams)
     BOOST_CHECK(!setup->getSetupEnded());
