@@ -9,9 +9,9 @@ add_custom_test(team)
 add_custom_test(character)
 add_custom_test(blood_bowl_game)
 add_custom_test(pass)
-add_custom_test(command)
 add_custom_test(engine)
 add_custom_test(move)
+add_custom_test(command)
 add_custom_test(pickUpBall)
 # vim: set sw=2 sts=2 et:
 
