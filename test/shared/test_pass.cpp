@@ -7,7 +7,7 @@
 using namespace engine;
 using namespace state;
 
-BOOST_AUTO_TEST_CASE(TestAbstractState) {
+BOOST_AUTO_TEST_CASE(TestPass) {
     // Set up game, team and characters
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
