@@ -23,6 +23,10 @@ namespace screen {
 
     void GameScreen::setManager(SceneManager *mgr) { this->manager = mgr; }
 
+    void GameScreen::onEnter() {
+        endRequested = false;
+    }
+
     void GameScreen::handleEvent(const sf::Event &event, sf::RenderWindow &window) {
         if (event.type == sf::Event::MouseButtonPressed &&
             event.mouseButton.button == sf::Mouse::Left &&
@@ -52,7 +56,15 @@ namespace screen {
 
     void GameScreen::update(float dt) {
         // update game or input-based logic if necessary
-        if (game && game->getCurrentState()) game->getCurrentState()->update();
+        if (game && game->getCurrentState()) {
+            game->getCurrentState()->update();
+
+            // Vérifier si on est passé à l'état EndGame
+            if (game->getCurrentState()->getName() == "EndGame" && !endRequested) {
+                endRequested = true;
+                if (manager) manager->switchTo(render::SceneId::END_GAME);
+            }
+        }
     }
 
     void GameScreen::draw(sf::RenderWindow &window) {

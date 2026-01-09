@@ -3,9 +3,16 @@
 #include "SceneManager.h"
 #include "LayoutHelper.h"
 #include "../../shared/utility/Constants.h"
+#include "../../shared/state/TeamManager.h"
+#include "../../shared/state/Team.h"
+#include "../../shared/state/BloodBowlGame.h"
+#include "../../shared/engine/Engine.h"
 
 namespace screen {
-    MatchCreationScreen::MatchCreationScreen() = default;
+    MatchCreationScreen::MatchCreationScreen()
+        : selectedTeam1Index(-1), selectedTeam2Index(-1),
+          vsHuman(true), selectedAIType(0) {
+    }
 
     MatchCreationScreen::~MatchCreationScreen() = default;
 
@@ -17,27 +24,167 @@ namespace screen {
         try { font = resources->getFont("fonts/bloodbowl.ttf"); } catch (...) {
         }
 
-        // Titre principal - centré
+        // Titre principal
         title.setFont(font);
         title.setString("Creation de match");
-        title.setCharacterSize(36);
+        title.setCharacterSize(32);
         title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(title, windowHeight, 0.05f);
-        LayoutHelper::centerHorizontally(title, windowWidth);
+        title.setPosition(windowWidth / 2 - 150, 20);
 
-        // Sous-titre - centré
-        subtitle.setFont(font);
-        subtitle.setString("Choisissez les equipes et options");
-        subtitle.setCharacterSize(36);
-        subtitle.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(subtitle, windowHeight, 0.12f);
-        LayoutHelper::centerHorizontally(subtitle, windowWidth);
+        // === ÉQUIPE 1 ===
+        team1Label.setFont(font);
+        team1Label.setString("Equipe 1:");
+        team1Label.setCharacterSize(20);
+        team1Label.setFillColor(sf::Color::White);
+        team1Label.setPosition(50, 80);
 
-        // Bouton retour - en bas à gauche
+        team1SelectBox.setSize({400, 40});
+        team1SelectBox.setFillColor(sf::Color(50, 50, 80));
+        team1SelectBox.setOutlineColor(sf::Color::White);
+        team1SelectBox.setOutlineThickness(2);
+        team1SelectBox.setPosition(50, 110);
+
+        team1NameText.setFont(font);
+        team1NameText.setCharacterSize(18);
+        team1NameText.setFillColor(sf::Color::White);
+        team1NameText.setPosition(60, 118);
+
+        team1PrevButton.setSize({35, 35});
+        team1PrevButton.setFillColor(sf::Color(100, 100, 100));
+        team1PrevButton.setPosition(460, 112);
+
+        team1PrevText.setFont(font);
+        team1PrevText.setString("<");
+        team1PrevText.setCharacterSize(20);
+        team1PrevText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(team1PrevText, team1PrevButton);
+
+        team1NextButton.setSize({35, 35});
+        team1NextButton.setFillColor(sf::Color(100, 100, 100));
+        team1NextButton.setPosition(500, 112);
+
+        team1NextText.setFont(font);
+        team1NextText.setString(">");
+        team1NextText.setCharacterSize(20);
+        team1NextText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(team1NextText, team1NextButton);
+
+        // === ÉQUIPE 2 ===
+        team2Label.setFont(font);
+        team2Label.setString("Equipe 2:");
+        team2Label.setCharacterSize(20);
+        team2Label.setFillColor(sf::Color::White);
+        team2Label.setPosition(50, 170);
+
+        team2SelectBox.setSize({400, 40});
+        team2SelectBox.setFillColor(sf::Color(80, 50, 50));
+        team2SelectBox.setOutlineColor(sf::Color::White);
+        team2SelectBox.setOutlineThickness(2);
+        team2SelectBox.setPosition(50, 200);
+
+        team2NameText.setFont(font);
+        team2NameText.setCharacterSize(18);
+        team2NameText.setFillColor(sf::Color::White);
+        team2NameText.setPosition(60, 208);
+
+        team2PrevButton.setSize({35, 35});
+        team2PrevButton.setFillColor(sf::Color(100, 100, 100));
+        team2PrevButton.setPosition(460, 202);
+
+        team2PrevText.setFont(font);
+        team2PrevText.setString("<");
+        team2PrevText.setCharacterSize(20);
+        team2PrevText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(team2PrevText, team2PrevButton);
+
+        team2NextButton.setSize({35, 35});
+        team2NextButton.setFillColor(sf::Color(100, 100, 100));
+        team2NextButton.setPosition(500, 202);
+
+        team2NextText.setFont(font);
+        team2NextText.setString(">");
+        team2NextText.setCharacterSize(20);
+        team2NextText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(team2NextText, team2NextButton);
+
+        // === MODE DE JEU ===
+        modeLabel.setFont(font);
+        modeLabel.setString("Mode de jeu:");
+        modeLabel.setCharacterSize(20);
+        modeLabel.setFillColor(sf::Color::White);
+        modeLabel.setPosition(50, 260);
+
+        pvpButton.setSize({180, 40});
+        pvpButton.setFillColor(sf::Color(70, 120, 70));
+        pvpButton.setOutlineColor(sf::Color::Yellow);
+        pvpButton.setOutlineThickness(3);
+        pvpButton.setPosition(50, 290);
+
+        pvpText.setFont(font);
+        pvpText.setString("Humain vs Humain");
+        pvpText.setCharacterSize(16);
+        pvpText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(pvpText, pvpButton);
+
+        pveButton.setSize({180, 40});
+        pveButton.setFillColor(sf::Color(120, 70, 70));
+        pveButton.setPosition(240, 290);
+
+        pveText.setFont(font);
+        pveText.setString("Humain vs IA");
+        pveText.setCharacterSize(16);
+        pveText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(pveText, pveButton);
+
+        // === TYPE D'IA ===
+        aiTypeLabel.setFont(font);
+        aiTypeLabel.setString("Type d'IA:");
+        aiTypeLabel.setCharacterSize(20);
+        aiTypeLabel.setFillColor(sf::Color::White);
+        aiTypeLabel.setPosition(50, 350);
+
+        randomAIButton.setSize({150, 35});
+        randomAIButton.setFillColor(sf::Color(80, 80, 120));
+        randomAIButton.setOutlineColor(sf::Color::Yellow);
+        randomAIButton.setOutlineThickness(2);
+        randomAIButton.setPosition(50, 380);
+
+        randomAIText.setFont(font);
+        randomAIText.setString("Random");
+        randomAIText.setCharacterSize(16);
+        randomAIText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(randomAIText, randomAIButton);
+
+        heuristicAIButton.setSize({150, 35});
+        heuristicAIButton.setFillColor(sf::Color(80, 80, 120));
+        heuristicAIButton.setPosition(210, 380);
+
+        heuristicAIText.setFont(font);
+        heuristicAIText.setString("Heuristique");
+        heuristicAIText.setCharacterSize(16);
+        heuristicAIText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(heuristicAIText, heuristicAIButton);
+
+        advancedAIButton.setSize({150, 35});
+        advancedAIButton.setFillColor(sf::Color(80, 80, 120));
+        advancedAIButton.setPosition(370, 380);
+
+        advancedAIText.setFont(font);
+        advancedAIText.setString("Avancee");
+        advancedAIText.setCharacterSize(16);
+        advancedAIText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(advancedAIText, advancedAIButton);
+
+        // === MESSAGE D'ERREUR ===
+        errorText.setFont(font);
+        errorText.setCharacterSize(16);
+        errorText.setFillColor(sf::Color::Red);
+        errorText.setPosition(50, 440);
+
+        // === BOUTONS D'ACTION ===
         backButton.setSize({140, 40});
         backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setPosition(20, 0);
-        LayoutHelper::positionAtBottom(backButton, windowHeight, 20);
+        backButton.setPosition(20, windowHeight - 60);
 
         backText.setFont(font);
         backText.setString("Retour");
@@ -45,17 +192,24 @@ namespace screen {
         backText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(backText, backButton);
 
-        // Bouton démarrer - centré en bas
         startButton.setSize({200, 50});
-        startButton.setFillColor(sf::Color(80, 120, 80));
-        LayoutHelper::setRelativeY(startButton, windowHeight, 0.85f);
-        LayoutHelper::centerHorizontally(startButton, windowWidth);
+        startButton.setFillColor(sf::Color(50, 150, 50));
+        startButton.setPosition(windowWidth - 220, windowHeight - 65);
 
         startText.setFont(font);
         startText.setString("Demarrer le match");
         startText.setCharacterSize(18);
         startText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(startText, startButton);
+
+        // Initialiser avec la première équipe si disponible
+        auto& teamManager = state::TeamManager::getInstance();
+        if (teamManager.getTeamCount() > 0) {
+            selectedTeam1Index = 0;
+            if (teamManager.getTeamCount() > 1) {
+                selectedTeam2Index = 1;
+            }
+        }
     }
 
     void MatchCreationScreen::setManager(SceneManager *mgr) { manager = mgr; }
@@ -63,22 +217,219 @@ namespace screen {
     void MatchCreationScreen::handleEvent(const sf::Event &event, sf::RenderWindow &window) {
         if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2f mpos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
+
+            auto& teamManager = state::TeamManager::getInstance();
+            int teamCount = teamManager.getTeamCount();
+
+            // Bouton retour
             if (backButton.getGlobalBounds().contains(mpos)) {
                 if (manager) manager->switchTo(render::SceneId::HOME);
+                return;
             }
-            if (startButton.getGlobalBounds().contains(mpos)) {
-                if (manager) manager->switchTo(render::SceneId::GAME);
+
+            // Bouton démarrer
+            if (startButton.getGlobalBounds().contains(mpos) && canStartMatch()) {
+                createAndStartMatch();
+                return;
+            }
+
+            // Navigation équipe 1
+            if (team1PrevButton.getGlobalBounds().contains(mpos) && teamCount > 0) {
+                selectedTeam1Index = (selectedTeam1Index - 1 + teamCount) % teamCount;
+            }
+            if (team1NextButton.getGlobalBounds().contains(mpos) && teamCount > 0) {
+                selectedTeam1Index = (selectedTeam1Index + 1) % teamCount;
+            }
+
+            // Navigation équipe 2
+            if (team2PrevButton.getGlobalBounds().contains(mpos) && teamCount > 0) {
+                selectedTeam2Index = (selectedTeam2Index - 1 + teamCount) % teamCount;
+            }
+            if (team2NextButton.getGlobalBounds().contains(mpos) && teamCount > 0) {
+                selectedTeam2Index = (selectedTeam2Index + 1) % teamCount;
+            }
+
+            // Sélection mode de jeu
+            if (pvpButton.getGlobalBounds().contains(mpos)) {
+                vsHuman = true;
+                pvpButton.setOutlineThickness(3);
+                pvpButton.setOutlineColor(sf::Color::Yellow);
+                pveButton.setOutlineThickness(0);
+            }
+            if (pveButton.getGlobalBounds().contains(mpos)) {
+                vsHuman = false;
+                pveButton.setOutlineThickness(3);
+                pveButton.setOutlineColor(sf::Color::Yellow);
+                pvpButton.setOutlineThickness(0);
+            }
+
+            // Sélection type d'IA (seulement si PvE)
+            if (!vsHuman) {
+                if (randomAIButton.getGlobalBounds().contains(mpos)) {
+                    selectedAIType = 0;
+                    randomAIButton.setOutlineThickness(2);
+                    randomAIButton.setOutlineColor(sf::Color::Yellow);
+                    heuristicAIButton.setOutlineThickness(0);
+                    advancedAIButton.setOutlineThickness(0);
+                }
+                if (heuristicAIButton.getGlobalBounds().contains(mpos)) {
+                    selectedAIType = 1;
+                    heuristicAIButton.setOutlineThickness(2);
+                    heuristicAIButton.setOutlineColor(sf::Color::Yellow);
+                    randomAIButton.setOutlineThickness(0);
+                    advancedAIButton.setOutlineThickness(0);
+                }
+                if (advancedAIButton.getGlobalBounds().contains(mpos)) {
+                    selectedAIType = 2;
+                    advancedAIButton.setOutlineThickness(2);
+                    advancedAIButton.setOutlineColor(sf::Color::Yellow);
+                    randomAIButton.setOutlineThickness(0);
+                    heuristicAIButton.setOutlineThickness(0);
+                }
             }
         }
     }
 
     void MatchCreationScreen::update(float dt) {
+        updateTeamDisplay();
+
+        // Mettre à jour l'état du bouton démarrer
+        if (canStartMatch()) {
+            startButton.setFillColor(sf::Color(50, 150, 50));
+        } else {
+            startButton.setFillColor(sf::Color(100, 100, 100));
+        }
+
+        // Mettre à jour le message d'erreur
+        errorText.setString(getErrorMessage());
+    }
+
+    void MatchCreationScreen::updateTeamDisplay() {
+        auto& teamManager = state::TeamManager::getInstance();
+        const auto& teams = teamManager.getSavedTeams();
+
+        if (teams.empty()) {
+            team1NameText.setString("Aucune equipe disponible");
+            team2NameText.setString("Aucune equipe disponible");
+            return;
+        }
+
+        // Équipe 1
+        if (selectedTeam1Index >= 0 && selectedTeam1Index < static_cast<int>(teams.size())) {
+            team1NameText.setString(teams[selectedTeam1Index]->getName() +
+                                   " (" + std::to_string(teams[selectedTeam1Index]->getCharacters().size()) + " joueurs)");
+        }
+
+        // Équipe 2
+        if (selectedTeam2Index >= 0 && selectedTeam2Index < static_cast<int>(teams.size())) {
+            team2NameText.setString(teams[selectedTeam2Index]->getName() +
+                                   " (" + std::to_string(teams[selectedTeam2Index]->getCharacters().size()) + " joueurs)");
+        }
+    }
+
+    bool MatchCreationScreen::canStartMatch() const {
+        auto& teamManager = state::TeamManager::getInstance();
+
+        // Au moins 2 équipes
+        if (teamManager.getTeamCount() < 2) return false;
+
+        // Indices valides
+        if (selectedTeam1Index < 0 || selectedTeam2Index < 0) return false;
+
+        // Équipes différentes
+        if (selectedTeam1Index == selectedTeam2Index) return false;
+
+        return true;
+    }
+
+    std::string MatchCreationScreen::getErrorMessage() const {
+        auto& teamManager = state::TeamManager::getInstance();
+
+        if (teamManager.getTeamCount() == 0) {
+            return "Veuillez creer au moins 2 equipes";
+        }
+        if (teamManager.getTeamCount() == 1) {
+            return "Veuillez creer une deuxieme equipe";
+        }
+        if (selectedTeam1Index == selectedTeam2Index) {
+            return "Veuillez selectionner deux equipes differentes";
+        }
+        return "";
+    }
+
+    void MatchCreationScreen::createAndStartMatch() {
+        auto& teamManager = state::TeamManager::getInstance();
+        const auto& teams = teamManager.getSavedTeams();
+
+        if (!canStartMatch()) return;
+
+        // Récupérer les équipes sélectionnées
+        state::Team* team1 = teams[selectedTeam1Index].get();
+        state::Team* team2 = teams[selectedTeam2Index].get();
+
+        // Créer le nouveau jeu avec ces équipes
+        auto newGame = std::make_shared<state::BloodBowlGame>(*team1, *team2);
+
+        // Mettre à jour le jeu dans le SceneManager
+        if (manager) {
+            manager->setGame(newGame);
+
+            // Créer et configurer l'Engine avec l'IA si nécessaire
+            if (!vsHuman && manager->getEngine()) {
+                // L'IA sera gérée par l'Engine existant
+                // Pour l'instant, on laisse l'Engine gérer cela
+                // TODO: Configurer le type d'IA selon selectedAIType
+            }
+
+            // Lancer le match
+            manager->switchTo(render::SceneId::GAME);
+        }
     }
 
     void MatchCreationScreen::draw(sf::RenderWindow &window) {
         window.clear(sf::Color(25, 25, 40));
+
         window.draw(title);
-        window.draw(subtitle);
+
+        // Équipes
+        window.draw(team1Label);
+        window.draw(team1SelectBox);
+        window.draw(team1NameText);
+        window.draw(team1PrevButton);
+        window.draw(team1PrevText);
+        window.draw(team1NextButton);
+        window.draw(team1NextText);
+
+        window.draw(team2Label);
+        window.draw(team2SelectBox);
+        window.draw(team2NameText);
+        window.draw(team2PrevButton);
+        window.draw(team2PrevText);
+        window.draw(team2NextButton);
+        window.draw(team2NextText);
+
+        // Mode de jeu
+        window.draw(modeLabel);
+        window.draw(pvpButton);
+        window.draw(pvpText);
+        window.draw(pveButton);
+        window.draw(pveText);
+
+        // Type d'IA (seulement si PvE sélectionné)
+        if (!vsHuman) {
+            window.draw(aiTypeLabel);
+            window.draw(randomAIButton);
+            window.draw(randomAIText);
+            window.draw(heuristicAIButton);
+            window.draw(heuristicAIText);
+            window.draw(advancedAIButton);
+            window.draw(advancedAIText);
+        }
+
+        // Message d'erreur
+        window.draw(errorText);
+
+        // Boutons d'action
         window.draw(backButton);
         window.draw(backText);
         window.draw(startButton);
