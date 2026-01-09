@@ -69,7 +69,7 @@ if(BUILD_CODE_COVERAGE)
           EXECUTABLE sh ${test_runner}
           DEPENDS ${test_runner}
           EXCLUDE ${COVER_GCOVR_EXCLUDES}
-          LCOV_ARGS "--ignore-errors" "mismatch,mismatch"
+          LCOV_ARGS "--ignore-errors" "mismatch,mismatch,inconsistent"
     )
   SETUP_TARGET_FOR_COVERAGE_GCOVR_XML(
           NAME code-coverage-gcov

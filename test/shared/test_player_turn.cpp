@@ -94,4 +94,7 @@ BOOST_AUTO_TEST_CASE(TestPlayerTurn)
     // Coverage: get/setEndTurn()
     playerTurn.setEndTurn(true);
     BOOST_CHECK(playerTurn.getEndTurn());
+
+    std::string expectedStr = "PlayerTurn";
+    BOOST_CHECK(playerTurn.getName() == expectedStr);
 }

@@ -53,4 +53,7 @@ BOOST_AUTO_TEST_CASE(TestEndGame)
 
     endgame.setRestart(false);
     BOOST_CHECK_EQUAL(endgame.getRestart(), false);
+
+    std::string expectedStr = "EndGame";
+    BOOST_CHECK(endgame.getName() == expectedStr);
 }

@@ -75,12 +75,6 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
     game.setCurrentState(stateList[KICKOFF].get());
     BOOST_CHECK(game.getCurrentState() == stateList[KICKOFF].get());
 
-    // Display test with currentTeam = nullptr
-    game.setCurrentTeam(nullptr);
-    std::ostringstream ossNone;
-    ossNone << game;
-    BOOST_CHECK(ossNone.str().find("None") != std::string::npos);
-
     // Display test
     std::ostringstream oss;
     oss << game;
@@ -88,7 +82,31 @@ BOOST_AUTO_TEST_CASE(TestBloodBowlGame)
     BOOST_CHECK(output.find("Team") != std::string::npos);
     BOOST_CHECK(output.find("Turn") != std::string::npos);
 
+    // Display test with currentTeam = nullptr
+    game.setCurrentTeam(nullptr);
+    std::ostringstream ossNone;
+    ossNone << game;
+    BOOST_CHECK(ossNone.str().find("None") != std::string::npos);
+
     // Overall consistency
     BOOST_CHECK_EQUAL(game.getTeamA().getCharacters().size(), 3);
     BOOST_CHECK_EQUAL(game.getTeamB().getCharacters().size(), 3);
+
+    // Test ballIsHold
+    game.setBallIsHold(true);
+    BOOST_CHECK(game.getBallIsHold());
+    game.setBallIsHold(false);
+    BOOST_CHECK(not game.getBallIsHold());
+
+    // ===== Force conflict marker '*' (player A + player B on same cell) =====
+
+    auto conflictPos = teamA.getCharacters()[0]->getPosition();
+    teamB.getCharacters()[0]->setPosition(conflictPos);
+
+    std::ostringstream ossConflict;
+    ossConflict << game;
+    std::string conflictOut = ossConflict.str();
+
+    BOOST_CHECK(conflictOut.find('*') != std::string::npos);
+
 }

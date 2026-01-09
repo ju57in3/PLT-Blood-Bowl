@@ -17,6 +17,7 @@ BOOST_AUTO_TEST_CASE(TestSetup)
         c->setStatus(playable);
         if (i < 3) c->setPosition({12, 4+i});      // line
         else if (i < 5) c->setPosition({10, 4+i}); // top
+        else if (i < 7) c->setPosition({10, 2+i-7}); // bot
         else c->setPosition({8, 2+i});             // middle
         teamA.addCharacter(std::move(c));
     }
@@ -26,17 +27,35 @@ BOOST_AUTO_TEST_CASE(TestSetup)
     Setup* setup = dynamic_cast<Setup*>(game.getStateList()[SETUP].get());
     BOOST_REQUIRE(setup != nullptr);
 
+    setup->update();
+    std::array<bool,2> expected = {false, false};
+    BOOST_CHECK(setup->teamSetupDone == expected);
+
     BOOST_CHECK(setup->isValidSetup(teamA));
     BOOST_CHECK_EQUAL(setup->nbCharacterOnBoard(teamA), 11);
     BOOST_CHECK_EQUAL(setup->nbCharacterOnLine(teamA), 3);
+    BOOST_CHECK_EQUAL(setup->nbCharacterOnLine(teamB), 0);
     BOOST_CHECK_EQUAL(setup->nbCharacterOnTop(teamA), 2);
-    BOOST_CHECK_EQUAL(setup->nbCharacterOnBottom(teamA), 0);
+    BOOST_CHECK_EQUAL(setup->nbCharacterOnBottom(teamA), 2);
 
     setup->endSetup();
     // After one team finishes, setup is not ended yet (need both teams)
     BOOST_CHECK(!setup->getSetupEnded());
 
+
     // Now finish setup for the second team
     setup->endSetup();
     BOOST_CHECK(setup->getSetupEnded());
+
+    std::string expectedStr = "Setup";
+    BOOST_CHECK(setup->getName() == expectedStr);
+
+
+    // Testing update
+    expected = {true, true};
+    BOOST_CHECK(setup->teamSetupDone == expected);
+    setup->update();
+    expected = {false, false};
+    BOOST_CHECK(setup->teamSetupDone == expected);
+
 }
