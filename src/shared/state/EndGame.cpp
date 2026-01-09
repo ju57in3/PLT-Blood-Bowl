@@ -1,39 +1,32 @@
 #include "EndGame.h"
 #include "Team.h"
 #include "BloodBowlGame.h"
+#include "Setup.h"
 
 namespace state {
     EndGame::EndGame(BloodBowlGame* game):AbstractState(game) {
-        restart = false;
+        shouldRestart = false;
+        shouldQuit = false;
     }
 
-    void EndGame::update()
-    {
-        if (restart == true)
-        {
-            for (auto& characterPtr : game->getTeamA().getCharacters()){
-                if (characterPtr != nullptr){
-                    characterPtr->setStatus(bench);
-                }
-            }
-            for (auto& characterPtr : game->getTeamB().getCharacters()){
-                if (characterPtr != nullptr){
-                    characterPtr->setStatus(bench);
-                }
-            }
-            new BloodBowlGame(game->getTeamA(), game->getTeamB());
-        }
+    void EndGame::update() {}
+
+    EndGame::~EndGame() = default;
+
+    bool EndGame::getShouldRestart() const {
+        return shouldRestart;
     }
 
-    EndGame::~EndGame() {
+    void EndGame::setShouldRestart(bool restartValue) {
+        this->shouldRestart = restartValue;
     }
 
-    bool EndGame::getRestart() const {
-        return restart;
+    bool EndGame::getShouldQuit() const {
+        return shouldQuit;
     }
 
-    void EndGame::setRestart(bool restartValue) {
-        this->restart = restartValue;
+    void EndGame::setShouldQuit(bool quitValue) {
+        this->shouldQuit = quitValue;
     }
 
     std::string EndGame::getName() const {
