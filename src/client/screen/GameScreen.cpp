@@ -13,14 +13,10 @@ namespace screen {
     void GameScreen::init(const std::shared_ptr<state::BloodBowlGame> &g, ResourceManager *res) {
         this->resources = res;
         this->game = g;
-        // create render::Scene
         scene = std::make_unique<render::Scene>(render::SceneId::GAME, game);
-        // optional: load a font or other resources if needed for overlays
-        // engine is provided via manager
         engine::Engine *eng = nullptr;
         if (manager) eng = manager->getEngine();
         if (eng) {
-            // create InputHandler using engine's pointer and game
             inputHandler = std::make_unique<client::InputHandler>(game, eng);
         }
     }
@@ -28,10 +24,10 @@ namespace screen {
     void GameScreen::setManager(SceneManager *mgr) { this->manager = mgr; }
 
     void GameScreen::handleEvent(const sf::Event &event, sf::RenderWindow &window) {
-        // Gestion des clics sur les dés en premier (si applicable)
         if (event.type == sf::Event::MouseButtonPressed &&
             event.mouseButton.button == sf::Mouse::Left &&
-            inputHandler && inputHandler->hasPendingBlock()) {
+            inputHandler && inputHandler->hasPendingBlock() &&
+            !inputHandler->hasPendingPush()) {
 
             auto diceOptions = inputHandler->getPendingBlockDiceOptions();
             if (!diceOptions.empty() && scene) {
@@ -78,7 +74,6 @@ namespace screen {
             return data;
         }
 
-        // Récupérer les données de l'InputHandler
         data.highlightedCharacter = inputHandler->getSelectedCharacter();
         data.previewPosition = inputHandler->getPreviewPosition();
         data.previewExists = inputHandler->hasPreviewPosition();
@@ -89,6 +84,10 @@ namespace screen {
         data.diceOptions = inputHandler->getPendingBlockDiceOptions();
         data.showDice = inputHandler->hasPendingBlock() && !data.diceOptions.empty();
 
+        // Positions de repoussée
+        data.pushPositionOptions = inputHandler->getPushPositionOptions();
+        data.showPushOptions = inputHandler->hasPendingPush();
+
         // Infos d'état
         if (game->getCurrentState()) {
             data.stateName = game->getCurrentState()->getName();
@@ -96,10 +95,6 @@ namespace screen {
         if (game->getCurrentTeam()) {
             data.currentTeamId = game->getCurrentTeam()->getTeamId();
         }
-
-        // TODO: playablePositions si nécessaire
-        // data.playablePositions = ...;
-
         return data;
     }
 
