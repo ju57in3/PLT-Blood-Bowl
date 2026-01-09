@@ -38,7 +38,7 @@ namespace client {
     }
 
     InputHandler::InputHandler(std::shared_ptr<state::BloodBowlGame> game, engine::Engine* engine)
-        : currentMode(Idle), selectedCharacter(nullptr), game(std::move(game)), engine(engine), pendingBlock(nullptr), previewBoardPos({0,0}), previewCharacter(nullptr) {
+        : currentMode(Idle), selectedCharacter(nullptr), game(std::move(game)), engine(engine), pendingBlock(nullptr), previewBoardPos({0,0}), previewCharacter(nullptr), previewIsLegal(false){
     }
 
     InputHandler::~InputHandler() = default;
@@ -78,256 +78,23 @@ namespace client {
             return;
         }
 
-        auto* setup = dynamic_cast<state::Setup*>(game->getCurrentState());
-        if (setup != nullptr) {
-            sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
-            auto boardPos = screenToBoard(mousePos);
-            if (mouseButton.button == sf::Mouse::Left) {
-                if (utility::GameUtils::getCharacterAt(game, boardPos)) {
-                    std::cout << "Tile occupied, cannot place character here\n";
-                    return;
-                }
-                auto* team = game->getCurrentTeam();
-                for (auto& cptr : team->getCharacters()) {
-                    if (cptr && cptr->getStatus() == state::CharacterStatus::bench) {
-                        cptr->setPosition(boardPos);
-                        cptr->setStatus(state::CharacterStatus::playable);
-                        std::cout << "Placed " << cptr->getName() << " at (" << boardPos.first << ", " << boardPos.second << ")\n";
-                        return;
-                    }
-                }
-                std::cout << "No bench character available to place for team " << team->getTeamId() << "\n";
-                return;
-            } if (mouseButton.button == sf::Mouse::Right) {
-                auto ch = utility::GameUtils::getCharacterAt(game, boardPos);
-                if (ch && ch->getStatus() != state::CharacterStatus::bench) {
-                    if (game->getCurrentTeam() && belongsToCurrentTeam(ch, game)) {
-                        ch->setPosition(std::make_pair(-1, -1));
-                        ch->setStatus(state::CharacterStatus::bench);
-                        std::cout << "Sent " << ch->getName() << " to bench\n";
-                    } else {
-                        std::cout << "Cannot remove opponent's character during setup\n";
-                    }
-                }
-                return;
-            }
+        auto* currentState = game->getCurrentState();
+        if (!currentState) return;
+
+        // Dispatch par type d'état
+        if (dynamic_cast<state::Setup*>(currentState)) {
+            handleSetupClick(mouseButton);
+            return;
         }
 
-        if (auto* kickoff = dynamic_cast<state::Kickoff*>(game->getCurrentState())) {
-            sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
-            auto boardPos = screenToBoard(mousePos);
-
-            /*
-            if (!kickoff->isValidKickoffTarget(boardPos, *game->getCurrentTeam())) {
-                std::cout << "Invalid kickoff target at (" << boardPos.first << ", " << boardPos.second << ")\n";
-                return;
-            }
-            */
-
-            if (mouseButton.button == sf::Mouse::Left) {
-                kickoff->setTarget(boardPos);
-                std::cout << "Kickoff target set to (" << boardPos.first << ", " << boardPos.second << ")\n";
-                kickoff->setTargetSelected(true);
-                return;
-            }
-
-            if (auto targetPlayer = utility::GameUtils::getCharacterAt(game, game->getBallPosition())) {
-
-            }
-            else {
-
-            }
+        if (dynamic_cast<state::Kickoff*>(currentState)) {
+            handleKickoffClick(mouseButton);
+            return;
         }
 
-        if (mouseButton.button == sf::Mouse::Left)
-        {
-            if (pendingBlock)
-            {
-                if (!diceChosen && !diceBounds.empty()) {
-                    auto mx = static_cast<float>(mouseButton.x);
-                    auto my = static_cast<float>(mouseButton.y);
-                    for (size_t i = 0; i < diceBounds.size(); ++i) {
-                        if (diceBounds[i].contains(mx, my)) {
-                            // apply choice (1-based index)
-                            diceChosen = true;
-                            applyPendingBlockChoice(static_cast<int>(i + 1));
-                            return;
-                        }
-                    }
-                    return;
-                }
-
-                if (diceChosen && pendingPush)
-                {
-                    sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
-                    std::pair<int,int> targetPos = screenToBoard(mousePos);
-
-                    std::vector<std::pair<int,int>> positionOptions = pendingBlock->getPushedPositionOptions();
-                    if (utility::GameUtils::getCharacterAt(game, targetPos))
-                    {
-                        std::cout << "You cannot pushed the enemy character in this squarre because it is occupied! \n";
-                        return;
-                    }
-
-                    if (std::find(positionOptions.begin(), positionOptions.end(), targetPos) != positionOptions.end())
-                    {
-                        applyPendingPushChoice(targetPos);
-                        diceChosen = false;
-                        pendingPush = false;
-                        return;
-                    }
-                    else
-                    {
-                        std::cout << "You cannot pushed the enemy character on this square because it is too far! \n";
-                        return;
-                    }
-                }
-            }
-
-
-            sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
-            auto boardPos = screenToBoard(mousePos);
-
-            auto character = utility::GameUtils::getCharacterAt(game, boardPos);
-            if (character) {
-                if (isCharacterPlayable(character) or isKnockdown(character)) {
-                    selectedCharacter = character;
-                    currentMode = InputMode::Selected_Character;
-                }
-                else {
-                    std::cout << "Cannot select this character (not playable)\n";
-                }
-            } else {
-                std::cout << "No character at this position\n";
-            }
-
-        } else if (mouseButton.button == sf::Mouse::Right) {
-            sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
-            auto boardPos = screenToBoard(mousePos);
-
-            auto targetCharacter = utility::GameUtils::getCharacterAt(game, boardPos);
-
-            if (!selectedCharacter) {
-                std::cout << "No character selected. Left click to select a character first.\n";
-                return;
-            }
-
-            if (!targetCharacter) {
-                // empty tile -> move
-                if (!dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
-                    std::cout << "Cannot move: not in PlayerTurn state\n";
-                    return;
-                }
-                if (!selectedCharacter) {
-                    std::cout << "No character selected for move path\n";
-                    return;
-                }
-
-                if (currentMovePath.empty()) {
-                    currentMovePath.push_back(selectedCharacter->getPosition());
-                }
-
-                auto last = currentMovePath.back();
-                if (boardPos == last && currentMovePath.size() > 1) {
-                    for (std::pair<int,int> pos : currentMovePath) {
-                        auto moveStepCmd = std::make_unique<engine::Move>(selectedCharacter, pos);
-                        engine->addCommand(std::move(moveStepCmd));
-                        engine->executeCommand();
-
-                        // Check if a turnover occurred after this step
-                        if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
-                            if (pt->getTurnOver()) {
-                                std::cout << "Turnover occurred during movement - stopping at current position\n";
-                                currentMovePath.clear();
-                                resetSelection();
-                                return;
-                            }
-                        }
-                        sleep(0.5);
-                    }
-
-                    currentMovePath.clear();
-                    resetSelection();
-                    return;
-                }
-
-                int dx = std::abs(boardPos.first - last.first);
-                int dy = std::abs(boardPos.second - last.second);
-                if (isKnockdown(selectedCharacter)) {
-                    std::cout << "This caracter is knockdown, click on him to get him up (cost 3 movements)\n";
-                    return;
-                }
-
-                if (std::max(dx, dy) != 1) {
-                    std::cout << "Invalid step: must be adjacent to previous step\n";
-                    return;
-                }
-
-                if (utility::GameUtils::getCharacterAt(game, boardPos)) {
-                    std::cout << "Cannot step onto occupied tile\n";
-                    return;
-                }
-
-                int steps = static_cast<int>(currentMovePath.size());
-
-                int range = selectedCharacter->getMovement();
-                if (selectedCharacter->gotUp) {
-                    range = range - 3;
-                }
-
-                if (steps >= range + 1) {
-                    std::cout << "Movement limit reached\n";
-                    return;
-                }
-
-                currentMovePath.push_back(boardPos);
-                return;
-            }
-
-            if (targetCharacter == selectedCharacter) {
-                if (isKnockdown(selectedCharacter)) {
-                    selectedCharacter->setStatus(state::CharacterStatus::playable);
-                    selectedCharacter->gotUp = true;
-                    std::cout << "Got up !\n";
-                    return;
-                } else if (selectedCharacter->gotUp){
-                    selectedCharacter->setStatus(state::CharacterStatus::played);
-                    resetSelection();
-                    return;
-                }
-                else {
-                    std::cout << "Right-clicked the selected character; no action\n";
-                    return;
-                }
-            }
-
-            if (belongsToCurrentTeam(targetCharacter, game)) {
-                // teammate -> pass
-                if (!dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
-                    std::cout << "Cannot pass: not in PlayerTurn state\n";
-                    return;
-                }
-                std::cout << "Creating Pass command to " << targetCharacter->getName() << "\n";
-                auto passCmd = std::make_unique<engine::Pass>(selectedCharacter, targetCharacter);
-                engine->addCommand(std::move(passCmd));
-                engine->executeCommand();
-                std::cout << "Pass command executed\n";
-                resetSelection();
-                return;
-            }
-            //Test debug problème blocage
-            int x_selected = targetCharacter->getPosition().first;
-            int y_selected = targetCharacter->getPosition().second;
-            std::cout << "On a sélectionné le joueur adverse situé à: (" << x_selected << ", " << y_selected << ")\n";
-            bool test = isBlockLegal(targetCharacter);   // Le Problème vient d'ici
-            std::cout << "Test Block: " << test;
-            //
-            if (isBlockLegal(targetCharacter))
-            {
-                pendingBlock = std::make_unique<engine::Block>(selectedCharacter, targetCharacter);
-                auto options = pendingBlock->getDiceOptions();
-                std::cout << "Block initiated against " << targetCharacter->getName() << ".\n";
-            }
+        if (dynamic_cast<state::PlayerTurn*>(currentState)) {
+            handlePlayerTurnClick(mouseButton);
+            return;
         }
     }
 
@@ -338,6 +105,17 @@ namespace client {
 
     bool InputHandler::hasPendingBlock() const {
         return pendingBlock != nullptr;
+    }
+
+    std::vector<std::pair<int,int>> InputHandler::getPushPositionOptions() const {
+        if (pendingBlock && pendingPush) {
+            return pendingBlock->getPushedPositionOptions();
+        }
+        return {};
+    }
+
+    bool InputHandler::hasPendingPush() const {
+        return pendingPush;
     }
 
     std::pair<int,int> InputHandler::getPreviewPosition() const {
@@ -445,6 +223,8 @@ namespace client {
         if (!pendingBlock || !engine) return;
         pendingBlock->applyDiceChoice(chosenIndex);
         pendingPush = pendingBlock->getEnemyPushed();
+        std::cout << "[DEBUG] applyPendingBlockChoice: pendingPush = " << pendingPush << "\n";
+
         if (!pendingPush)
         {
             engine->addCommand(std::move(pendingBlock));
@@ -455,16 +235,23 @@ namespace client {
         else
         {
             diceChosen = true;
-            std::cout << "Pushed Position Choice required \n";
+            std::cout << "[DEBUG] applyPendingBlockChoice: diceChosen set to TRUE\n";
+            std::cout << "[DEBUG] State after: pendingBlock=" << (pendingBlock != nullptr)
+                      << ", diceChosen=" << diceChosen
+                      << ", pendingPush=" << pendingPush << "\n";
         }
     }
 
-    void InputHandler::applyPendingPushChoice(std::pair<int,int> targetPos)
-    {
-        if (!pendingPush || !engine) return;
+    void InputHandler::applyPendingPushChoice(std::pair<int,int> targetPos) {
+        if (!pendingBlock || !engine) return;
+
         pendingBlock->applyPushedPositionChoice(targetPos);
-        std::cout << "Push executed \n";
+        std::cout << "Push executed to (" << targetPos.first << ", " << targetPos.second << ")\n";
+
         pendingFollow = true;
+        pendingPush = false;
+        diceChosen = false;
+
         std::cout << "Following Choice Required: tap Y to Follow or N to not Follow.\n";
     }
 
@@ -538,6 +325,274 @@ namespace client {
         }
 
         return false;
+    }
+
+    void InputHandler::handleSetupClick(const sf::Event::MouseButtonEvent& mouseButton) {
+        sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
+        auto boardPos = screenToBoard(mousePos);
+
+        if (mouseButton.button == sf::Mouse::Left) {
+            if (utility::GameUtils::getCharacterAt(game, boardPos)) {
+                std::cout << "Tile occupied, cannot place character here\n";
+                return;
+            }
+            auto* team = game->getCurrentTeam();
+            for (auto& cptr : team->getCharacters()) {
+                if (cptr && cptr->getStatus() == state::CharacterStatus::bench) {
+                    cptr->setPosition(boardPos);
+                    cptr->setStatus(state::CharacterStatus::playable);
+                    std::cout << "Placed " << cptr->getName() << " at (" << boardPos.first << ", " << boardPos.second << ")\n";
+                    return;
+                }
+            }
+            std::cout << "No bench character available to place for team " << team->getTeamId() << "\n";
+        }
+        else if (mouseButton.button == sf::Mouse::Right) {
+            auto ch = utility::GameUtils::getCharacterAt(game, boardPos);
+            if (ch && ch->getStatus() != state::CharacterStatus::bench) {
+                if (game->getCurrentTeam() && belongsToCurrentTeam(ch, game)) {
+                    ch->setPosition(std::make_pair(-1, -1));
+                    ch->setStatus(state::CharacterStatus::bench);
+                    std::cout << "Sent " << ch->getName() << " to bench\n";
+                } else {
+                    std::cout << "Cannot remove opponent's character during setup\n";
+                }
+            }
+        }
+    }
+
+    void InputHandler::handleKickoffClick(const sf::Event::MouseButtonEvent& mouseButton) {
+        auto* kickoff = dynamic_cast<state::Kickoff*>(game->getCurrentState());
+        if (!kickoff) return;
+
+        sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
+        auto boardPos = screenToBoard(mousePos);
+
+        if (mouseButton.button == sf::Mouse::Left) {
+            kickoff->setTarget(boardPos);
+            std::cout << "Kickoff target set to (" << boardPos.first << ", " << boardPos.second << ")\n";
+            kickoff->setTargetSelected(true);
+        }
+    }
+
+    void InputHandler::handlePlayerTurnClick(const sf::Event::MouseButtonEvent& mouseButton) {
+        sf::Vector2i mousePos(mouseButton.x, mouseButton.y);
+        auto boardPos = screenToBoard(mousePos);
+
+        if (mouseButton.button == sf::Mouse::Left) {
+            handleLeftClick(boardPos);
+        }
+        else if (mouseButton.button == sf::Mouse::Right) {
+            handleRightClick(boardPos);
+        }
+    }
+
+    void InputHandler::handleLeftClick(const std::pair<int,int>& boardPos) {
+        std::cout << "[DEBUG handleLeftClick] pendingBlock=" << (pendingBlock != nullptr)
+                  << ", diceChosen=" << diceChosen
+                  << ", pendingPush=" << pendingPush << "\n";
+
+        // Gestion du workflow de push
+        if (pendingBlock && diceChosen && pendingPush) {
+            std::cout << "[DEBUG handleLeftClick] Entering push position selection mode\n";
+            handlePushPositionSelection(boardPos);
+            return;
+        }
+
+        // Sélection de personnage
+        auto character = utility::GameUtils::getCharacterAt(game, boardPos);
+        if (character) {
+            handleCharacterSelection(boardPos);
+        } else {
+            std::cout << "No character at this position\n";
+        }
+    }
+
+    void InputHandler::handleRightClick(const std::pair<int,int>& boardPos) {
+        if (!selectedCharacter) {
+            std::cout << "No character selected. Left click to select a character first.\n";
+            return;
+        }
+
+        auto targetCharacter = utility::GameUtils::getCharacterAt(game, boardPos);
+
+        if (!targetCharacter) {
+            handleMoveAction(boardPos);
+        }
+        else if (targetCharacter == selectedCharacter) {
+            handleGetUpAction();
+        }
+        else if (belongsToCurrentTeam(targetCharacter, game)) {
+            handlePassAction(targetCharacter);
+        }
+        else {
+            handleBlockAction(targetCharacter);
+        }
+    }
+
+    void InputHandler::handleCharacterSelection(const std::pair<int,int>& boardPos) {
+        auto character = utility::GameUtils::getCharacterAt(game, boardPos);
+        if (!character) return;
+
+        if (isCharacterPlayable(character) || isKnockdown(character)) {
+            selectedCharacter = character;
+            currentMode = InputMode::Selected_Character;
+            std::cout << "Selected character: " << character->getName() << "\n";
+        } else {
+            std::cout << "Cannot select this character (not playable)\n";
+        }
+    }
+
+    void InputHandler::handleMoveAction(const std::pair<int,int>& boardPos) {
+        if (!dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+            std::cout << "Cannot move: not in PlayerTurn state\n";
+            return;
+        }
+
+        if (isKnockdown(selectedCharacter)) {
+            std::cout << "This character is knocked down, click on them to get them up (costs 3 movements)\n";
+            return;
+        }
+
+        if (currentMovePath.empty()) {
+            currentMovePath.push_back(selectedCharacter->getPosition());
+        }
+
+        auto last = currentMovePath.back();
+
+        // Double-clic pour confirmer le mouvement
+        if (boardPos == last && currentMovePath.size() > 1) {
+            executeMoveCommands();
+            return;
+        }
+
+        // Vérifier si c'est un pas adjacent
+        if (!isAdjacentStep(boardPos, last)) {
+            std::cout << "Invalid step: must be adjacent to previous step\n";
+            return;
+        }
+
+        // Vérifier si la case est occupée
+        if (utility::GameUtils::getCharacterAt(game, boardPos)) {
+            std::cout << "Cannot step onto occupied tile\n";
+            return;
+        }
+
+        // Vérifier la limite de mouvement
+        if (!canAddMoveStep()) {
+            std::cout << "Movement limit reached\n";
+            return;
+        }
+
+        currentMovePath.push_back(boardPos);
+    }
+
+    void InputHandler::handlePassAction(const std::shared_ptr<state::Character>& target) {
+        if (!dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+            std::cout << "Cannot pass: not in PlayerTurn state\n";
+            return;
+        }
+
+        std::cout << "Creating Pass command to " << target->getName() << "\n";
+        auto passCmd = std::make_unique<engine::Pass>(selectedCharacter, target);
+        engine->addCommand(std::move(passCmd));
+        engine->executeCommand();
+        std::cout << "Pass command executed\n";
+        resetSelection();
+    }
+
+    void InputHandler::handleBlockAction(const std::shared_ptr<state::Character>& target) {
+        int x_selected = target->getPosition().first;
+        int y_selected = target->getPosition().second;
+        std::cout << "Selected opponent at: (" << x_selected << ", " << y_selected << ")\n";
+
+        if (isBlockLegal(target)) {
+            pendingBlock = std::make_unique<engine::Block>(selectedCharacter, target);
+            auto options = pendingBlock->getDiceOptions();
+            std::cout << "Block initiated against " << target->getName() << ".\n";
+        } else {
+            std::cout << "Block is not legal against this target\n";
+        }
+    }
+
+    void InputHandler::handleGetUpAction() {
+        if (isKnockdown(selectedCharacter)) {
+            selectedCharacter->setStatus(state::CharacterStatus::playable);
+            selectedCharacter->gotUp = true;
+            std::cout << "Got up!\n";
+        } else if (selectedCharacter->gotUp) {
+            selectedCharacter->setStatus(state::CharacterStatus::played);
+            resetSelection();
+        } else {
+            std::cout << "Right-clicked the selected character; no action\n";
+        }
+    }
+
+    void InputHandler::handlePushPositionSelection(const std::pair<int,int>& targetPos) {
+        std::cout << "[DEBUG] Push selection mode active\n";
+        std::vector<std::pair<int,int>> positionOptions = pendingBlock->getPushedPositionOptions();
+
+        std::cout << "[DEBUG] Clicked position: (" << targetPos.first << ", " << targetPos.second << ")\n";
+        std::cout << "[DEBUG] Available push positions: ";
+        for (const auto& pos : positionOptions) {
+            std::cout << "(" << pos.first << ", " << pos.second << ") ";
+        }
+        std::cout << "\n";
+
+        if (utility::GameUtils::getCharacterAt(game, targetPos)) {
+            std::cout << "Occupied square\n";
+            return;
+        }
+
+        if (std::find(positionOptions.begin(), positionOptions.end(), targetPos) != positionOptions.end()) {
+            std::cout << "[DEBUG] Valid push position selected!\n";
+            applyPendingPushChoice(targetPos);
+            diceChosen = false;
+            pendingPush = false;
+        } else {
+            std::cout << "Not a valid push position\n";
+        }
+    }
+
+    bool InputHandler::isAdjacentStep(const std::pair<int,int>& pos, const std::pair<int,int>& last) const {
+        int dx = std::abs(pos.first - last.first);
+        int dy = std::abs(pos.second - last.second);
+        return std::max(dx, dy) == 1;
+    }
+
+    bool InputHandler::canAddMoveStep() const {
+        if (!selectedCharacter) return false;
+
+        int steps = static_cast<int>(currentMovePath.size());
+        int range = selectedCharacter->getMovement();
+
+        if (selectedCharacter->gotUp) {
+            range -= 3;
+        }
+
+        return steps < range + 1;
+    }
+
+    void InputHandler::executeMoveCommands() {
+        for (const auto& pos : currentMovePath) {
+            auto moveStepCmd = std::make_unique<engine::Move>(selectedCharacter, pos);
+            engine->addCommand(std::move(moveStepCmd));
+            engine->executeCommand();
+
+            // Check if a turnover occurred after this step
+            if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
+                if (pt->getTurnOver()) {
+                    std::cout << "Turnover occurred during movement - stopping at current position\n";
+                    currentMovePath.clear();
+                    resetSelection();
+                    return;
+                }
+            }
+            sleep(0.5);
+        }
+
+        currentMovePath.clear();
+        resetSelection();
     }
 
 } // namespace client

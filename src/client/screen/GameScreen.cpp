@@ -29,9 +29,11 @@ namespace screen {
 
     void GameScreen::handleEvent(const sf::Event &event, sf::RenderWindow &window) {
         // Gestion des clics sur les dés en premier (si applicable)
+        // Mais ne pas intercepter si on attend la sélection de position de push
         if (event.type == sf::Event::MouseButtonPressed &&
             event.mouseButton.button == sf::Mouse::Left &&
-            inputHandler && inputHandler->hasPendingBlock()) {
+            inputHandler && inputHandler->hasPendingBlock() &&
+            !inputHandler->hasPendingPush()) {
 
             auto diceOptions = inputHandler->getPendingBlockDiceOptions();
             if (!diceOptions.empty() && scene) {
@@ -88,6 +90,10 @@ namespace screen {
         // Dés de block
         data.diceOptions = inputHandler->getPendingBlockDiceOptions();
         data.showDice = inputHandler->hasPendingBlock() && !data.diceOptions.empty();
+
+        // Positions de repoussée
+        data.pushPositionOptions = inputHandler->getPushPositionOptions();
+        data.showPushOptions = inputHandler->hasPendingPush();
 
         // Infos d'état
         if (game->getCurrentState()) {

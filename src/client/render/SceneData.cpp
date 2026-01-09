@@ -194,6 +194,20 @@ namespace render {
             }
         }
 
+        // Dessiner les options de position de repoussée
+        if (renderData.showPushOptions && !renderData.pushPositionOptions.empty()) {
+            for (const auto &pushPos : renderData.pushPositionOptions) {
+                auto coord = pos2Coords(pushPos);
+                sf::RectangleShape pushHighlight;
+                pushHighlight.setSize(sf::Vector2f(Constants::BOARD_TILE_PIXEL_SIZE, Constants::BOARD_TILE_PIXEL_SIZE));
+                pushHighlight.setPosition(coord);
+                pushHighlight.setFillColor(sf::Color(0, 128, 255, 120)); // Orange semi-transparent
+                pushHighlight.setOutlineColor(sf::Color(0, 128, 255, 255)); // Orange vif
+                pushHighlight.setOutlineThickness(3.0f);
+                window.draw(pushHighlight);
+            }
+        }
+
         for (auto &s: playersSprites_TeamA) {
             window.draw(s);
         }
