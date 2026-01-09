@@ -25,6 +25,7 @@ namespace state {
         return "Setup";
     }
 
+
     bool Setup::isValidSetup(const Team& team) const {
         int onBoard = nbCharacterOnBoard(team);
         if (onBoard > 11) return false;
@@ -130,10 +131,13 @@ namespace state {
         return teamSetupDone[0] && teamSetupDone[1];
     }
 
+    /// TO DO : unused ?
+    /*
     void Setup::setSetupEnded(bool setupStatus)
     {
         this->setupEnded = setupStatus;
     }
+    */
 
     Setup::~Setup() {
 
