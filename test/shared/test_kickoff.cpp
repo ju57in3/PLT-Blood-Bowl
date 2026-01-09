@@ -34,6 +34,7 @@ BOOST_AUTO_TEST_CASE(TestKickoff)
     kickoff->kickBall(base);
     auto pos = game.getBallPosition();
 
+
     // Check if ball position stay on the field or assigned to a player
     BOOST_CHECK(pos.first >= 0 && pos.first < 26);
     BOOST_CHECK(pos.second >= 0 && pos.second < 15);
@@ -63,4 +64,5 @@ BOOST_AUTO_TEST_CASE(TestKickoff)
 
     //Verify that the state stay in PLAYERTURN
     BOOST_CHECK(game.getCurrentState() == game.getStateList()[PLAYERTURN].get());
+
 }

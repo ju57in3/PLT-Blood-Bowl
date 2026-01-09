@@ -60,6 +60,9 @@ BOOST_AUTO_TEST_CASE(TestCharacter)
     human.setStatus(bench);
     oss << human;
 
+    human.setId(2);
+    BOOST_CHECK_EQUAL(human.getId(),2);
+
 
 }
 
