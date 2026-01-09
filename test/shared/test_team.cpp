@@ -37,6 +37,8 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     human->setStatus(playable);
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),1);
 
+
+
     std::ostringstream oss;
     oss << teamA;
     std::string expected =  "Team ID: 1\n"
@@ -45,6 +47,15 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
                             "Position: (1, 1) | Status: playable\n";
 
     BOOST_CHECK_EQUAL(oss.str(), expected);
+
+    for (int i = 0; i < 15; i++) {
+        auto c = std::make_unique<Character>(i+1,"H" + std::to_string(i+1), "Human", 6, 3, 3, 8);
+        c->setStatus(playable);
+        teamA.addCharacter(std::move(c));
+    }
+    auto extra = std::make_shared<Character>(16,"Extra","Human", 6, 3, 3, 8);
+    teamA.addCharacter(extra);
+    BOOST_CHECK_EQUAL(teamA.getCharacters().size(), 16);
 }
 
 /* vim: set sw=2 sts=2 et : */
