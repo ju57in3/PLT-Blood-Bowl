@@ -48,5 +48,3 @@ BOOST_AUTO_TEST_CASE(TestPickUpBall) {
 
     BOOST_CHECK(true);
 }
-
-gamePtr
