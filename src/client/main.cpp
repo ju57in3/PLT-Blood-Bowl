@@ -24,7 +24,7 @@ using namespace client;
 using namespace state;
 
 int main(int argc, char* argv[]) {
-    cout << "=== BLOOD BOWL GAME TEST ===\n\n";
+    cout << "=== BLOOD BOWL GAME TEST ===\n";
 
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
@@ -163,17 +163,6 @@ int main(int argc, char* argv[]) {
 
     scenes.switchTo(render::SceneId::HOME);
 
-    // If you still want an InputHandler for game scene, create it and keep it available
-    client::InputHandler inputHandler(gamePtr, &eng);
-
-    cout << "\n=== INTERACTIVE MODE ===\n";
-    cout << "Controls:\n";
-    cout << "  - Click on a character to select it\n";
-    cout << "  - Right click to Move/Block/Pass\n";
-    cout << "  - L to list team A\n";
-    cout << "  - Q in main window to quit\n\n";
-
-
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
@@ -181,7 +170,6 @@ int main(int argc, char* argv[]) {
                 window.close();
             }
 
-            // delegate to scenes
             scenes.handleEvent(event,window);
 
             if (event.type == sf::Event::KeyReleased) {
@@ -201,7 +189,6 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        // update game state if needed
         if (gamePtr && gamePtr->getCurrentState()) {
             gamePtr->getCurrentState()->update();
         }
