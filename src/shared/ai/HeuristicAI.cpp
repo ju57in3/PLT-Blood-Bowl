@@ -4,7 +4,6 @@
 #include "HeuristicAI.h"
 
 #include <iostream>
-#include <limits>
 #include <random>
 #include <thread>
 #include <chrono>
@@ -39,6 +38,14 @@ namespace ai {
         std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Pause avant de commencer
 
         auto ballPos = game->getBallPosition();
+        std::cout << "[HEURISTIC AI] Ball position: (" << ballPos.first << ", " << ballPos.second << ")\n";
+
+        // Vérifier que la position de la balle est valide
+        if (ballPos.first < 0 || ballPos.first >= utility::Constants::BOARD_WIDTH ||
+            ballPos.second < 0 || ballPos.second >= utility::Constants::BOARD_HEIGHT) {
+            std::cerr << "[HEURISTIC AI] WARNING: Invalid ball position! Ball may not be initialized.\n";
+            // On continue quand même avec un comportement par défaut
+        }
 
         // Parcourir tous les personnages jouables et leur assigner une action
         for (const auto& c : myTeam->getCharacters()) {
@@ -59,38 +66,51 @@ namespace ai {
             std::pair<int,int> currentPos = c->getPosition();
             std::pair<int,int> targetPos = currentPos;
 
-            // Calculer la direction vers la balle
+            // Calculer la distance à la balle
             int dx = ballPos.first - currentPos.first;
             int dy = ballPos.second - currentPos.second;
-            int distToBall = dx * dx + dy * dy;
+            int distToBall = std::abs(dx) + std::abs(dy); // Distance de Manhattan
 
             if (distToBall > 2) {
                 // Si loin de la balle, aller vers elle
-                std::cout << "[HEURISTIC AI] " << c->getName() << " moving towards ball\n";
+                std::cout << "[HEURISTIC AI] " << c->getName() << " at (" << currentPos.first << ","
+                          << currentPos.second << ") moving towards ball at ("
+                          << ballPos.first << "," << ballPos.second << ")\n";
 
                 // Déplacer progressivement vers la balle
                 for (int step = 0; step < maxMove; ++step) {
+                    // Recalculer la direction depuis la position actuelle
+                    dx = ballPos.first - targetPos.first;
+                    dy = ballPos.second - targetPos.second;
+
+                    // Si on a atteint la balle, arrêter
+                    if (dx == 0 && dy == 0) {
+                        std::cout << "[HEURISTIC AI] Reached ball position!\n";
+                        break;
+                    }
+
                     int nextX = targetPos.first;
                     int nextY = targetPos.second;
 
-                    // Avancer vers la balle
-                    if (nextX < ballPos.first) nextX++;
-                    else if (nextX > ballPos.first) nextX--;
-
-                    if (nextY < ballPos.second) nextY++;
-                    else if (nextY > ballPos.second) nextY--;
+                    // Avancer d'une case vers la balle (priorité sur l'axe avec la plus grande distance)
+                    if (std::abs(dx) >= std::abs(dy) && dx != 0) {
+                        nextX += (dx > 0) ? 1 : -1;
+                    } else if (dy != 0) {
+                        nextY += (dy > 0) ? 1 : -1;
+                    }
 
                     // Vérifier les limites du terrain
                     if (nextX < 0 || nextX >= utility::Constants::BOARD_WIDTH ||
                         nextY < 0 || nextY >= utility::Constants::BOARD_HEIGHT) {
+                        std::cout << "[HEURISTIC AI] Movement would go out of bounds, stopping.\n";
                         break;
                     }
 
                     targetPos = {nextX, nextY};
-
-                    // Arrêter si on a atteint la balle
-                    if (targetPos == ballPos) break;
                 }
+
+                std::cout << "[HEURISTIC AI] Final target position: (" << targetPos.first << ","
+                          << targetPos.second << ")\n";
 
                 auto moveCmd = std::make_unique<engine::Move>(c, targetPos);
                 engine.addCommand(std::move(moveCmd));
