@@ -293,7 +293,7 @@ namespace screen {
         }
     }
 
-    void MatchCreationScreen::update(float dt) {
+    void MatchCreationScreen::update() {
         updateTeamDisplay();
 
         // Mettre à jour l'état du bouton démarrer
@@ -416,7 +416,6 @@ namespace screen {
                         break;
                 }
 
-                // Attacher l'IA à l'Engine
                 if (aiInstance) {
                     manager->getEngine()->setAI(std::move(aiInstance));
                 }

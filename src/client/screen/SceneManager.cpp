@@ -60,9 +60,9 @@ namespace screen {
         if (cur && window) cur->handleEvent(event, *window);
     }
 
-    void SceneManager::update(float dt) {
+    void SceneManager::update() {
         Screen *cur = getCurrent();
-        if (cur) cur->update(dt);
+        if (cur) cur->update();
     }
 
     void SceneManager::draw(sf::RenderWindow &window) {
@@ -73,12 +73,7 @@ namespace screen {
     }
 
     render::SceneId SceneManager::getId() const {
-        // SceneManager doesn't have a single ID, return a dummy value
         return render::SceneId::HOME;
-    }
-
-    void SceneManager::setManager(SceneManager *mgr) {
-        // SceneManager doesn't set itself as manager
     }
 
     void SceneManager::setGame(const std::shared_ptr<state::BloodBowlGame> &gamePtr) {

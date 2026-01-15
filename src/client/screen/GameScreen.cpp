@@ -55,7 +55,7 @@ namespace screen {
         }
     }
 
-    void GameScreen::update(float dt) {
+    void GameScreen::update() {
         // update game or input-based logic if necessary
         if (game && game->getCurrentState()) {
             game->getCurrentState()->update();
