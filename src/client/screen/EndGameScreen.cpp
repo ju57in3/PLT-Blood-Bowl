@@ -101,7 +101,7 @@ namespace screen {
         }
     }
 
-    void EndGameScreen::update(float dt) {
+    void EndGameScreen::update() {
         // Mettre à jour l'affichage des scores
         if (game) {
             int scoreA = game->getTeamA().getScore();

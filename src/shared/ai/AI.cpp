@@ -5,6 +5,7 @@
 
 #include <set>
 #include <random>
+#include <iostream>
 
 #include "state/BloodBowlGame.h"
 #include "engine/Engine.h"
@@ -84,9 +85,12 @@ namespace ai {
 
             const auto& pos = losPositions[i];
             character->setPosition(pos);
+            character->setStatus(state::playable);
             occupied.insert(pos);
+
             ++playerIndex;
         }
+
 
         // Define the half of the field allowed for random placement
         int minX, maxX;
@@ -140,6 +144,7 @@ namespace ai {
             } while (attempts < 1000);
 
             character->setPosition(pos);
+            character->setStatus(state::playable); // Important : mettre le status à playable
             occupied.insert(pos);
 
             if (pos.second <= TOP_ZONE_Y_MAX) {

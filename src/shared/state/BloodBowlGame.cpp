@@ -63,14 +63,15 @@ namespace  state {
         : teamA(teamA),
           teamB(teamB),
     currentTeam(&teamA),
-    turnCounter(0) { // Initialize currentTeam with a const reference
+    turnCounter(0),
+    ballPosition({-1, -1}),  // Initialize to invalid position
+    ballIsHold(false) {
         stateList.push_back(std::make_unique<Setup>(this));
         stateList.push_back(std::make_unique<Kickoff>(this));
         stateList.push_back(std::make_unique<PlayerTurn>(this));
         stateList.push_back(std::make_unique<HalfTime>(this));
         stateList.push_back(std::make_unique<EndGame>(this));
         currentState = stateList.at(SETUP).get(); // initial state
-        ballIsHold = false;
     }
 
     void BloodBowlGame::setCurrentState(AbstractState* state) {
