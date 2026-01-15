@@ -11,7 +11,9 @@ namespace render {
     const char *statusToFile(state::CharacterStatus status) {
         switch (status) {
             case state::stunned: return "_stu";
-            case state::ko: return "_ko";
+            case state::knockedDown: return "_down";
+            case state::ko: return "_up";
+            case state::injured: return "_up";
             case state::played: return "_up";
             case state::playable: return "_up";
             case state::bench: return "_up";
