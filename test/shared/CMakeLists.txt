@@ -13,5 +13,6 @@ add_custom_test(engine)
 add_custom_test(move)
 add_custom_test(command)
 add_custom_test(pickUpBall)
+add_custom_test(teamManager)
 # vim: set sw=2 sts=2 et:
 

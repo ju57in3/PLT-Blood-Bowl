@@ -40,18 +40,6 @@ BOOST_AUTO_TEST_CASE(TestEndGame)
     endgame.setShouldQuit(true);
     BOOST_CHECK(endgame.getShouldQuit());
 
-    /*
-    // Verify if all characters are on bench
-    for (auto& c : game.getTeamA().getCharacters()) {
-        BOOST_CHECK(c != nullptr);
-        BOOST_CHECK_EQUAL(c->getStatus(), bench);
-    }
-    for (auto& c : game.getTeamB().getCharacters()) {
-        BOOST_CHECK(c != nullptr);
-        BOOST_CHECK_EQUAL(c->getStatus(), bench);
-    }
-    */
-
     endgame.update();
 
     std::string expectedStr = "EndGame";
