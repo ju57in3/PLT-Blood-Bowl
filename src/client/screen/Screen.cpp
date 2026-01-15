@@ -19,7 +19,7 @@ namespace screen {
     }
 
 
-    void Screen::update(float dt) {
+    void Screen::update() {
         // Default empty implementation - can be overridden by subclasses if needed
     }
 

@@ -89,7 +89,7 @@ namespace screen {
         }
     }
 
-    void HomeScreen::update(float dt) {
+    void HomeScreen::update() {
         // hover effect
         if (!resources) return;
     }

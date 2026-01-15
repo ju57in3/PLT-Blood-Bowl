@@ -7,6 +7,9 @@
 #include "../../shared/state/Team.h"
 #include "../../shared/state/BloodBowlGame.h"
 #include "../../shared/engine/Engine.h"
+#include "../../shared/ai/RandomAI.h"
+#include "../../shared/ai/HeuristicAI.h"
+#include <iostream>
 
 namespace screen {
     MatchCreationScreen::MatchCreationScreen()
@@ -290,7 +293,7 @@ namespace screen {
         }
     }
 
-    void MatchCreationScreen::update(float dt) {
+    void MatchCreationScreen::update() {
         updateTeamDisplay();
 
         // Mettre à jour l'état du bouton démarrer
@@ -374,11 +377,50 @@ namespace screen {
         if (manager) {
             manager->setGame(newGame);
 
-            // Créer et configurer l'Engine avec l'IA si nécessaire
+            // Créer et configurer l'IA si mode PvE
             if (!vsHuman && manager->getEngine()) {
-                // L'IA sera gérée par l'Engine existant
-                // Pour l'instant, on laisse l'Engine gérer cela
-                // TODO: Configurer le type d'IA selon selectedAIType
+                int aiTeamId = team2->getTeamId(); // L'IA contrôle l'équipe 2
+
+                std::unique_ptr<ai::AI> aiInstance = nullptr;
+
+                switch (selectedAIType) {
+                    case 0: // Random AI
+                        std::cout << "[MATCH CREATION] Creating RandomAI for team " << aiTeamId << "\n";
+                        aiInstance = std::make_unique<ai::RandomAI>(
+                            *manager->getEngine(),
+                            newGame,
+                            aiTeamId
+                        );
+                        break;
+
+                    case 1: // Heuristic AI
+                        std::cout << "[MATCH CREATION] Creating HeuristicAI for team " << aiTeamId << "\n";
+                        aiInstance = std::make_unique<ai::HeuristicAI>(
+                            *manager->getEngine(),
+                            newGame,
+                            aiTeamId
+                        );
+                        break;
+
+                    case 2:
+                        // TODO : Advanced AI implementation
+                        break;
+
+                    default:
+                        std::cout << "[MATCH CREATION] Invalid AI type, defaulting to RandomAI\n";
+                        aiInstance = std::make_unique<ai::RandomAI>(
+                            *manager->getEngine(),
+                            newGame,
+                            aiTeamId
+                        );
+                        break;
+                }
+
+                if (aiInstance) {
+                    manager->getEngine()->setAI(std::move(aiInstance));
+                }
+            } else if (vsHuman) {
+                std::cout << "[MATCH CREATION] PvP mode - No AI\n";
             }
 
             // Lancer le match

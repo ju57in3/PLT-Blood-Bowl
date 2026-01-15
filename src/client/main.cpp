@@ -198,7 +198,7 @@ int main(int argc, char* argv[]) {
         }
 
         // scenes update/draw
-        scenes.update(1.f/60.f);
+        scenes.update();
         scenes.draw(window);
     }
     return 0;

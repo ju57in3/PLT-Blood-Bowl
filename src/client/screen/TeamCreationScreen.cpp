@@ -269,7 +269,7 @@ namespace screen {
         }
     }
 
-    void TeamCreationScreen::update(float dt) {
+    void TeamCreationScreen::update() {
         updateSummary();
 
         // Mettre à jour le compteur de joueurs

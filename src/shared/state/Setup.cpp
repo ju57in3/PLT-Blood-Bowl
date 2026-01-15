@@ -28,16 +28,28 @@ namespace state {
 
     bool Setup::isValidSetup(const Team& team) const {
         int onBoard = nbCharacterOnBoard(team);
-        if (onBoard > 11) return false;
+        if (onBoard > 11) {
+            std::cout << "Invalid setup: More than 11 characters on board.\n";
+            return false;
+        }
 
         int onLine = nbCharacterOnLine(team);
-        if (onLine < 3) return false;
+        if (onLine < 3) {
+            std::cout << "Invalid setup: Less than 3 characters on the midline.\n";
+            return false;
+        }
 
         int onTop = nbCharacterOnTop(team);
-        if (onTop > 2) return false;
+        if (onTop > 2) {
+            std::cout << "Invalid setup: More than 2 characters in the top zone.\n";
+            return false;
+        }
 
         int onBottom = nbCharacterOnBottom(team);
-        if (onBottom > 2) return false;
+        if (onBottom > 2) {
+            std::cout << "Invalid setup: More than 2 characters in the bottom zone.\n";
+            return false;
+        }
 
         return true;
     }
@@ -71,6 +83,7 @@ namespace state {
             if (ptr != nullptr) {
                 const Character& piece = *ptr;
                 auto pos = piece.getPosition();
+
                 if (piece.getStatus() == playable && piece.getPosition() != HORS_TABLEAU && pos.first == frontlineCol) {
                     if (pos.second >= 4 && pos.second <= (utility::Constants::BOARD_HEIGHT - 4)) {
                         count++;
@@ -78,6 +91,7 @@ namespace state {
                 }
             }
         }
+
         return count;
     }
 
@@ -129,7 +143,17 @@ namespace state {
         return teamSetupDone[0] && teamSetupDone[1];
     }
 
-    /// TO DO : unused ?
+    bool Setup::isTeamSetupDone(int teamId) const
+    {
+        if (teamId == game->getTeamA().getTeamId()) {
+            return teamSetupDone[0];
+        } else if (teamId == game->getTeamB().getTeamId()) {
+            return teamSetupDone[1];
+        }
+        return false;
+    }
+
+    // TODO : unused ?
     /*
     void Setup::setSetupEnded(bool setupStatus)
     {
