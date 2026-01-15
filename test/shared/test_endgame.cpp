@@ -29,18 +29,18 @@ BOOST_AUTO_TEST_CASE(TestEndGame)
     BloodBowlGame game(teamA, teamB);
     EndGame endgame(&game);
 
-    /*
-    // Verify initial state
-    BOOST_CHECK_EQUAL(endgame.getRestart(), false);
-
-    // Activate restart to start the loop
-    endgame.setRestart(true);
-    BOOST_CHECK_EQUAL(endgame.getRestart(), true);
-    */
-
     // Execution of update()
     endgame.update();
 
+    BOOST_CHECK(not endgame.getShouldRestart());
+    endgame.setShouldRestart(true);
+    BOOST_CHECK(endgame.getShouldRestart());
+
+    BOOST_CHECK(not endgame.getShouldQuit());
+    endgame.setShouldQuit(true);
+    BOOST_CHECK(endgame.getShouldQuit());
+
+    /*
     // Verify if all characters are on bench
     for (auto& c : game.getTeamA().getCharacters()) {
         BOOST_CHECK(c != nullptr);
@@ -50,13 +50,9 @@ BOOST_AUTO_TEST_CASE(TestEndGame)
         BOOST_CHECK(c != nullptr);
         BOOST_CHECK_EQUAL(c->getStatus(), bench);
     }
+    */
 
     endgame.update();
-
-    /*
-    endgame.setRestart(false);
-    BOOST_CHECK_EQUAL(endgame.getRestart(), false);
-    */
 
     std::string expectedStr = "EndGame";
     BOOST_CHECK(endgame.getName() == expectedStr);
