@@ -139,6 +139,7 @@ namespace engine {
         if (!interceptors.empty()) {
             // Choisir le meilleur (AG la plus haute) comme approximation du choix coach
             // TODO: Choix du joueur
+            // TODO : need 2 interceptors for the moments to work
             chosenInterceptor = *std::max_element(interceptors.begin(), interceptors.end(), [](auto& a, auto& b){ return a->getAgility() < b->getAgility(); });
         }
 
