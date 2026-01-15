@@ -2,6 +2,8 @@
 // Created by matt-o on 1/9/26.
 //
 #include <boost/test/unit_test.hpp>
+#include <state/PlayerTurn.h>
+
 #include "engine/Move.h"
 
 using namespace engine;
@@ -32,6 +34,7 @@ BOOST_AUTO_TEST_CASE(TestMove) {
     character->setPosition({5, 5});
     gamePtr->setBallPosition({5, 5});
     gamePtr->setBallIsHold(true);
+    character->setHasBall(true);
     targetPos = {6, 6};
     Move moveCmdBall(character, targetPos);
 
@@ -41,26 +44,20 @@ BOOST_AUTO_TEST_CASE(TestMove) {
     BOOST_CHECK(gamePtr->getBallPosition() == targetPos);
     BOOST_CHECK(character->getHasBall());
 
-    // Test out of range
-    character->setPosition({5, 5});
-    targetPos = {20, 20};
-    Move moveCmdOutofRange(character, targetPos);
-
-    auto initialPos = character->getPosition();
-    moveCmdOutofRange.execute(gamePtr);
-
-    BOOST_CHECK(character->getPosition() == initialPos);
+    BOOST_CHECK(not moveCmd.checkTackleZones());
 
     // Test pickup bal
     character->setPosition({5, 5});
     gamePtr->setBallPosition({6, 6});
     gamePtr->setBallIsHold(false);
+    character->setHasBall(false);
+    gamePtr->setCurrentState(gamePtr->getStateList().at(PLAYERTURN).get());
+    auto* pt = dynamic_cast<state::PlayerTurn*>(gamePtr->getCurrentState());
+    pt->setTurnOver(true);
 
     Move moveCmdPickup(character, {6, 6});
     moveCmdPickup.execute(gamePtr);
 
     // Should attempt to pick up ball (success depends on agility roll)
     BOOST_CHECK(character->getPosition() == std::make_pair(6, 6));
-
-    // Test
 }

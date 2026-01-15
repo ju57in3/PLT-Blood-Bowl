@@ -61,9 +61,12 @@ namespace engine {
     }
 
 
+    // TODO : Unused ?
+    /*
     std::vector<std::pair<int, int> > Move::calculatePath(std::pair<int, int> dest) {
         return {};
     }
+    */
 
     bool Move::checkTackleZones() {
         bool isTackle = false;
