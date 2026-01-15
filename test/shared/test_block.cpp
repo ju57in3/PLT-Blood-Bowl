@@ -1,0 +1,12 @@
+//
+// Created by matt-o on 1/15/26.
+//
+#include <boost/test/unit_test.hpp>
+#include "engine/Engine.h"
+
+using namespace engine;
+using namespace state;
+
+BOOST_AUTO_TEST_CASE(TestEngine) {
+
+}
