@@ -2,7 +2,10 @@
 // Created by matt-o on 1/9/26.
 //
 #include <boost/test/unit_test.hpp>
-#include "engine/Pass.h"
+#include <state/PlayerTurn.h>
+
+#include "engine/Engine.h"
+#include "utility/Constants.h"
 
 using namespace engine;
 using namespace state;
@@ -18,7 +21,7 @@ BOOST_AUTO_TEST_CASE(TestCommand) {
     Team teamB(2, "Orcs", 2);
 
     auto hum = std::make_shared<Character>(1, "Player1", "Human", 6, 3, 3, 8);
-    hum->setPosition({24, 5}); // Near TD zone team A
+    hum->setPosition({20, 5});
     hum->setStatus(playable);
     teamA.addCharacter(hum);
 
@@ -38,4 +41,26 @@ BOOST_AUTO_TEST_CASE(TestCommand) {
     baseCmd.execute(gamePtr);
     BOOST_CHECK(true);
 
+    // Test touchdown
+    gamePtr->setCurrentState(gamePtr->getStateList().at(PLAYERTURN).get());
+    gamePtr->setBallPosition({24, 5});
+    baseCmd.checkAndHandleTouchdown(gamePtr);
+    BOOST_CHECK_EQUAL(teamA.getScore(), 0);
+
+    std::pair<int, int> targetPos = {utility::Constants::BOARD_WIDTH - 1, 5};
+    gamePtr->setBallPosition(targetPos);
+
+    baseCmd.checkAndHandleTouchdown(gamePtr);
+    BOOST_CHECK_EQUAL(teamA.getScore(), 1);
+
+    targetPos = {0, 5};
+    gamePtr->setBallPosition(targetPos);
+
+    baseCmd.checkAndHandleTouchdown(gamePtr);
+    BOOST_CHECK_EQUAL(teamB.getScore(), 1);
+
+    // Test Turnover
+    baseCmd.checkAndHandleTurnover(gamePtr);
+    auto* pt = dynamic_cast<state::PlayerTurn*>(gamePtr->getCurrentState());
+    BOOST_CHECK(pt->getTurnOver());
 }
