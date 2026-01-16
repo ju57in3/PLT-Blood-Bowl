@@ -51,6 +51,51 @@ namespace render {
         return {static_cast<float>(x), static_cast<float>(y)};
     }
 
+    // Calcule les coordonnées pour les joueurs hors-jeu (KO, injured, bench)
+    static sf::Vector2f getOffFieldCoords(state::CharacterStatus status, bool isTeamA, int index) {
+        // Zones dédiées pour chaque équipe
+        // Team A (gauche) : x < 160
+        // Team B (droite) : x > 160 + 26*32 = 992
+
+        const float tileSize = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
+        const float spacing = 4.0f; // Espacement entre les joueurs
+
+        // Positions de base pour les zones
+        float baseX = 0.0f;
+        float baseY = 0.0f;
+
+        switch (status) {
+            case state::bench:
+                baseX = 165; // En haut
+                break;
+            case state::ko:
+                baseX = 452; // Au milieu
+                break;
+            case state::injured:
+                baseX = 740; // En bas
+                break;
+            default:
+                baseX = Constants::BOARD_OFFSET_Y;
+                break;
+        }
+
+        if (isTeamA) {
+            baseY = 12.0f;
+
+        } else {
+            baseY = 592.0f;
+        }
+
+        const int playersPerRow = 7;
+        const int row = index / playersPerRow;
+        const int col = index % playersPerRow;
+
+        float x = baseX + col * (tileSize + spacing);
+        float y = baseY + row * (tileSize);
+
+        return {x, y};
+    }
+
     SceneData::SceneData(std::string colorA, std::string colorB)
         : colorA(std::move(colorA)), colorB(std::move(colorB)) {
         diceTextures.clear();
@@ -85,6 +130,10 @@ namespace render {
             std::cerr << "Error: characters directory does not exist: " << charactersDir << std::endl;
         }
 
+        // Compteurs pour positionner les joueurs dans les zones dédiées
+        int benchCountA = 0, koCountA = 0, injuredCountA = 0;
+        int benchCountB = 0, koCountB = 0, injuredCountB = 0;
+
         for (const auto &character: game->getTeamA().getCharacters()) {
             const auto index = static_cast<size_t>(character->getId());
             if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
@@ -94,7 +143,23 @@ namespace render {
 
             if (loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
                 playersSprites_TeamA.at(index).setTexture(playersTextures_TeamA.at(index));
-                playersSprites_TeamA.at(index).setPosition(pos2Coords(character->getPosition()));
+
+                // Déterminer la position en fonction du statut
+                sf::Vector2f position;
+                auto status = character->getStatus();
+
+                if (status == state::bench) {
+                    position = getOffFieldCoords(state::bench, true, benchCountA++);
+                } else if (status == state::ko) {
+                    position = getOffFieldCoords(state::ko, true, koCountA++);
+                } else if (status == state::injured) {
+                    position = getOffFieldCoords(state::injured, true, injuredCountA++);
+                } else {
+                    // Joueur sur le terrain
+                    position = pos2Coords(character->getPosition());
+                }
+
+                playersSprites_TeamA.at(index).setPosition(position);
             } else {
                 std::cerr << "Error loading " << texturePath << std::endl;
             }
@@ -109,7 +174,23 @@ namespace render {
 
             if (loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
                 playersSprites_TeamB.at(index).setTexture(playersTextures_TeamB.at(index));
-                playersSprites_TeamB.at(index).setPosition(pos2Coords(character->getPosition()));
+
+                // Déterminer la position en fonction du statut
+                sf::Vector2f position;
+                auto status = character->getStatus();
+
+                if (status == state::bench) {
+                    position = getOffFieldCoords(state::bench, false, benchCountB++);
+                } else if (status == state::ko) {
+                    position = getOffFieldCoords(state::ko, false, koCountB++);
+                } else if (status == state::injured) {
+                    position = getOffFieldCoords(state::injured, false, injuredCountB++);
+                } else {
+                    // Joueur sur le terrain
+                    position = pos2Coords(character->getPosition());
+                }
+
+                playersSprites_TeamB.at(index).setPosition(position);
             } else {
                 std::cerr << "Error loading " << texturePath << std::endl;
             }
@@ -300,6 +381,10 @@ namespace render {
 
         const std::string charactersDir = "../res/characters/";
 
+        // Compteurs pour positionner les joueurs dans les zones dédiées
+        int benchCountA = 0, koCountA = 0, injuredCountA = 0;
+        int benchCountB = 0, koCountB = 0, injuredCountB = 0;
+
         for (const auto &character: game->getTeamA().getCharacters()) {
             const size_t index = static_cast<size_t>(character->getId());
             if (index >= Constants::MAX_PLAYERS_PER_TEAM) continue;
@@ -310,7 +395,23 @@ namespace render {
             if (loadTextureFromFile(texturePath, playersTextures_TeamA.at(index))) {
                 auto &sprite = playersSprites_TeamA.at(index);
                 sprite.setTexture(playersTextures_TeamA.at(index));
-                sprite.setPosition(pos2Coords(character->getPosition()));
+
+                // Déterminer la position en fonction du statut
+                sf::Vector2f position;
+                auto status = character->getStatus();
+
+                if (status == state::bench) {
+                    position = getOffFieldCoords(state::bench, true, benchCountA++);
+                } else if (status == state::ko) {
+                    position = getOffFieldCoords(state::ko, true, koCountA++);
+                } else if (status == state::injured) {
+                    position = getOffFieldCoords(state::injured, true, injuredCountA++);
+                } else {
+                    // Joueur sur le terrain (playable, played, knockedDown, stunned)
+                    position = pos2Coords(character->getPosition());
+                }
+
+                sprite.setPosition(position);
             } else {
                 std::cerr << "[Render] Error loading " << texturePath << std::endl;
             }
@@ -326,7 +427,23 @@ namespace render {
             if (loadTextureFromFile(texturePath, playersTextures_TeamB.at(index))) {
                 auto &sprite = playersSprites_TeamB.at(index);
                 sprite.setTexture(playersTextures_TeamB.at(index));
-                sprite.setPosition(pos2Coords(character->getPosition()));
+
+                // Déterminer la position en fonction du statut
+                sf::Vector2f position;
+                auto status = character->getStatus();
+
+                if (status == state::bench) {
+                    position = getOffFieldCoords(state::bench, false, benchCountB++);
+                } else if (status == state::ko) {
+                    position = getOffFieldCoords(state::ko, false, koCountB++);
+                } else if (status == state::injured) {
+                    position = getOffFieldCoords(state::injured, false, injuredCountB++);
+                } else {
+                    // Joueur sur le terrain (playable, played, knockedDown, stunned)
+                    position = pos2Coords(character->getPosition());
+                }
+
+                sprite.setPosition(position);
             } else {
                 std::cerr << "[Render] Error loading " << texturePath << std::endl;
             }
