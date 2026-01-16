@@ -9,3 +9,4 @@ src/**/*.h
 *.autosave
 tmp
 .env
+test_teams.json
