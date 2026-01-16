@@ -295,28 +295,46 @@ namespace ai {
 
         Candidate best;
         best.score = -1e9f;
+        best.a = nullptr;
+        best.b = nullptr;
+        best.dest = {0,0};
+        best.type = ActType::Move;
+
+        auto toSharedLocal = [&](state::Team& team, state::Character* raw) -> std::shared_ptr<state::Character> {
+            if (!raw) return nullptr;
+            for (auto& sp : team.getCharacters()) {
+                if (sp.get() == raw) return sp;
+            }
+            return nullptr;
+        };
 
         {
-            auto playable = me.getPlayableCharacter();
-            for (auto& c : playable) {
-                if (!c) continue;
-                auto blockables = utility::GameUtils::blockableCharacters(c, opp);
+            auto playableRaw = me.getPlayableCharacter();
+            for (auto* c : playableRaw) {
+                auto cSP = toSharedLocal(me, c);
+                if (!cSP) continue;
+                auto blockables = utility::GameUtils::blockableCharacters(cSP, opp);
                 for (auto& def : blockables) {
-                    float sc = scoreBlock(c, def);
+                    float sc = scoreBlock(cSP, def);
                     if (sc > best.score) {
-                        best = {ActType::Block, sc, c, def, {0,0}};
+                        best.type = ActType::Block;
+                        best.score = sc;
+                        best.a = cSP;
+                        best.b = def;
+                        best.dest = {0,0};
                     }
                 }
             }
         }
 
         {
-            auto playable = me.getPlayableCharacter();
-            for (auto& ch : playable) {
-                if (!ch) continue;
+            auto playableRaw = me.getPlayableCharacter();
+            for (auto* ch : playableRaw) {
+                auto chSP = toSharedLocal(me, ch);
+                if (!chSP) continue;
 
-                auto pos = ch->getPosition();
-                int mv = ch->getMovement();
+                auto pos = chSP->getPosition();
+                int mv = chSP->getMovement();
 
                 for (int dx = -mv; dx <= mv; dx++) {
                     for (int dy = -mv; dy <= mv; dy++) {
@@ -324,16 +342,38 @@ namespace ai {
                         std::pair<int,int> dest = {pos.first + dx, pos.second + dy};
                         if (!isInside(dest)) continue;
 
-                        float sc = scoreMove(ch, dest);
+                        float sc = scoreMove(chSP, dest);
                         if (sc > best.score) {
-                            best = {ActType::Move, sc, ch, nullptr, dest};
+                            best.type = ActType::Move;
+                            best.score = sc;
+                            best.a = chSP;
+                            best.b = nullptr;
+                            best.dest = dest;
                         }
                     }
                 }
             }
         }
 
-        if (best.score <= -1e8f) {
+        if (myCarrier) {
+            auto playableRaw = me.getPlayableCharacter();
+            for (auto* r : playableRaw) {
+                auto rSP = toSharedLocal(me, r);
+                if (!rSP) continue;
+                if (rSP.get() == myCarrier.get()) continue;
+
+                float sc = scorePass(myCarrier, rSP);
+                if (sc > best.score) {
+                    best.type = ActType::Pass;
+                    best.score = sc;
+                    best.a = myCarrier;
+                    best.b = rSP;
+                    best.dest = {0,0};
+                }
+            }
+        }
+
+        if (best.score <= -1e8f || !best.a) {
             std::cout << "[ADVANCED AI] No valid actions available.\n";
             return false;
         }
