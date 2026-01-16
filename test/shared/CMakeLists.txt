@@ -16,5 +16,6 @@ add_custom_test(pickUpBall)
 add_custom_test(teamManager)
 add_custom_test(block)
 add_custom_test(endTurn)
+add_custom_test(gameUtils)
 # vim: set sw=2 sts=2 et:
 
