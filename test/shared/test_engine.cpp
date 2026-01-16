@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(TestEngine) {
     BOOST_CHECK(engineAI.getAI() != nullptr);
     BOOST_CHECK(engineAI.getAI() == mockAIPtr);
 
-    // Test fallback AI
+    // Test fallback set and get AI
     engineAI.setAI(nullptr);
     BOOST_CHECK(engineAI.getAI() == nullptr);
 
@@ -288,23 +288,69 @@ BOOST_AUTO_TEST_CASE(TestEngine) {
     }
 
     auto gamePtr5 = std::make_shared<BloodBowlGame>(teamA3, teamB3);
-    Setup* setup = dynamic_cast<Setup*>(gamePtr5->getStateList()[SETUP].get());
-    gamePtr5->setCurrentState(setup);
-    gamePtr5->setCurrentTeam(&teamA3);
-
     Setup* setupState2 = dynamic_cast<Setup*>(gamePtr5->getStateList()[SETUP].get());
     BOOST_REQUIRE(setupState2 != nullptr);
 
+    // Set current state and current team
+    gamePtr5->setCurrentState(setupState2);
+    gamePtr5->setCurrentTeam(&teamA3);
+
+    // Verify setup is NOT done yet for team A
+    BOOST_CHECK(!setupState2->isTeamSetupDone(teamA3.getTeamId()));
+
+    // Count characters before setup
+    int charactersBeforeSetup = 0;
+    for (const auto& c : teamA3.getCharacters()) {
+        if (c && c->getStatus() == playable) {
+            charactersBeforeSetup++;
+        }
+    }
+
     Engine engineSetupValid(gamePtr5);
     auto mockAI8 = std::make_unique<MockAI>(engineSetupValid, gamePtr5, 1);
-    auto* mockAI8Ptr = mockAI8.get();
     engineSetupValid.setAI(std::move(mockAI8));
 
     // Run AI setup
     engineSetupValid.runAISetupIfNeeded(setupState2);
-    BOOST_CHECK(mockAI8Ptr->placePlayersCalled);
 
-    // Verify setup is valid and was ended
+    // Verify setup was executed by checking characters are now positioned and playable
+    int charactersAfterSetup = 0;
+    for (const auto& c : teamA3.getCharacters()) {
+        if (c && c->getStatus() == playable && c->getPosition() != std::make_pair(-1, -1)) {
+            charactersAfterSetup++;
+        }
+    }
+
+    BOOST_CHECK(charactersAfterSetup > 0); // AI placed players
     BOOST_CHECK(setupState2->isValidSetup(teamA3));
+    BOOST_CHECK(setupState2->isTeamSetupDone(teamA3.getTeamId()));
 
+    // Test runAISetupIfNeeded with invalid setup (AI places incorrectly)
+    Team teamA_invalid(1, "Humans", 3);
+    Team teamB_invalid(2, "Orcs", 2);
+
+    // Add only 2 characters - not enough for valid setup (needs 3 on line)
+    for (int i = 0; i < 2; i++) {
+        auto c = std::make_unique<Character>(i+1, "H" + std::to_string(i+1), "Human", 6, 3, 3, 8);
+        c->setStatus(playable);
+        teamA_invalid.addCharacter(std::move(c));
+    }
+
+    auto gamePtr_invalid = std::make_shared<BloodBowlGame>(teamA_invalid, teamB_invalid);
+    Setup* setupState_invalid = dynamic_cast<Setup*>(gamePtr_invalid->getStateList()[SETUP].get());
+
+    gamePtr_invalid->setCurrentState(setupState_invalid);
+    gamePtr_invalid->setCurrentTeam(&teamA_invalid);
+
+    Engine engineSetupInvalid(gamePtr_invalid);
+    auto mockAI_invalid = std::make_unique<MockAI>(engineSetupInvalid, gamePtr_invalid, 1);
+    engineSetupInvalid.setAI(std::move(mockAI_invalid));
+
+    // Run AI setup - should place players but setup will be invalid
+    engineSetupInvalid.runAISetupIfNeeded(setupState_invalid);
+
+    // Verify setup is NOT valid (less than 3 on line)
+    BOOST_CHECK(!setupState_invalid->isValidSetup(teamA_invalid));
+    // Verify setup was NOT ended (because invalid)
+    BOOST_CHECK(!setupState_invalid->isTeamSetupDone(teamA_invalid.getTeamId()));
 }
