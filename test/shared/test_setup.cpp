@@ -3,6 +3,8 @@
 //
 
 #include <boost/test/unit_test.hpp>
+#include <utility/Constants.h>
+
 #include "state.h"
 
 using namespace state;
@@ -57,5 +59,26 @@ BOOST_AUTO_TEST_CASE(TestSetup)
     setup->update();
     expected = {false, false};
     BOOST_CHECK(setup->teamSetupDone == expected);
+
+    // Testing wrong setup and
+    for (int i = 0; i < 12; i++) { // too much characters
+        auto c = std::make_unique<Character>(i+1,"O" + std::to_string(i+1), "Orc", 6, 3, 3, 8);
+        c->setStatus(playable);
+        if (i < 2) c->setPosition({13, 4+i});      // Only 2 on line
+        else if (i < 5) c->setPosition({16, utility::Constants::BOARD_HEIGHT-4+i-1}); // too much on top
+        else if (i < 8) c->setPosition({14, i-5}); // too luch on bot
+        else c->setPosition({15+i, 6});             // middle
+        teamB.addCharacter(std::move(c));
+    }
+    BOOST_CHECK(!setup->isValidSetup(teamB));
+    auto chars = teamB.getCharacters();
+    chars[11]->setStatus(bench);
+    BOOST_CHECK(!setup->isValidSetup(teamB));
+    chars[10]->setPosition({13, 7});
+    BOOST_CHECK(!setup->isValidSetup(teamB));
+    chars[3]->setPosition({16, 5});
+    BOOST_CHECK(!setup->isValidSetup(teamB));
+    chars[6]->setPosition({14, 8});
+    BOOST_CHECK(setup->isValidSetup(teamB));
 
 }
