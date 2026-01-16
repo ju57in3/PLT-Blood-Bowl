@@ -167,8 +167,8 @@ namespace engine {
             auto dropPos = passer->getPosition();
             bool outOfBounds = false;
             bool ballTurnover = false;
-            GameUtils::handleBallBounce(game, dropPos, outOfBounds, ballTurnover);
-            if (ballTurnover) {// doit tenir le ballon
+            GameUtils::handleBallBounce(game, dropPos, outOfBounds, ballTurnover, passerTeam);
+            if (ballTurnover) {
                 checkAndHandleTurnover(game);
             }
             return;
@@ -201,7 +201,7 @@ namespace engine {
             auto scatterPos = receiver->getPosition();
             bool outOfBounds = false;
             bool ballTurnover = false;
-            GameUtils::handleBallBounce(game, scatterPos, outOfBounds, ballTurnover);
+            GameUtils::handleBallBounce(game, scatterPos, outOfBounds, ballTurnover, passerTeam);
             if (ballTurnover) {
                 checkAndHandleTurnover(game);
             }
