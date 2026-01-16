@@ -113,7 +113,6 @@ BOOST_AUTO_TEST_CASE(TestPass) {
     gamePtr->setBallIsHold(true);
     auto interceptor = std::make_shared<Character>(3, "Interceptor", "Orc", 6, 3, 100, 9); // High agility to sucess
     interceptor->setPosition({7, 5}); // On the pass line
-    interceptor->setPosition({8, 5}); // Need 2 interceptors for the moment
     interceptor->setStatus(playable);
     teamB.addCharacter(interceptor);
 
