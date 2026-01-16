@@ -16,6 +16,7 @@
 #include "state/Team.h"
 #include "state/Character.h"
 #include "state/CharacterStatus.h"
+#include "state/PlayerTurn.h"
 
 #include "utility/Constants.h"
 #include "utility/GameUtils.h"
@@ -262,27 +263,6 @@ namespace ai {
         state::Team& me = myTeam();
         state::Team& opp = oppTeam();
 
-        auto myCarrier = findBallCarrier(me);
-        auto oppCarrier = findBallCarrier(opp);
-
-        targetMode = (oppCarrier != nullptr);
-
-        enum class ActType { Move, Block, Pass };
-        struct Candidate {
-            ActType type;
-            float score;
-            std::shared_ptr<state::Character> a;
-            std::shared_ptr<state::Character> b;
-            std::pair<int,int> dest;
-        };
-
-        Candidate best;
-        best.score = -1e9f;
-        best.a = nullptr;
-        best.b = nullptr;
-        best.dest = {0,0};
-        best.type = ActType::Move;
-
         auto toSharedLocal = [&](state::Team& team, state::Character* raw) -> std::shared_ptr<state::Character> {
             if (!raw) return nullptr;
             for (auto& sp : team.getCharacters()) {
@@ -291,92 +271,212 @@ namespace ai {
             return nullptr;
         };
 
+        const float MIN_SCORE_TO_PLAY = 0.5f;
+        const int MAX_ACTIONS_PER_TURN = 11;
+
+        int actionsDone = 0;
+        bool didAnything = false;
+
+        std::cout << "\n[ADVANCED AI] ===== TURN START =====\n";
+        std::cout << "[ADVANCED AI] TeamId=" << teamId
+                  << " | currentTeam="
+                  << (game->getCurrentTeam() ? game->getCurrentTeam()->getTeamId() : -1)
+                  << " | turnCounter=" << game->getTurnCounter()
+                  << " | ballPos=(" << game->getBallPosition().first << "," << game->getBallPosition().second << ")"
+                  << " | ballHeld=" << (game->getBallIsHold() ? "true" : "false")
+                  << "\n";
+
         {
-            const auto playableRaw = me.getPlayableCharacter();
-            for (const auto& c : playableRaw) {
-                auto cSP = toSharedLocal(me, c.get());
-                if (!cSP) continue;
-                auto blockables = utility::GameUtils::blockableCharacters(cSP, opp);
-                for (auto& def : blockables) {
-                    float sc = scoreBlock(cSP, def);
-                    if (sc > best.score) {
-                        best.type = ActType::Block;
-                        best.score = sc;
-                        best.a = cSP;
-                        best.b = def;
-                        best.dest = {0,0};
-                    }
-                }
-            }
+            auto myC = findBallCarrier(me);
+            auto oppC = findBallCarrier(opp);
+            std::cout << "[ADVANCED AI] My carrier: "
+                      << (myC ? (myC->getName() + std::string("#") + std::to_string(myC->getId())) : std::string("<none>"))
+                      << " oppCarrier="
+                      << (oppC ? (oppC->getName() + std::string("#") + std::to_string(oppC->getId())) : std::string("<none>"))
+                      << "\n";
         }
 
-        {
-            const auto playableRaw = me.getPlayableCharacter();
-            for (const auto& ch : playableRaw) {
-                auto chSP = toSharedLocal(me, ch.get());
-                if (!chSP) continue;
+        while (actionsDone < MAX_ACTIONS_PER_TURN) {
+            if (game->getCurrentTeam() == nullptr || game->getCurrentTeam()->getTeamId() != teamId) {
+                std::cout << "[ADVANCED AI] Stop : not my turn anymore.\n";
+                break;
+            }
 
-                auto pos = chSP->getPosition();
-                int mv = chSP->getMovement();
+            auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState());
+            if (pt) {
+                if (pt->getTurnOver()) {
+                    std::cout << "[ADVANCED AI] Stop : turn is over.\n";
+                    break;
+                }
+                if (pt->getTouchDown()) {
+                    std::cout << "[ADVANCED AI] Stop : touchdown scored.\n";
+                    break;
+                }
+            }
 
-                for (int dx = -mv; dx <= mv; dx++) {
-                    for (int dy = -mv; dy <= mv; dy++) {
-                        if (std::max(std::abs(dx), std::abs(dy)) > mv) continue;
-                        std::pair<int,int> dest = {pos.first + dx, pos.second + dy};
-                        if (!isInside(dest)) continue;
+            auto myCarrier = findBallCarrier(me);
+            auto oppCarrier = findBallCarrier(opp);
 
-                        float sc = scoreMove(chSP, dest);
+            targetMode = (oppCarrier != nullptr);
+
+            std::cout << "[ADVANCED AI] Search action #" << (actionsDone + 1)
+                      << " targetMode=" << (targetMode ? "ON" : "OFF")
+                      << " myCarrier=" << (myCarrier ? (myCarrier->getName() + std::string("#") + std::to_string(myCarrier->getId())) : std::string("<none>"))
+                      << " oppCarrier=" << (oppCarrier ? (oppCarrier->getName() + std::string("#") + std::to_string(oppCarrier->getId())) : std::string("<none>"))
+                      << "\n";
+
+            enum class ActType { Move, Block, Pass };
+            struct Candidate {
+                ActType type;
+                float score;
+                std::shared_ptr<state::Character> a;
+                std::shared_ptr<state::Character> b;
+                std::pair<int,int> dest;
+            };
+
+            Candidate best;
+            best.score = -1e9f;
+            best.a = nullptr;
+            best.b = nullptr;
+            best.dest = {0,0};
+            best.type = ActType::Move;
+
+            {
+                const auto playableRaw = me.getPlayableCharacter();
+                for (const auto& c : playableRaw) {
+                    auto cSP = toSharedLocal(me, c.get());
+                    if (!cSP) continue;
+
+                    if (cSP->getStatus() != state::CharacterStatus::playable) continue;
+
+                    auto blockables = utility::GameUtils::blockableCharacters(cSP, opp);
+                    for (auto& def : blockables) {
+                        float sc = scoreBlock(cSP, def);
                         if (sc > best.score) {
-                            best.type = ActType::Move;
+                            best.type = ActType::Block;
                             best.score = sc;
-                            best.a = chSP;
-                            best.b = nullptr;
-                            best.dest = dest;
+                            best.a = cSP;
+                            best.b = def;
+                            best.dest = {0,0};
                         }
                     }
                 }
             }
-        }
 
-        if (myCarrier) {
-            const auto playableRaw = me.getPlayableCharacter();
-            for (const auto& r : playableRaw) {
-                auto rSP = toSharedLocal(me, r.get());
-                if (!rSP) continue;
-                if (rSP.get() == myCarrier.get()) continue;
+            {
+                const auto playableRaw = me.getPlayableCharacter();
+                for (const auto& ch : playableRaw) {
+                    auto chSP = toSharedLocal(me, ch.get());
+                    if (!chSP) continue;
+                    if (chSP->getStatus() != state::CharacterStatus::playable) continue;
 
-                float sc = scorePass(myCarrier, rSP);
-                if (sc > best.score) {
-                    best.type = ActType::Pass;
-                    best.score = sc;
-                    best.a = myCarrier;
-                    best.b = rSP;
-                    best.dest = {0,0};
+                    auto pos = chSP->getPosition();
+                    int mv = chSP->getMovement();
+
+                    for (int dx = -mv; dx <= mv; dx++) {
+                        for (int dy = -mv; dy <= mv; dy++) {
+                            if (std::max(std::abs(dx), std::abs(dy)) > mv) continue;
+                            std::pair<int,int> dest = {pos.first + dx, pos.second + dy};
+                            if (!isInside(dest)) continue;
+
+                            float sc = scoreMove(chSP, dest);
+                            if (sc > best.score) {
+                                best.type = ActType::Move;
+                                best.score = sc;
+                                best.a = chSP;
+                                best.b = nullptr;
+                                best.dest = dest;
+                            }
+                        }
+                    }
                 }
             }
-        }
 
-        if (best.score <= -1e8f || !best.a) {
-            std::cout << "[ADVANCED AI] No valid actions available.\n";
-            return false;
-        }
+            if (myCarrier && myCarrier->getStatus() == state::CharacterStatus::playable) {
+                const auto playableRaw = me.getPlayableCharacter();
+                for (const auto& r : playableRaw) {
+                    auto rSP = toSharedLocal(me, r.get());
+                    if (!rSP) continue;
+                    if (rSP.get() == myCarrier.get()) continue;
+                    if (rSP->getStatus() != state::CharacterStatus::playable) continue;
 
-        switch (best.type) {
-            case ActType::Move: {
-                engine.addCommand(std::make_unique<::engine::Move>(best.a, best.dest));
+                    float sc = scorePass(myCarrier, rSP);
+                    if (sc > best.score) {
+                        best.type = ActType::Pass;
+                        best.score = sc;//
+                        best.a = myCarrier;
+                        best.b = rSP;
+                        best.dest = {0,0};
+                    }
+                }
+            }
+
+            if (!best.a) {
+                std::cout << "[ADVANCED AI] Stop : no candidate action found.\n";
                 break;
             }
+
+            if (best.score < MIN_SCORE_TO_PLAY) {
+                std::cout << "[ADVANCED AI] Stop : bestScore=" << best.score << " < MIN_SCORE_TO_PLAY=" << MIN_SCORE_TO_PLAY << "\n";
+                break;
+            }
+
+            std::cout << "[ADVANCED AI] CHOSEN ";
+            if (best.type == ActType::Move) std::cout << "move";
+            else if (best.type == ActType::Block) std::cout << "block";
+            else if (best.type == ActType::Pass) std::cout << "pass";
+
+            std::cout << "[ADVANCED AI] CHOSEN ";
+            if (best.type == ActType::Move) std::cout << "MOVE";
+            else if (best.type == ActType::Block) std::cout << "BLOCK";
+            else std::cout << "PASS";
+
+            std::cout << " score=" << best.score
+                      << " actor=" << (best.a ? (best.a->getName() + std::string("#") + std::to_string(best.a->getId())) : std::string("<null>"))
+                      << " actorPos=(" << (best.a ? best.a->getPosition().first : -1) << "," << (best.a ? best.a->getPosition().second : -1) << ")";
+
+            if (best.type == ActType::Move) {
+                std::cout << " dest=(" << best.dest.first << "," << best.dest.second << ")";
+            } else if (best.type == ActType::Block) {
+                std::cout << " target=" << (best.b ? (best.b->getName() + std::string("#") + std::to_string(best.b->getId())) : std::string("<null>"))
+                          << " targetPos=(" << (best.b ? best.b->getPosition().first : -1) << "," << (best.b ? best.b->getPosition().second : -1) << ")";
+            } else { // Pass
+                std::cout << " receiver=" << (best.b ? (best.b->getName() + std::string("#") + std::to_string(best.b->getId())) : std::string("<null>"))
+                          << " receiverPos=(" << (best.b ? best.b->getPosition().first : -1) << "," << (best.b ? best.b->getPosition().second : -1) << ")";
+            }
+            std::cout << "\n";
+
+            switch (best.type) {
+                case ActType::Move: {
+                    engine.addCommand(std::make_unique<::engine::Move>(best.a, best.dest));
+                    break;
+                }
                 case ActType::Block: {
-                engine.addCommand(std::make_unique<::engine::Block>(best.a, best.b));
-                break;
+                    engine.addCommand(std::make_unique<::engine::Block>(best.a, best.b));
+                    break;
+                }
+                case ActType::Pass: {
+                    engine.addCommand(std::make_unique<::engine::Pass>(best.a, best.b));
+                    break;
+                }
             }
-            case ActType::Pass: {
-                engine.addCommand(std::make_unique<::engine::Pass>(best.a, best.b));
-                break;
-            }
+
+            engine.executeCommand();
+
+            didAnything = true;
+            actionsDone++;
+
+            std::cout << "[ADVANCED AI] Action #" << actionsDone << " score =" << best.score << "\n";
         }
 
-        std::cout << "[ADVANCED AI] Best action score=" << best.score << "\n";
-        return true;
+        if (!didAnything) {
+            std::cout << "[ADVANCED AI] No valid actions available.\n";
+        }
+
+        auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState());
+        if (pt && didAnything) {
+            pt->setTurnOver(true);
+        }
+        return didAnything;
     }
 }
