@@ -4,6 +4,7 @@
 #include "LayoutHelper.h"
 #include "../../shared/utility/Constants.h"
 #include "../../shared/state/EndGame.h"
+#include "../../shared/state/TeamManager.h"
 
 namespace screen {
     EndGameScreen::EndGameScreen() = default;
@@ -78,6 +79,11 @@ namespace screen {
             sf::Vector2f mpos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
 
             if (backButton.getGlobalBounds().contains(mpos)) {
+                // Sauvegarder les équipes avant de retourner au menu
+                // Les changements persistants (XP, blessures, etc.) seront conservés
+                auto& teamManager = state::TeamManager::getInstance();
+                teamManager.saveToDisk("teams.json");
+
                 if (manager) manager->switchTo(render::SceneId::HOME);
             }
             else if (restartButton.getGlobalBounds().contains(mpos)) {

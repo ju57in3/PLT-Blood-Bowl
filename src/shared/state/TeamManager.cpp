@@ -117,10 +117,7 @@ namespace state {
                 charJson["strength"] = character->getStrength();
                 charJson["agility"] = character->getAgility();
                 charJson["armor"] = character->getArmor();
-                charJson["status"] = static_cast<int>(character->getStatus());
-                auto pos = character->getPosition();
-                charJson["posX"] = pos.first;
-                charJson["posY"] = pos.second;
+                // Ne pas sauvegarder status et position - ce sont des données de partie
                 charactersJson.append(charJson);
             }
             teamJson["characters"] = charactersJson;
@@ -191,12 +188,7 @@ namespace state {
                         charJson["armor"].asInt()
                     );
 
-                    if (charJson.isMember("status")) {
-                        character->setStatus(static_cast<CharacterStatus>(charJson["status"].asInt()));
-                    }
-                    if (charJson.isMember("posX") && charJson.isMember("posY")) {
-                        character->setPosition({charJson["posX"].asInt(), charJson["posY"].asInt()});
-                    }
+                    // Ne pas charger status et position - ils seront initialisés lors du Setup
 
                     team->addCharacter(character);
                 }
