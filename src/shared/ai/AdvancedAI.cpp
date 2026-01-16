@@ -472,6 +472,11 @@ namespace ai {
         if (!didAnything) {
             std::cout << "[ADVANCED AI] No valid actions available.\n";
         }
+
+        auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState());
+        if (pt && didAnything) {
+            pt->setTurnOver(true);
+        }
         return didAnything;
     }
 }
