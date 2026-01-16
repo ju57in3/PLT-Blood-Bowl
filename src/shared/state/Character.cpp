@@ -119,6 +119,14 @@ namespace state {
         this->status = newStatus;
     }
 
+    void Character::resetMatchData() {
+        // Reset temporary match data only
+        this->currentPosition = std::make_pair(-1, -1);
+        this->hasBall = false;
+        this->status = bench;
+        this->gotUp = false;
+    }
+
     std::ostream& operator<<(std::ostream& os, const Character& character) {
         os << "Position: (" << character.getPosition().first << ", " << character.getPosition().second << ")";
         os << " | Status: " << statusToString(character.getStatus());

@@ -13,6 +13,18 @@ namespace state {
         characters.reserve(Constants::MAX_PLAYERS_PER_TEAM);
     }
 
+    void Team::resetMatchData() {
+        // Reset score for new match
+        score = 0;
+
+        // Reset match data for each character
+        for (auto& character : characters) {
+            if (character) {
+                character->resetMatchData();
+            }
+        }
+    }
+
     std::vector<std::shared_ptr<Character>>& Team::getCharacters() {
         return characters;
     }

@@ -33,7 +33,6 @@ int main(int argc, char* argv[]) {
     // Create a placeholder game (will be replaced when starting a match)
     // For now, we just initialize with nullptr to avoid requiring teams at startup
     std::shared_ptr<BloodBowlGame> gamePtr = nullptr;
-    engine::Engine* engPtr = nullptr;
 
     sf::RenderWindow window(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl");
 
@@ -41,7 +40,7 @@ int main(int argc, char* argv[]) {
     screen::ResourceManager resources("../res/");
     screen::SceneManager scenes(&window, &resources);
     scenes.setGame(gamePtr);
-    scenes.setEngine(engPtr);
+    scenes.setEngine(nullptr); // Initialize with nullptr, will be set when match is created
 
     // register screens
     scenes.registerScreen(std::make_unique<screen::HomeScreen>());

@@ -5,6 +5,7 @@
 #include "../client/InputHandler.h"
 #include <engine/Engine.h>
 #include <state/Setup.h>
+#include <state/TeamManager.h>
 
 namespace screen {
     GameScreen::GameScreen() = default;
@@ -66,6 +67,10 @@ namespace screen {
 
         // Échap pour quitter
         if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape) {
+            // Sauvegarder les équipes avant de quitter
+            auto& teamManager = state::TeamManager::getInstance();
+            teamManager.saveToDisk("teams.json");
+
             endRequested = true;
             if (manager) manager->switchTo(render::SceneId::END_GAME);
         }
