@@ -179,6 +179,8 @@ namespace state {
     }
 
     std::shared_ptr<BloodBowlGame> GameStateManager::deserializeGame(const Json::Value& root) {
+        auto& teamManager = TeamManager::getInstance();
+
         // Charger équipe A
         const auto& teamAJson = root["teamA"];
         auto teamA = std::make_unique<Team>(
@@ -237,8 +239,25 @@ namespace state {
             teamB->addCharacter(character);
         }
 
-        // Créer le jeu avec les équipes restaurées
-        auto game = std::make_shared<BloodBowlGame>(*teamA, *teamB);
+        // IMPORTANT: Sauvegarder les teamID pour récupérer les équipes après
+        int teamAId = teamA->getTeamId();
+        int teamBId = teamB->getTeamId();
+
+        // Transférer la propriété des équipes au TeamManager
+        // pour qu'elles restent en mémoire
+        teamManager.saveTeam(std::move(teamA));
+        teamManager.saveTeam(std::move(teamB));
+
+        // Récupérer les pointeurs vers les équipes depuis le TeamManager
+        Team* teamAPtr = teamManager.getTeamById(teamAId);
+        Team* teamBPtr = teamManager.getTeamById(teamBId);
+
+        if (!teamAPtr || !teamBPtr) {
+            std::cerr << "Failed to retrieve teams from TeamManager!" << std::endl;
+            return nullptr;
+        }
+
+        auto game = std::make_shared<BloodBowlGame>(*teamAPtr, *teamBPtr);
 
         // Restaurer l'état du jeu
         game->setTurnCounter(root["turnCounter"].asInt());
@@ -267,8 +286,6 @@ namespace state {
         // Restaurer l'équipe courante en utilisant le teamID
         if (root.isMember("currentTeamId")) {
             int currentTeamId = root["currentTeamId"].asInt();
-            int teamAId = teamAJson["teamId"].asInt();
-            int teamBId = teamBJson["teamId"].asInt();
 
             if (currentTeamId == teamAId) {
                 game->setCurrentTeam(&game->getTeamA());
@@ -276,7 +293,6 @@ namespace state {
                 game->setCurrentTeam(&game->getTeamB());
             }
         }
-
         return game;
     }
 

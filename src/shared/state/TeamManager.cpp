@@ -22,7 +22,23 @@ namespace state {
     }
 
     void TeamManager::saveTeam(std::unique_ptr<Team> team) {
-        if (team) {
+        if (!team) return;
+
+        // Vérifier si une équipe avec le même ID existe déjà
+        auto it = std::find_if(savedTeams.begin(), savedTeams.end(),
+            [&team](const std::unique_ptr<Team>& existingTeam) {
+                return existingTeam->getTeamId() == team->getTeamId();
+            });
+
+        if (it != savedTeams.end()) {
+            // Remplacer l'équipe existante
+            std::cout << "[TeamManager] Replacing existing team ID " << team->getTeamId()
+                      << " (" << (*it)->getName() << " -> " << team->getName() << ")" << std::endl;
+            *it = std::move(team);
+        } else {
+            // Ajouter une nouvelle équipe
+            std::cout << "[TeamManager] Adding new team ID " << team->getTeamId()
+                      << " (" << team->getName() << ")" << std::endl;
             savedTeams.push_back(std::move(team));
         }
     }

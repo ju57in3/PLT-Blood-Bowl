@@ -221,12 +221,11 @@ namespace screen {
             // Charger le jeu dans le SceneManager
             manager->setGame(loadedGame);
 
-            // Créer un nouvel engine pour le jeu chargé
+            // Créer un nouvel Engine avec le jeu chargé
             auto newEngine = std::make_unique<engine::Engine>(loadedGame);
             manager->setEngine(std::move(newEngine));
 
             std::cout << "Game loaded successfully!" << std::endl;
-
             // Aller à l'écran de jeu
             manager->switchTo(render::SceneId::GAME);
         } else {
