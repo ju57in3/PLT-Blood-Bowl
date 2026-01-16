@@ -60,4 +60,28 @@ BOOST_AUTO_TEST_CASE(TestMove) {
 
     // Should attempt to pick up ball (success depends on agility roll)
     BOOST_CHECK(character->getPosition() == std::make_pair(6, 6));
+
+    // Test pickup for team B
+    auto characterB = std::make_shared<Character>(2, "Player2", "Orc", 6, 3, 100, 8);
+    characterB->setPosition({20, 5});
+    characterB->setStatus(playable);
+    teamB.addCharacter(characterB);
+
+    // Place ball at target position for Team B character
+    std::pair<int, int> targetPosB = {20, 6};
+    gamePtr->setBallPosition(targetPosB);
+    gamePtr->setBallIsHold(false);
+    characterB->setHasBall(false);
+
+    gamePtr->setCurrentState(gamePtr->getStateList().at(PLAYERTURN).get());
+    auto* ptB = dynamic_cast<state::PlayerTurn*>(gamePtr->getCurrentState());
+    ptB->setTurnOver(true);
+
+    Move moveCmdB(characterB, targetPosB);
+
+    BOOST_CHECK_EQUAL(moveCmdB.getCommandTypeId(), MoveId);
+
+    moveCmdB.execute(gamePtr);
+
+    BOOST_CHECK(characterB->getPosition() == targetPosB);
 }
