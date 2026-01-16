@@ -7,7 +7,13 @@ namespace screen {
         resources(resources) {
     }
 
-    SceneManager::~SceneManager() = default;
+    SceneManager::~SceneManager() {
+        // Clean up the engine if it exists
+        if (engine != nullptr) {
+            delete engine;
+            engine = nullptr;
+        }
+    }
 
     void SceneManager::registerScreen(std::unique_ptr<Screen> screen) {
         render::SceneId id = screen->getId();
@@ -81,10 +87,18 @@ namespace screen {
     }
 
     void SceneManager::setEngine(engine::Engine *eng) {
+        // Delete the old engine if it exists
+        if (engine != nullptr && engine != eng) {
+            delete engine;
+        }
         engine = eng;
     }
 
     engine::Engine *SceneManager::getEngine() const {
         return engine;
+    }
+
+    std::shared_ptr<state::BloodBowlGame> SceneManager::getGame() const {
+        return game;
     }
 } // namespace screen

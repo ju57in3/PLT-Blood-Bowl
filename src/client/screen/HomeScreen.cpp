@@ -38,7 +38,7 @@ namespace screen {
         buttonTexts.clear();
         buttonRects.clear();
 
-        std::vector<std::string> labels = {"Nouvelle equipe", "Creer match", "Quitter"};
+        std::vector<std::string> labels = {"Gerer equipes", "Creer match", "Quitter"};
 
         // Positions relatives pour les boutons (centrés verticalement)
         const float buttonWidth = 300.f;
@@ -71,8 +71,8 @@ namespace screen {
             for (size_t i = 0; i < buttonRects.size(); ++i) {
                 if (buttonRects[i].getGlobalBounds().contains(mpos)) {
                     switch (i) {
-                        case 0: // Nouvelle équipe
-                            if (manager) manager->switchTo(render::SceneId::TEAM_CREATION);
+                        case 0: // Gérer équipes
+                            if (manager) manager->switchTo(render::SceneId::TEAM_MANAGEMENT);
                             break;
                         case 1: // Créer match
                             if (manager) manager->switchTo(render::SceneId::MATCH_CREATION);

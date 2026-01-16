@@ -26,6 +26,22 @@ namespace screen {
 
     void GameScreen::onEnter() {
         endRequested = false;
+
+        // Réinitialiser avec le jeu actuel du SceneManager
+        if (manager) {
+            game = manager->getGame();
+
+            // Recréer la scène avec le nouveau jeu
+            if (game) {
+                scene = std::make_unique<render::Scene>(render::SceneId::GAME, game);
+            }
+
+            // Recréer l'InputHandler avec le nouveau jeu et engine
+            engine::Engine* eng = manager->getEngine();
+            if (game && eng) {
+                inputHandler = std::make_unique<client::InputHandler>(game, eng);
+            }
+        }
     }
 
     void GameScreen::handleEvent(const sf::Event &event, sf::RenderWindow &window) {

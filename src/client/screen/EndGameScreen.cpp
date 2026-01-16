@@ -66,6 +66,13 @@ namespace screen {
 
     void EndGameScreen::setManager(SceneManager *mgr) { manager = mgr; }
 
+    void EndGameScreen::onEnter() {
+        // Récupérer le jeu actuel du SceneManager
+        if (manager) {
+            game = manager->getGame();
+        }
+    }
+
     void EndGameScreen::handleEvent(const sf::Event &event, sf::RenderWindow &window) {
         if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2f mpos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
@@ -76,17 +83,30 @@ namespace screen {
             else if (restartButton.getGlobalBounds().contains(mpos)) {
                 // Réinitialiser le jeu et retourner au Setup
                 if (game) {
-                    // Remettre tous les personnages sur le banc
+                    // Position hors plateau pour indiquer que le personnage n'est pas sur le terrain
+                    const std::pair<int, int> OFF_BOARD = {-1, -1};
+
+                    // Remettre tous les personnages sur le banc ET réinitialiser leurs positions
                     for (auto& characterPtr : game->getTeamA().getCharacters()){
                         if (characterPtr != nullptr){
                             characterPtr->setStatus(state::bench);
+                            characterPtr->setPosition(OFF_BOARD);  // Réinitialiser la position
+                            characterPtr->setHasBall(false);       // Le personnage n'a plus la balle
+                            characterPtr->gotUp = false;           // Réinitialiser le flag gotUp
                         }
                     }
                     for (auto& characterPtr : game->getTeamB().getCharacters()){
                         if (characterPtr != nullptr){
                             characterPtr->setStatus(state::bench);
+                            characterPtr->setPosition(OFF_BOARD);  // Réinitialiser la position
+                            characterPtr->setHasBall(false);       // Le personnage n'a plus la balle
+                            characterPtr->gotUp = false;           // Réinitialiser le flag gotUp
                         }
                     }
+
+                    // Réinitialiser l'état de la balle
+                    game->setBallPosition(OFF_BOARD);
+                    game->setBallIsHold(false);
 
                     // Réinitialiser le compteur de tours
                     game->setTurnCounter(0);

@@ -217,6 +217,23 @@ namespace screen {
 
     void MatchCreationScreen::setManager(SceneManager *mgr) { manager = mgr; }
 
+    void MatchCreationScreen::onEnter() {
+        // Reload teams from disk when entering the screen
+        auto& teamManager = state::TeamManager::getInstance();
+        teamManager.loadFromDisk("teams.json");
+
+        // Reset selections based on available teams
+        selectedTeam1Index = -1;
+        selectedTeam2Index = -1;
+
+        if (teamManager.getTeamCount() > 0) {
+            selectedTeam1Index = 0;
+            if (teamManager.getTeamCount() > 1) {
+                selectedTeam2Index = 1;
+            }
+        }
+    }
+
     void MatchCreationScreen::handleEvent(const sf::Event &event, sf::RenderWindow &window) {
         if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2f mpos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
@@ -373,12 +390,16 @@ namespace screen {
         // Créer le nouveau jeu avec ces équipes
         auto newGame = std::make_shared<state::BloodBowlGame>(*team1, *team2);
 
-        // Mettre à jour le jeu dans le SceneManager
+        // Créer le nouveau moteur de jeu
+        auto* newEngine = new engine::Engine(newGame);
+
+        // Mettre à jour le jeu et l'engine dans le SceneManager
         if (manager) {
             manager->setGame(newGame);
+            manager->setEngine(newEngine);
 
             // Créer et configurer l'IA si mode PvE
-            if (!vsHuman && manager->getEngine()) {
+            if (!vsHuman) {
                 int aiTeamId = team2->getTeamId(); // L'IA contrôle l'équipe 2
 
                 std::unique_ptr<ai::AI> aiInstance = nullptr;
@@ -387,7 +408,7 @@ namespace screen {
                     case 0: // Random AI
                         std::cout << "[MATCH CREATION] Creating RandomAI for team " << aiTeamId << "\n";
                         aiInstance = std::make_unique<ai::RandomAI>(
-                            *manager->getEngine(),
+                            *newEngine,
                             newGame,
                             aiTeamId
                         );
@@ -396,7 +417,7 @@ namespace screen {
                     case 1: // Heuristic AI
                         std::cout << "[MATCH CREATION] Creating HeuristicAI for team " << aiTeamId << "\n";
                         aiInstance = std::make_unique<ai::HeuristicAI>(
-                            *manager->getEngine(),
+                            *newEngine,
                             newGame,
                             aiTeamId
                         );
@@ -409,7 +430,7 @@ namespace screen {
                     default:
                         std::cout << "[MATCH CREATION] Invalid AI type, defaulting to RandomAI\n";
                         aiInstance = std::make_unique<ai::RandomAI>(
-                            *manager->getEngine(),
+                            *newEngine,
                             newGame,
                             aiTeamId
                         );
@@ -417,7 +438,7 @@ namespace screen {
                 }
 
                 if (aiInstance) {
-                    manager->getEngine()->setAI(std::move(aiInstance));
+                    newEngine->setAI(std::move(aiInstance));
                 }
             } else if (vsHuman) {
                 std::cout << "[MATCH CREATION] PvP mode - No AI\n";

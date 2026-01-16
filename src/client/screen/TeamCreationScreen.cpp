@@ -200,7 +200,7 @@ namespace screen {
             // Bouton valider
             if (validateButton.getGlobalBounds().contains(mpos) && canValidate()) {
                 createTeam();
-                if (manager) manager->switchTo(render::SceneId::MATCH_CREATION);
+                if (manager) manager->switchTo(render::SceneId::TEAM_MANAGEMENT);
                 return;
             }
 
@@ -331,7 +331,7 @@ namespace screen {
     void TeamCreationScreen::createTeam() {
         // Créer l'équipe
         auto& teamManager = state::TeamManager::getInstance();
-        int teamId = teamManager.getTeamCount() + 1;
+        int teamId = teamManager.getNextTeamId();
 
         auto newTeam = std::make_unique<state::Team>(teamId, teamName, 3);
 
@@ -373,6 +373,9 @@ namespace screen {
         }
 
         teamManager.saveTeam(std::move(newTeam));
+
+        // Auto-save to disk
+        teamManager.saveToDisk("teams.json");
     }
 
     void TeamCreationScreen::draw(sf::RenderWindow &window) {
