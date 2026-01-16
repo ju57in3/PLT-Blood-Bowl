@@ -11,6 +11,8 @@
 #include "../../shared/ai/HeuristicAI.h"
 #include <iostream>
 
+#include "ai/AdvancedAI.h"
+
 namespace screen {
     MatchCreationScreen::MatchCreationScreen()
         : selectedTeam1Index(-1), selectedTeam2Index(-1),
@@ -424,7 +426,12 @@ namespace screen {
                         break;
 
                     case 2:
-                        // TODO : Advanced AI implementation
+                        std::cout << "[MATCH CREATION] Creating AdvancedAI for team " << aiTeamId << "\n";
+                        aiInstance = std::make_unique<ai::AdvancedAI>(
+                            *newEngine,
+                            newGame,
+                            aiTeamId
+                        );
                         break;
 
                     default:

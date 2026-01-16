@@ -27,7 +27,7 @@ namespace ai {
 
     AdvancedAI::~AdvancedAI() = default;
 
-    state::Team &AdvancedAI::myTeam() const {
+    state::Team& AdvancedAI::myTeam() const {
         if (game->getTeamA().getTeamId() == teamId) {
             return game->getTeamA();
         } else {
@@ -35,7 +35,7 @@ namespace ai {
         }
     }
 
-    state::Team &AdvancedAI::oppTeam() const {
+    state::Team& AdvancedAI::oppTeam() const {
         if (game->getTeamA().getTeamId() == teamId) {
             return game->getTeamB();
         } else {
@@ -60,7 +60,7 @@ namespace ai {
         return p.first >= 0 && p.first < utility::Constants::BOARD_WIDTH && p.second >= 0 && p.second < utility::Constants::BOARD_HEIGHT;
     }
 
-    std::shared_ptr<state::Character> AdvancedAI::findClosestTo(const std::vector<std::shared_ptr<state::Character> > &chars, std::pair<int, int> pos) const {
+    std::shared_ptr<state::Character> AdvancedAI::findClosestTo(const std::vector<std::shared_ptr<state::Character>>& chars, std::pair<int, int> pos) const {
         std::shared_ptr<state::Character> best = nullptr;
         int bestD = 1e9;
         for (const auto& c : chars) {
@@ -92,24 +92,7 @@ namespace ai {
         return static_cast<float>(successCount) / 6.0f;
     }
 
-    int AdvancedAI::tackleZonesOnTile(std::pair<int, int> tile, state::Team &opp) const {
-        int count = 0;
-        for (const auto& c : opp.getCharacters()) {
-            if (!c) continue;
-
-            if (c->getStatus() != state::CharacterStatus::playable && c->getStatus() != state::CharacterStatus::played) {
-                continue;
-            }
-
-            auto pos = c->getPosition();
-            int dx = std::abs(pos.first - tile.first);
-            int dy = std::abs(pos.second - tile.second);
-            if (dx <= 1 && dy <= 1 && (dx +dy) > 0) count++;
-        }
-        return count;
-    }
-
-    float AdvancedAI::scoreMove(const std::shared_ptr<state::Character> &ch, std::pair<int, int> dest) const {
+    float AdvancedAI::scoreMove(const std::shared_ptr<state::Character>& ch, std::pair<int, int> dest) const {
         if (!ch) return -1e9f;
         if (!isInside(dest)) return -1e9f;
 
@@ -125,7 +108,7 @@ namespace ai {
 
         float score = 0.0f;
 
-        int tz = tackleZonesOnTile(dest, opp);
+        int tz = utility::GameUtils::countTackleZones(*ch, opp);
         score -= 1.5f * tz;
 
         if (ch->getHasBall()) {
@@ -162,7 +145,7 @@ namespace ai {
         return score;
     }
 
-    float AdvancedAI::scoreBlock(const std::shared_ptr<state::Character> &attacker, const std::shared_ptr<state::Character> &defender) const {
+    float AdvancedAI::scoreBlock(const std::shared_ptr<state::Character>& attacker, const std::shared_ptr<state::Character>& defender) const {
         if (!attacker || !defender) return -1e9f;
 
         if (attacker->getStatus() != state::CharacterStatus::playable) return -1e9f;
@@ -230,7 +213,7 @@ namespace ai {
         return score;
     }
 
-    float AdvancedAI::scorePass(const std::shared_ptr<state::Character> &passer, const std::shared_ptr<state::Character> &receiver) const {
+    float AdvancedAI::scorePass(const std::shared_ptr<state::Character>& passer, const std::shared_ptr<state::Character>& receiver) const {
         if (!passer || !receiver) return -1e9f;
         if (!passer->getHasBall()) return -1e9f;
         if (passer->getStatus() != state::CharacterStatus::playable) return -1e9f;
@@ -258,7 +241,7 @@ namespace ai {
         float pCatch = agilitySuccessProb(receiver->getAgility(), +1 - recvTZ);
 
         float interceptionPenalty = 0.0f;
-        interceptionPenalty += 0.08f * tackleZonesOnTile(rPos, opp);
+        interceptionPenalty += 0.08f * static_cast<float>(utility::GameUtils::countTackleZones(*receiver, opp));
 
         float pTotal = pPass * (1.0f - interceptionPenalty) * pCatch;
         pTotal = std::clamp(pTotal, 0.0f, 1.0f);
@@ -309,9 +292,9 @@ namespace ai {
         };
 
         {
-            auto playableRaw = me.getPlayableCharacter();
-            for (auto* c : playableRaw) {
-                auto cSP = toSharedLocal(me, c);
+            const auto playableRaw = me.getPlayableCharacter();
+            for (const auto& c : playableRaw) {
+                auto cSP = toSharedLocal(me, c.get());
                 if (!cSP) continue;
                 auto blockables = utility::GameUtils::blockableCharacters(cSP, opp);
                 for (auto& def : blockables) {
@@ -328,9 +311,9 @@ namespace ai {
         }
 
         {
-            auto playableRaw = me.getPlayableCharacter();
-            for (auto* ch : playableRaw) {
-                auto chSP = toSharedLocal(me, ch);
+            const auto playableRaw = me.getPlayableCharacter();
+            for (const auto& ch : playableRaw) {
+                auto chSP = toSharedLocal(me, ch.get());
                 if (!chSP) continue;
 
                 auto pos = chSP->getPosition();
@@ -356,9 +339,9 @@ namespace ai {
         }
 
         if (myCarrier) {
-            auto playableRaw = me.getPlayableCharacter();
-            for (auto* r : playableRaw) {
-                auto rSP = toSharedLocal(me, r);
+            const auto playableRaw = me.getPlayableCharacter();
+            for (const auto& r : playableRaw) {
+                auto rSP = toSharedLocal(me, r.get());
                 if (!rSP) continue;
                 if (rSP.get() == myCarrier.get()) continue;
 
