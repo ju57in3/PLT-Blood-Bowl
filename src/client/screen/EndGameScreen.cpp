@@ -153,7 +153,7 @@ namespace screen {
     }
 
     void EndGameScreen::draw(sf::RenderWindow &window) {
-        window.clear(sf::Color(40, 20, 20));
+        window.clear(sf::Color(30, 30, 30));
         window.draw(title);
         window.draw(winnerText);
         window.draw(scoreText);

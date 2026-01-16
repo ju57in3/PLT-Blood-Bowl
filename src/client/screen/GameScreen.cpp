@@ -10,6 +10,7 @@
 #include <state/Setup.h>
 #include <state/TeamManager.h>
 #include <state/GameStateManager.h>
+#include <utility/Constants.h>
 
 namespace screen {
     GameScreen::GameScreen() = default;
@@ -69,26 +70,16 @@ namespace screen {
             inputHandler->handleEvent(event, &window);
         }
 
-        // Échap pour quitter
+        // Échap pour ouvrir le PauseScreen
         if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape) {
-            // Sauvegarder la partie en cours
-            if (game) {
-                auto& gameStateManager = state::GameStateManager::getInstance();
-                std::string saveName = "QuickSave_" + game->getTeamA().getName() + "_vs_" + game->getTeamB().getName();
-                gameStateManager.saveGame(*game, saveName);
-                std::cout << "Game saved as: " << saveName << std::endl;
+            if (manager) {
+                manager->push(render::SceneId::PAUSE); // push pour pouvoir revenir avec pop()
             }
-
-            // Sauvegarder aussi les équipes (pour les changements persistants)
-            auto& teamManager = state::TeamManager::getInstance();
-            teamManager.saveToDisk("teams.json");
-
-            endRequested = true;
-            if (manager) manager->switchTo(render::SceneId::END_GAME);
         }
     }
 
     void GameScreen::update() {
+
         // update game or input-based logic if necessary
         if (game && game->getCurrentState()) {
             game->getCurrentState()->update();
