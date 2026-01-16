@@ -1,4 +1,7 @@
 #include "GameScreen.h"
+
+#include <iostream>
+
 #include "ResourceManager.h"
 #include "SceneManager.h"
 #include "../render/Scene.h"
@@ -6,6 +9,7 @@
 #include <engine/Engine.h>
 #include <state/Setup.h>
 #include <state/TeamManager.h>
+#include <state/GameStateManager.h>
 
 namespace screen {
     GameScreen::GameScreen() = default;
@@ -67,7 +71,15 @@ namespace screen {
 
         // Échap pour quitter
         if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape) {
-            // Sauvegarder les équipes avant de quitter
+            // Sauvegarder la partie en cours
+            if (game) {
+                auto& gameStateManager = state::GameStateManager::getInstance();
+                std::string saveName = "QuickSave_" + game->getTeamA().getName() + "_vs_" + game->getTeamB().getName();
+                gameStateManager.saveGame(*game, saveName);
+                std::cout << "Game saved as: " << saveName << std::endl;
+            }
+
+            // Sauvegarder aussi les équipes (pour les changements persistants)
             auto& teamManager = state::TeamManager::getInstance();
             teamManager.saveToDisk("teams.json");
 

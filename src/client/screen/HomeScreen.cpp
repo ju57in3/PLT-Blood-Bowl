@@ -38,7 +38,7 @@ namespace screen {
         buttonTexts.clear();
         buttonRects.clear();
 
-        std::vector<std::string> labels = {"Gerer equipes", "Creer match", "Quitter"};
+        std::vector<std::string> labels = {"Gerer equipes", "Creer match", "Charger partie", "Quitter"};
 
         // Positions relatives pour les boutons (centrés verticalement)
         const float buttonWidth = 300.f;
@@ -77,7 +77,10 @@ namespace screen {
                         case 1: // Créer match
                             if (manager) manager->switchTo(render::SceneId::MATCH_CREATION);
                             break;
-                        case 2: // Quitter
+                        case 2: // Charger partie
+                            if (manager) manager->switchTo(render::SceneId::LOAD_GAME);
+                            break;
+                        case 3: // Quitter
                             window.close();
                             break;
                         default:
