@@ -87,7 +87,7 @@ namespace screen {
         engine = std::move(eng);
     }
 
-    engine::Engine *SceneManager::getEngine() const {
+    engine::Engine* SceneManager::getEngine() const {
         return engine.get();
     }
 

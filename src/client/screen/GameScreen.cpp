@@ -16,7 +16,7 @@ namespace screen {
         this->resources = res;
         this->game = g;
         scene = std::make_unique<render::Scene>(render::SceneId::GAME, game);
-        engine::Engine *eng = nullptr;
+        engine::Engine* eng = nullptr;
         if (manager) eng = manager->getEngine();
         if (eng) {
             inputHandler = std::make_unique<client::InputHandler>(game, eng);

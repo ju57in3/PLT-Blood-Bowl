@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include "../../shared/state/CharacterStatus.h"
+#include "screen/LayoutHelper.h"
 
 using namespace utility;
 
@@ -321,12 +322,28 @@ namespace render {
         }
 
         if (!defaultFont.getInfo().family.empty()) {
+            // Header en haut à gauche (état du jeu)
             sf::Text header(
                 renderData.stateName + " - Team: " + (renderData.currentTeamId >= 0 ? std::to_string(renderData.currentTeamId) : std::string("-")),
                 defaultFont, 16);
             header.setFillColor(sf::Color::White);
             header.setPosition(8.0f, 4.0f);
             window.draw(header);
+
+            // Score en haut à droite
+            if (game) {
+                std::string scoreText = std::to_string(game->getTeamA().getScore()) +
+                                       "  -  " +
+                                       std::to_string(game->getTeamB().getScore());
+
+                sf::Text scoreDisplay(scoreText, defaultFont, 24);
+                scoreDisplay.setFillColor(sf::Color::Yellow);
+                scoreDisplay.setStyle(sf::Text::Bold);
+
+                auto scoreBounds = scoreDisplay.getLocalBounds();
+                scoreDisplay.setPosition(Constants::WINDOW_WIDTH - scoreBounds.width - 30.0f, 35.0f);
+                window.draw(scoreDisplay);
+            }
         }
 
 
