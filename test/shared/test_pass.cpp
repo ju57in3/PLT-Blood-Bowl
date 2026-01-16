@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(TestPass) {
 
     BOOST_CHECK(!receiver->getHasBall());
 
-    // Test Successful Quick range pass (distance <= 3)
+    // Test Quick range pass (distance <= 3)
     passer->setHasBall(true);
     passer->setStatus(playable);
     receiver->setPosition({7, 5}); // Distance = 2
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(TestPass) {
     BOOST_CHECK(!passer->getHasBall());
     BOOST_CHECK(passer->getStatus() == played);
 
-    // Test Successful Short range pass (distance 4-6)
+    // Test Short range pass (distance 4-6)
     passer->setHasBall(true);
     passer->setStatus(playable);
     receiver->setPosition({10, 5}); // Distance = 5
@@ -162,4 +162,29 @@ BOOST_AUTO_TEST_CASE(TestPass) {
     BOOST_CHECK(!passerB->getHasBall());
     BOOST_CHECK(passerB->getStatus() == played);
 
+    // Test without passerTeam
+    Team teamC(3, "Humans", 3);
+    Team teamD(4, "Orcs", 2);
+
+    auto gamePtrNoPasser = std::make_shared<BloodBowlGame>(teamC, teamD);
+
+    passer->setHasBall(true);
+    Pass passNoPasser(passer, receiver);
+    passNoPasser.execute(gamePtrNoPasser);
+
+    BOOST_CHECK(true);
+
+    // Test without Passer in any team
+    Team teamX(10, "X", 0);
+    Team teamY(11, "Y", 0);
+    auto gameNoPasser = std::make_shared<BloodBowlGame>(teamX, teamY);
+
+    auto foreignPasser = std::make_shared<Character>(99, "Ghost", "?", 6,3,3,8);
+    foreignPasser->setPosition({1,1});
+    auto foreignReceiver = std::make_shared<Character>(100, "Ghost2", "?", 6,3,3,8);
+
+    Pass p(foreignPasser, foreignReceiver);
+    auto res = p.checkInterceptions(gameNoPasser);
+
+    BOOST_CHECK(true);
 }

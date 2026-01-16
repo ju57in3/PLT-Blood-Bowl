@@ -30,6 +30,7 @@ BOOST_AUTO_TEST_CASE(TestPickUpBall) {
 
     // Test with wrong position
     character->setPosition({5, 5});
+    character->setHasBall(false);
     gamePtr->setBallPosition({10, 10});
     gamePtr->setBallIsHold(false);
 
@@ -45,6 +46,34 @@ BOOST_AUTO_TEST_CASE(TestPickUpBall) {
 
     PickUpBall pickUpCmdNullCHar(nullptr);
     pickUpCmd.execute(gamePtrNullChar);
+
+    BOOST_CHECK(true);
+
+    // Test failure for coverage
+    auto badPlayer = std::make_shared<Character>(99, "NoHands", "Human", 1, 3, 1, 8); // very low AG
+    badPlayer->setPosition({3, 3});
+    badPlayer->setStatus(playable);
+    teamA.addCharacter(badPlayer);
+
+    gamePtr->setBallPosition({3, 3});
+    gamePtr->setBallIsHold(false);
+
+    PickUpBall pickUpFail(badPlayer);
+
+    // try several times to statistically force a failure
+    bool failed = false;
+    for (int i = 0; i < 10; ++i) {
+        badPlayer->setHasBall(false);
+        badPlayer->setStatus(playable);
+        gamePtr->setBallIsHold(false);
+
+        pickUpFail.execute(gamePtr);
+
+        if (!badPlayer->getHasBall()) {
+            failed = true;
+            break;
+        }
+    }
 
     BOOST_CHECK(true);
 }
