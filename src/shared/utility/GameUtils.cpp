@@ -174,7 +174,8 @@ namespace utility {
     void GameUtils::handleBallBounce(const std::shared_ptr<state::BloodBowlGame>& game,
                                      std::pair<int,int> startPosition,
                                      bool& outOfBounds,
-                                     bool& turnover) {
+                                     bool& turnover,
+                                     state::Team* originalTeam) {
         if (!game) {
             outOfBounds = true;
             turnover = false;
@@ -212,16 +213,19 @@ namespace utility {
                     characterAtPos->getStatus() == state::CharacterStatus::played) {
 
                     state::Team* opponentTeam = nullptr;
+                    state::Team* characterTeam = nullptr;
                     bool isTeamA = false;
 
                     for (const auto& ch : game->getTeamA().getCharacters()) {
                         if (ch.get() == characterAtPos.get()) {
                             isTeamA = true;
+                            characterTeam = &game->getTeamA();
                             opponentTeam = &game->getTeamB();
                             break;
                         }
                     }
                     if (!isTeamA) {
+                        characterTeam = &game->getTeamB();
                         opponentTeam = &game->getTeamA();
                     }
 
@@ -236,7 +240,14 @@ namespace utility {
                         game->setBallPosition(ballPos);
                         game->setBallIsHold(true);
                         ballLanded = true;
-                        turnover = false;
+
+                        // Si originalTeam est fourni, vérifier si c'est la même équipe qui récupère
+                        if (originalTeam && characterTeam != originalTeam) {
+                            turnover = true;
+                        } else {
+                            turnover = false;
+                        }
+
                         std::cout << "Ball caught by " << characterAtPos->getName() << " at position (" << ballPos.first << ", " << ballPos.second << ")\n";
                     }
                 } else {
@@ -245,7 +256,12 @@ namespace utility {
                 }
             } else {
                 ballLanded = true;
-                turnover = false;
+                // Si originalTeam est fourni et que la balle n'est pas récupérée, c'est un turnover
+                if (originalTeam) {
+                    turnover = true;
+                } else {
+                    turnover = false;
+                }
                 game->setBallPosition(ballPos);
                 game->setBallIsHold(false);
                 std::cout << "Ball landed on empty tile at (" << ballPos.first << ", " << ballPos.second << ")\n";

@@ -94,7 +94,7 @@
         <dia:point val="2.75,2.55"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="2.7,1.5;64.35,35.85"/>
+        <dia:rectangle val="2.7,1.5;75.9,35.85"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -103,7 +103,7 @@
         <dia:point val="2.75,2.55"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="61.549999999999997"/>
+        <dia:real val="73.099999999999994"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="33.250000000000007"/>
@@ -1002,6 +1002,23 @@
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="comment">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
+                <dia:string>#originalTeam#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#state::Team*#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string>#nullptr#</dia:string>
               </dia:attribute>
               <dia:attribute name="comment">
                 <dia:string>##</dia:string>

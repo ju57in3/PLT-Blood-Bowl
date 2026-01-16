@@ -236,7 +236,25 @@ namespace engine {
                     attacker->setHasBall(false);
                     bool outOfBounds = false;
                     bool ballTurnover = false;
-                    GameUtils::handleBallBounce(game, attacker->getPosition(), outOfBounds, ballTurnover);
+
+                    // Déterminer l'équipe de l'attaquant
+                    state::Team* attackerTeam = nullptr;
+                    for (auto& c : game->getTeamA().getCharacters()) {
+                        if (c.get() == attacker.get()) {
+                            attackerTeam = &game->getTeamA();
+                            break;
+                        }
+                    }
+                    if (!attackerTeam) {
+                        for (auto& c : game->getTeamB().getCharacters()) {
+                            if (c.get() == attacker.get()) {
+                                attackerTeam = &game->getTeamB();
+                                break;
+                            }
+                        }
+                    }
+
+                    GameUtils::handleBallBounce(game, attacker->getPosition(), outOfBounds, ballTurnover, attackerTeam);
                 }
                 resolveInjury(attacker);
                 checkAndHandleTurnover(game);

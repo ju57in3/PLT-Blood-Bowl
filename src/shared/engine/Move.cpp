@@ -46,7 +46,25 @@ namespace engine {
                     if (pt->getTurnOver()) {
                         bool outOfBounds = false;
                         bool turnover = false;
-                        utility::GameUtils::handleBallBounce(game,position,outOfBounds,turnover);
+
+                        // Déterminer l'équipe du personnage
+                        state::Team* characterTeam = nullptr;
+                        for (auto& c : game->getTeamA().getCharacters()) {
+                            if (c.get() == character.get()) {
+                                characterTeam = &game->getTeamA();
+                                break;
+                            }
+                        }
+                        if (!characterTeam) {
+                            for (auto& c : game->getTeamB().getCharacters()) {
+                                if (c.get() == character.get()) {
+                                    characterTeam = &game->getTeamB();
+                                    break;
+                                }
+                            }
+                        }
+
+                        utility::GameUtils::handleBallBounce(game, position, outOfBounds, turnover, characterTeam);
                         return;
                     }
                 }

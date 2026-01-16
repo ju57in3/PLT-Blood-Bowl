@@ -5,7 +5,6 @@
 #include "state/Team.h"
 #include <cmath>
 #include <functional>
-#include <iostream>
 #include <utility>
 #include <state/PlayerTurn.h>
 
@@ -50,7 +49,6 @@ namespace engine {
             if (x != x1 || y != y1) { linePositions.emplace_back(x, y); }
         }
 
-        // Déterminer équipe du passeur via adresse (plus fiable que nom)
         state::Team& teamA = game->getTeamA();
         state::Team& teamB = game->getTeamB();
         state::Team* passerTeam = nullptr;
@@ -67,15 +65,18 @@ namespace engine {
         if (passerTeam) {
             opposingTeamPtr = (passerTeam == &teamA) ? &teamB : &teamA;
         } else {
-            // Fallback si non trouvé (ne devrait pas arriver si design correct)
             opposingTeamPtr = &teamB;
         }
 
-        // Récupérer les personnages jouables adverses (interception seulement par jouable?)
-        auto opposingPlayable = opposingTeamPtr->getPlayableCharacter();
+        auto opposingCharacters = opposingTeamPtr->getCharacters();
         std::vector<std::shared_ptr<state::Character>> result;
 
-        for (std::shared_ptr<state::Character> character : opposingPlayable) {
+        for (const auto& character : opposingCharacters) {
+            if (!character) continue;
+            if (character->getStatus() != state::CharacterStatus::playable &&
+                character->getStatus() != state::CharacterStatus::played) {
+                continue;
+            }
             auto charPos = character->getPosition();
             for (const auto& linePos : linePositions) {
                 if (charPos == linePos) { result.emplace_back(character); break; }
@@ -92,7 +93,7 @@ namespace engine {
             return;
         }
         if (!passer->getHasBall()) {
-            return; // doit tenir le ballon
+            return;
         }
 
         // Déterminer équipes
@@ -114,7 +115,17 @@ namespace engine {
                 }
             }
         }
-        state::Team* opposingTeam = passerTeam == &teamA ? &teamB : &teamA;
+
+        if (!passerTeam) {
+            return;
+        }
+
+        state::Team* opposingTeam = (passerTeam == &teamA) ? &teamB : &teamA;
+
+        // Une tentative de passe compte toujours comme une action
+        if (passer->getStatus() == state::CharacterStatus::playable) {
+            passer->setStatus(state::CharacterStatus::played);
+        }
 
         int passerTZ = GameUtils::countTackleZones(*passer, *opposingTeam);
 
@@ -139,7 +150,6 @@ namespace engine {
         if (!interceptors.empty()) {
             // Choisir le meilleur (AG la plus haute) comme approximation du choix coach
             // TODO: Choix du joueur
-            // TODO : need 2 interceptors for the moments to work
             chosenInterceptor = *std::max_element(interceptors.begin(), interceptors.end(), [](auto& a, auto& b){ return a->getAgility() < b->getAgility(); });
         }
 
@@ -157,8 +167,10 @@ namespace engine {
             auto dropPos = passer->getPosition();
             bool outOfBounds = false;
             bool ballTurnover = false;
-            GameUtils::handleBallBounce(game, dropPos, outOfBounds, ballTurnover);
-            checkAndHandleTurnover(game);
+            GameUtils::handleBallBounce(game, dropPos, outOfBounds, ballTurnover, passerTeam);
+            if (ballTurnover) {
+                checkAndHandleTurnover(game);
+            }
             return;
         }
 
@@ -189,14 +201,12 @@ namespace engine {
             auto scatterPos = receiver->getPosition();
             bool outOfBounds = false;
             bool ballTurnover = false;
-            GameUtils::handleBallBounce(game, scatterPos, outOfBounds, ballTurnover);
-            checkAndHandleTurnover(game);
+            GameUtils::handleBallBounce(game, scatterPos, outOfBounds, ballTurnover, passerTeam);
+            if (ballTurnover) {
+                checkAndHandleTurnover(game);
+            }
          }
 
          checkAndHandleTouchdown(game);
-
-        if (passer->getStatus() == state::CharacterStatus::playable) {
-            passer->setStatus(state::CharacterStatus::played);
-        }
      }
  }
