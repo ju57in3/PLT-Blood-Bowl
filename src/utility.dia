@@ -135,13 +135,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O1">
       <dia:attribute name="obj_pos">
-        <dia:point val="6.55,5.35"/>
+        <dia:point val="6.35,5.55"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="6.5,5.3;23.27,16.2"/>
+        <dia:rectangle val="6.3,5.5;23.07,16.4"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="6.55,5.35"/>
+        <dia:point val="6.35,5.55"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="16.669999999999998"/>
@@ -177,7 +177,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="wrap_operations">
-        <dia:boolean val="true"/>
+        <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="wrap_after_char">
         <dia:int val="40"/>
@@ -455,7 +455,7 @@
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#1151#</dia:string>
+            <dia:string>#1152#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -478,7 +478,7 @@
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#656#</dia:string>
+            <dia:string>#672#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
