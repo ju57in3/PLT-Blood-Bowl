@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 
 #include "engine/Engine.h"
 #include "engine/Move.h"
@@ -277,39 +278,28 @@ namespace ai {
         int actionsDone = 0;
         bool didAnything = false;
 
-        std::cout << "\n[ADVANCED AI] ===== TURN START =====\n";
-        std::cout << "[ADVANCED AI] TeamId=" << teamId
-                  << " | currentTeam="
-                  << (game->getCurrentTeam() ? game->getCurrentTeam()->getTeamId() : -1)
-                  << " | turnCounter=" << game->getTurnCounter()
-                  << " | ballPos=(" << game->getBallPosition().first << "," << game->getBallPosition().second << ")"
-                  << " | ballHeld=" << (game->getBallIsHold() ? "true" : "false")
-                  << "\n";
+        // LOGS NARRATIFS
+        std::cout << "\n--- [ADVANCED AI] : My turn ---\n";
 
         {
             auto myC = findBallCarrier(me);
             auto oppC = findBallCarrier(opp);
-            std::cout << "[ADVANCED AI] My carrier: "
-                      << (myC ? (myC->getName() + std::string("#") + std::to_string(myC->getId())) : std::string("<none>"))
-                      << " oppCarrier="
-                      << (oppC ? (oppC->getName() + std::string("#") + std::to_string(oppC->getId())) : std::string("<none>"))
-                      << "\n";
         }
 
         while (actionsDone < MAX_ACTIONS_PER_TURN) {
             if (game->getCurrentTeam() == nullptr || game->getCurrentTeam()->getTeamId() != teamId) {
-                std::cout << "[ADVANCED AI] Stop : not my turn anymore.\n";
+                std::cout << "[ADVANCED AI] : Stop ! Not my turn anymore.\n";
                 break;
             }
 
             auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState());
             if (pt) {
                 if (pt->getTurnOver()) {
-                    std::cout << "[ADVANCED AI] Stop : turn is over.\n";
+                    std::cout << "[ADVANCED AI] : Stop ! My turn is over.\n";
                     break;
                 }
                 if (pt->getTouchDown()) {
-                    std::cout << "[ADVANCED AI] Stop : touchdown scored.\n";
+                    std::cout << "[ADVANCED AI] : Stop ! Touchdown scored.\n";
                     break;
                 }
             }
@@ -319,11 +309,8 @@ namespace ai {
 
             targetMode = (oppCarrier != nullptr);
 
-            std::cout << "[ADVANCED AI] Search action #" << (actionsDone + 1)
-                      << " targetMode=" << (targetMode ? "ON" : "OFF")
-                      << " myCarrier=" << (myCarrier ? (myCarrier->getName() + std::string("#") + std::to_string(myCarrier->getId())) : std::string("<none>"))
-                      << " oppCarrier=" << (oppCarrier ? (oppCarrier->getName() + std::string("#") + std::to_string(oppCarrier->getId())) : std::string("<none>"))
-                      << "\n";
+            // LOGS NARRATIFS
+            std::cout << "[ADVANCED AI] : Thinking about its next move ...\n";
 
             enum class ActType { Move, Block, Pass };
             struct Candidate {
@@ -410,40 +397,36 @@ namespace ai {
                     }
                 }
             }
-
+            // LOGS NARRATIFS
             if (!best.a) {
-                std::cout << "[ADVANCED AI] Stop : no candidate action found.\n";
+                std::cout << "[ADVANCED AI] : AI can't make a move on this turn.\n";
                 break;
             }
 
+            // LOGS NARRATIFS
             if (best.score < MIN_SCORE_TO_PLAY) {
-                std::cout << "[ADVANCED AI] Stop : bestScore=" << best.score << " < MIN_SCORE_TO_PLAY=" << MIN_SCORE_TO_PLAY << "\n";
+                std::cout << "[ADVANCED AI] : AI sees no more actions interesting and end its turn.\n";
                 break;
             }
 
-            std::cout << "[ADVANCED AI] CHOSEN ";
-            if (best.type == ActType::Move) std::cout << "move";
-            else if (best.type == ActType::Block) std::cout << "block";
-            else if (best.type == ActType::Pass) std::cout << "pass";
-
-            std::cout << "[ADVANCED AI] CHOSEN ";
-            if (best.type == ActType::Move) std::cout << "MOVE";
-            else if (best.type == ActType::Block) std::cout << "BLOCK";
-            else std::cout << "PASS";
-
-            std::cout << " score=" << best.score
-                      << " actor=" << (best.a ? (best.a->getName() + std::string("#") + std::to_string(best.a->getId())) : std::string("<null>"))
-                      << " actorPos=(" << (best.a ? best.a->getPosition().first : -1) << "," << (best.a ? best.a->getPosition().second : -1) << ")";
-
+            // LOGS NARRATIFS
             if (best.type == ActType::Move) {
-                std::cout << " dest=(" << best.dest.first << "," << best.dest.second << ")";
+                std::cout << "[ADVANCED AI] : AI move " << best.a->getName()
+                          << " from (" << best.a->getPosition().first << "," << best.a->getPosition().second << ")"
+                          << " to (" << best.dest.first << "," << best.dest.second << ")";
             } else if (best.type == ActType::Block) {
-                std::cout << " target=" << (best.b ? (best.b->getName() + std::string("#") + std::to_string(best.b->getId())) : std::string("<null>"))
-                          << " targetPos=(" << (best.b ? best.b->getPosition().first : -1) << "," << (best.b ? best.b->getPosition().second : -1) << ")";
-            } else { // Pass
-                std::cout << " receiver=" << (best.b ? (best.b->getName() + std::string("#") + std::to_string(best.b->getId())) : std::string("<null>"))
-                          << " receiverPos=(" << (best.b ? best.b->getPosition().first : -1) << "," << (best.b ? best.b->getPosition().second : -1) << ")";
+                std::cout << "[ADVANCED AI] : AI block " << best.b->getName()
+                          << " with " << best.a->getName()
+                          << " from (" << best.a->getPosition().first << "," << best.a->getPosition().second << ")";
+            } else {
+                std::cout << "[ADVANCED AI] : AI pass from " << best.a->getName()
+                          << " at (" << best.a->getPosition().first << "," << best.a->getPosition().second << ")"
+                          << " to " << best.b->getName()
+                          << " at (" << best.b->getPosition().first << "," << best.b->getPosition().second << ")";
             }
+
+            std::cout << " (score : " <<std::fixed << std::setprecision(5)
+                      << best.score << ")";
             std::cout << "\n";
 
             switch (best.type) {
@@ -466,15 +449,16 @@ namespace ai {
             didAnything = true;
             actionsDone++;
 
-            std::cout << "[ADVANCED AI] Action #" << actionsDone << " score =" << best.score << "\n";
+            //std::cout << "[ADVANCED AI] Action #" << actionsDone << " score =" << best.score << "\n";
         }
 
         if (!didAnything) {
-            std::cout << "[ADVANCED AI] No valid actions available.\n";
+            std::cout << "[ADVANCED AI] : No valid actions available.\n";
         }
 
         auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState());
         if (pt && didAnything) {
+            std::cout << "[ADVANCED AI] : Ending turn after actions.\n";
             pt->setTurnOver(true);
         }
         return didAnything;
