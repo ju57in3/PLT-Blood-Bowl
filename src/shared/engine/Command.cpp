@@ -25,13 +25,13 @@ namespace engine {
 
         auto ballPos = game->getBallPosition();
 
-        if (ballPos.first == tdColumnTeamA) {
+        if ((ballPos.first == tdColumnTeamA) && (game->getCurrentTeam()->getTeamId() == game->getTeamA().getTeamId()) ) {
             game->getTeamA().setScore(game->getTeamA().getScore() + 1);
 
             if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
                 pt->setTouchDown(true);
             }
-        } else if (ballPos.first == tdColumnTeamB) {
+        } else if ((ballPos.first == tdColumnTeamB) && (game->getCurrentTeam()->getTeamId() == game->getTeamB().getTeamId()) ) {
             game->getTeamB().setScore(game->getTeamB().getScore() + 1);
 
             if (auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState())) {
