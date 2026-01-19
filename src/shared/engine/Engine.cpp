@@ -14,7 +14,7 @@
 namespace engine {
 
     Engine::Engine(std::shared_ptr<state::BloodBowlGame> game)
-        : game(std::move(game)), currentAI(nullptr), lastAITeamTurn(-1)
+        : game(std::move(game)), currentAI(nullptr), secondAI(nullptr), lastAITeamTurn(-1)
     {
     }
 
@@ -62,14 +62,27 @@ namespace engine {
         }
     }
 
+    void Engine::setSecondAI(std::unique_ptr<ai::AI> ai)
+    {
+        secondAI = std::move(ai);
+        if (secondAI) {
+            std::cout << "[ENGINE] Second AI configured for team " << secondAI->teamId << "\n";
+        }
+    }
+
     ai::AI* Engine::getAI() const
     {
         return currentAI.get();
     }
 
+    ai::AI* Engine::getSecondAI() const
+    {
+        return secondAI.get();
+    }
+
     void Engine::runAITurnIfNeeded()
     {
-        if (!currentAI || !game) {
+        if (!game) {
             return;
         }
 
@@ -81,22 +94,28 @@ namespace engine {
 
         int currentTeamId = currentTeam->getTeamId();
 
-        // Si c'est le tour de l'IA ET qu'elle n'a pas déjà joué ce tour
-        if (currentTeamId == currentAI->teamId && lastAITeamTurn != currentTeamId) {
+        // Essayer avec la première IA
+        if (currentAI && currentTeamId == currentAI->teamId && lastAITeamTurn != currentTeamId) {
             std::cout << "[ENGINE] Running AI for team " << currentAI->teamId << "\n";
             currentAI->runAI();
             lastAITeamTurn = currentTeamId; // Marquer que l'IA a joué ce tour
         }
+        // Essayer avec la deuxième IA
+        else if (secondAI && currentTeamId == secondAI->teamId && lastAITeamTurn != currentTeamId) {
+            std::cout << "[ENGINE] Running second AI for team " << secondAI->teamId << "\n";
+            secondAI->runAI();
+            lastAITeamTurn = currentTeamId; // Marquer que l'IA a joué ce tour
+        }
 
-        // Réinitialiser le flag si c'est le tour de l'autre équipe
-        if (currentTeamId != currentAI->teamId) {
+        // Réinitialiser le flag si on a changé d'équipe
+        if (lastAITeamTurn != -1 && currentTeamId != lastAITeamTurn) {
             lastAITeamTurn = -1;
         }
     }
 
     void Engine::runAISetupIfNeeded(state::Setup* setupState)
     {
-        if (!setupState || !currentAI || !game) {
+        if (!setupState || !game) {
             return;
         }
 
@@ -105,21 +124,29 @@ namespace engine {
             return;
         }
 
-        // Si l'IA contrôle l'équipe actuelle ET n'a pas encore fini son setup
-        if (currentAI->teamId == currentTeam->getTeamId() &&
-            !setupState->isTeamSetupDone(currentTeam->getTeamId())) {
+        int currentTeamId = currentTeam->getTeamId();
+        ai::AI* activeAI = nullptr;
 
-            std::cout << "[ENGINE] AI placing players for team " << currentTeam->getTeamId() << "\n";
+        // Déterminer quelle IA est active
+        if (currentAI && currentAI->teamId == currentTeamId) {
+            activeAI = currentAI.get();
+        } else if (secondAI && secondAI->teamId == currentTeamId) {
+            activeAI = secondAI.get();
+        }
+
+        // Si une IA contrôle l'équipe actuelle ET n'a pas encore fini son setup
+        if (activeAI && !setupState->isTeamSetupDone(currentTeamId)) {
+            std::cout << "[ENGINE] AI placing players for team " << currentTeamId << "\n";
 
             // L'IA place ses joueurs
-            currentAI->placePlayers();
+            activeAI->placePlayers();
 
             // Valider le setup
             if (setupState->isValidSetup(*currentTeam)) {
-                std::cout << "[ENGINE] AI setup valid, ending setup for team " << currentTeam->getTeamId() << "\n";
+                std::cout << "[ENGINE] AI setup valid, ending setup for team " << currentTeamId << "\n";
                 setupState->endSetup();
             } else {
-                std::cerr << "[ENGINE] AI setup invalid for team " << currentTeam->getTeamId() << "!\n";
+                std::cerr << "[ENGINE] AI setup invalid for team " << currentTeamId << "!\n";
             }
         }
     }
