@@ -20,6 +20,7 @@
 #include "screen/GameScreen.h"
 #include "screen/EndGameScreen.h"
 #include "screen/LoadGameScreen.h"
+#include "screen/PauseScreen.h"
 
 using namespace std;
 using namespace client;
@@ -51,6 +52,7 @@ int main(int argc, char* argv[]) {
     scenes.registerScreen(std::make_unique<screen::GameScreen>());
     scenes.registerScreen(std::make_unique<screen::EndGameScreen>());
     scenes.registerScreen(std::make_unique<screen::LoadGameScreen>());
+    scenes.registerScreen(std::make_unique<screen::PauseScreen>());
 
     scenes.switchTo(render::SceneId::HOME);
 

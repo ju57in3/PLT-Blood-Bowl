@@ -212,8 +212,10 @@ namespace state {
         if (!game->isInsideBoard(target))
             return false;
 
-        int minX = (kickingTeam.getTeamId() == 1) ? 0 : utility::Constants::BOARD_WIDTH / 2;
-        int maxX = (kickingTeam.getTeamId() == 1) ? utility::Constants::BOARD_WIDTH / 2 - 1 : utility::Constants::BOARD_WIDTH - 1;
+        bool isTeamA = (game->getTeamA().getTeamId() == kickingTeam.getTeamId());
+
+        int minX = isTeamA ? 0 : utility::Constants::BOARD_WIDTH / 2;
+        int maxX = isTeamA ? utility::Constants::BOARD_WIDTH / 2 - 1 : utility::Constants::BOARD_WIDTH - 1;
 
         if (target.first < minX) {
             return false;
