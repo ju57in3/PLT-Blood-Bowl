@@ -7,9 +7,12 @@
 #include <memory>
 #include <ostream>
 #include <utility>
+#include <random>
 #include "state/PlayerTurn.h"
 #include "state/Setup.h"
+#include "state/Kickoff.h"
 #include "ai/AI.h"
+#include "utility/Constants.h"
 
 namespace engine {
 
@@ -147,6 +150,58 @@ namespace engine {
                 setupState->endSetup();
             } else {
                 std::cerr << "[ENGINE] AI setup invalid for team " << currentTeamId << "!\n";
+            }
+        }
+    }
+
+    void Engine::runAIKickoffIfNeeded(state::Kickoff* kickoffState)
+    {
+        if (!kickoffState || !game) {
+            return;
+        }
+
+        auto* currentTeam = game->getCurrentTeam();
+        if (!currentTeam) {
+            return;
+        }
+
+        int currentTeamId = currentTeam->getTeamId();
+        ai::AI* activeAI = nullptr;
+
+        // Déterminer quelle IA est active
+        if (currentAI && currentAI->teamId == currentTeamId) {
+            activeAI = currentAI.get();
+        } else if (secondAI && secondAI->teamId == currentTeamId) {
+            activeAI = secondAI.get();
+        }
+
+        // Si une IA contrôle l'équipe actuelle, sélectionner automatiquement une cible de kickoff
+        if (activeAI) {
+            std::cout << "[ENGINE] AI selecting kickoff target for team " << currentTeamId << "\n";
+
+            // Déterminer quelle moitié du terrain est valide pour cette équipe
+            bool isTeamA = (game->getTeamA().getTeamId() == currentTeamId);
+
+            // TeamA tire vers la gauche (0-12), TeamB tire vers la droite (13-25)
+            int minX = isTeamA ? 0 : utility::Constants::BOARD_WIDTH / 2;
+            int maxX = isTeamA ? utility::Constants::BOARD_WIDTH / 2 - 1 : utility::Constants::BOARD_WIDTH - 1;
+
+            // Sélectionner une position aléatoire au milieu de la moitié de terrain valide
+            std::random_device rd;
+            std::mt19937 rng(rd());
+            std::uniform_int_distribution<int> distX(minX, maxX);
+            std::uniform_int_distribution<int> distY(utility::Constants::BOARD_HEIGHT / 4,
+                                                      3 * utility::Constants::BOARD_HEIGHT / 4);
+
+            std::pair<int, int> target = {distX(rng), distY(rng)};
+
+            // Valider que la cible est valide
+            if (kickoffState->isValidKickoffTarget(target, *currentTeam)) {
+                std::cout << "[ENGINE] AI kickoff target: (" << target.first << ", " << target.second << ")\n";
+                kickoffState->setTarget(target);
+                kickoffState->setTargetSelected(true);
+            } else {
+                std::cerr << "[ENGINE] AI kickoff target invalid!\n";
             }
         }
     }
