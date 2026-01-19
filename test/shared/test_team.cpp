@@ -12,9 +12,6 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     BOOST_CHECK_EQUAL(teamA.getRerolls(), 3);
     BOOST_CHECK_EQUAL(teamA.getName(),"Humans");
 
-    teamA.setScore(1);
-    BOOST_CHECK_EQUAL(teamA.getScore(),1);
-
     teamA.setRerolls(2);
     BOOST_CHECK_EQUAL(teamA.getRerolls(),2);
 
@@ -37,12 +34,15 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     human->setStatus(playable);
     BOOST_CHECK_EQUAL(size(teamA.getPlayableCharacter()),1);
 
-
+    teamA.setScore(1);
+    BOOST_CHECK_EQUAL(teamA.getScore(),1);
+    teamA.resetMatchData();
+    BOOST_CHECK_EQUAL(teamA.getScore(),0);
 
     std::ostringstream oss;
     oss << teamA;
     std::string expected =  "Team ID: 1\n"
-                            "Score: 1\n"
+                            "Score: 0\n"
                             "Characters:\n"
                             "Position: (1, 1) | Status: playable\n";
 
@@ -56,6 +56,7 @@ BOOST_AUTO_TEST_CASE(TestTeam) {
     auto extra = std::make_shared<Character>(16,"Extra","Human", 6, 3, 3, 8);
     teamA.addCharacter(extra);
     BOOST_CHECK_EQUAL(teamA.getCharacters().size(), 16);
+
 }
 
 /* vim: set sw=2 sts=2 et : */
