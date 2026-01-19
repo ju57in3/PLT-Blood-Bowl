@@ -16,7 +16,7 @@
 namespace screen {
     MatchCreationScreen::MatchCreationScreen()
         : selectedTeam1Index(-1), selectedTeam2Index(-1),
-          vsHuman(true), selectedAIType(0) {
+          gameMode(0), selectedAIType(0), selectedAI1Type(0) {
     }
 
     MatchCreationScreen::~MatchCreationScreen() = default;
@@ -119,7 +119,7 @@ namespace screen {
         modeLabel.setFillColor(sf::Color::White);
         modeLabel.setPosition(50, 260);
 
-        pvpButton.setSize({180, 40});
+        pvpButton.setSize({150, 40});
         pvpButton.setFillColor(sf::Color(70, 120, 70));
         pvpButton.setOutlineColor(sf::Color::Yellow);
         pvpButton.setOutlineThickness(3);
@@ -127,32 +127,81 @@ namespace screen {
 
         pvpText.setFont(font);
         pvpText.setString("Humain vs Humain");
-        pvpText.setCharacterSize(16);
+        pvpText.setCharacterSize(14);
         pvpText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(pvpText, pvpButton);
 
-        pveButton.setSize({180, 40});
+        pveButton.setSize({150, 40});
         pveButton.setFillColor(sf::Color(120, 70, 70));
-        pveButton.setPosition(240, 290);
+        pveButton.setPosition(210, 290);
 
         pveText.setFont(font);
         pveText.setString("Humain vs IA");
-        pveText.setCharacterSize(16);
+        pveText.setCharacterSize(14);
         pveText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(pveText, pveButton);
 
-        // === TYPE D'IA ===
+        aivsaiButton.setSize({150, 40});
+        aivsaiButton.setFillColor(sf::Color(70, 70, 120));
+        aivsaiButton.setPosition(370, 290);
+
+        aivsaiText.setFont(font);
+        aivsaiText.setString("IA vs IA");
+        aivsaiText.setCharacterSize(14);
+        aivsaiText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(aivsaiText, aivsaiButton);
+
+        // === TYPE D'IA EQUIPE 1 (AIvAI mode only) ===
+        ai1TypeLabel.setFont(font);
+        ai1TypeLabel.setString("IA Equipe 1:");
+        ai1TypeLabel.setCharacterSize(20);
+        ai1TypeLabel.setFillColor(sf::Color::White);
+        ai1TypeLabel.setPosition(50, 350);
+
+        randomAI1Button.setSize({150, 35});
+        randomAI1Button.setFillColor(sf::Color(80, 80, 120));
+        randomAI1Button.setOutlineColor(sf::Color::Yellow);
+        randomAI1Button.setOutlineThickness(2);
+        randomAI1Button.setPosition(50, 380);
+
+        randomAI1Text.setFont(font);
+        randomAI1Text.setString("Random");
+        randomAI1Text.setCharacterSize(16);
+        randomAI1Text.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(randomAI1Text, randomAI1Button);
+
+        heuristicAI1Button.setSize({150, 35});
+        heuristicAI1Button.setFillColor(sf::Color(80, 80, 120));
+        heuristicAI1Button.setPosition(210, 380);
+
+        heuristicAI1Text.setFont(font);
+        heuristicAI1Text.setString("Heuristique");
+        heuristicAI1Text.setCharacterSize(16);
+        heuristicAI1Text.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(heuristicAI1Text, heuristicAI1Button);
+
+        advancedAI1Button.setSize({150, 35});
+        advancedAI1Button.setFillColor(sf::Color(80, 80, 120));
+        advancedAI1Button.setPosition(370, 380);
+
+        advancedAI1Text.setFont(font);
+        advancedAI1Text.setString("Avancee");
+        advancedAI1Text.setCharacterSize(16);
+        advancedAI1Text.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(advancedAI1Text, advancedAI1Button);
+
+        // === TYPE D'IA EQUIPE 2 (PvE and AIvAI modes) ===
         aiTypeLabel.setFont(font);
-        aiTypeLabel.setString("Type d'IA:");
+        aiTypeLabel.setString("IA Equipe 2:");
         aiTypeLabel.setCharacterSize(20);
         aiTypeLabel.setFillColor(sf::Color::White);
-        aiTypeLabel.setPosition(50, 350);
+        aiTypeLabel.setPosition(50, 430);
 
         randomAIButton.setSize({150, 35});
         randomAIButton.setFillColor(sf::Color(80, 80, 120));
         randomAIButton.setOutlineColor(sf::Color::Yellow);
         randomAIButton.setOutlineThickness(2);
-        randomAIButton.setPosition(50, 380);
+        randomAIButton.setPosition(50, 460);
 
         randomAIText.setFont(font);
         randomAIText.setString("Random");
@@ -162,7 +211,7 @@ namespace screen {
 
         heuristicAIButton.setSize({150, 35});
         heuristicAIButton.setFillColor(sf::Color(80, 80, 120));
-        heuristicAIButton.setPosition(210, 380);
+        heuristicAIButton.setPosition(210, 460);
 
         heuristicAIText.setFont(font);
         heuristicAIText.setString("Heuristique");
@@ -172,7 +221,7 @@ namespace screen {
 
         advancedAIButton.setSize({150, 35});
         advancedAIButton.setFillColor(sf::Color(80, 80, 120));
-        advancedAIButton.setPosition(370, 380);
+        advancedAIButton.setPosition(370, 460);
 
         advancedAIText.setFont(font);
         advancedAIText.setString("Avancee");
@@ -184,7 +233,7 @@ namespace screen {
         errorText.setFont(font);
         errorText.setCharacterSize(16);
         errorText.setFillColor(sf::Color::Red);
-        errorText.setPosition(50, 440);
+        errorText.setPosition(50, 520);
 
         // === BOUTONS D'ACTION ===
         backButton.setSize({140, 40});
@@ -273,20 +322,54 @@ namespace screen {
 
             // Sélection mode de jeu
             if (pvpButton.getGlobalBounds().contains(mpos)) {
-                vsHuman = true;
+                gameMode = 0; // PvP
                 pvpButton.setOutlineThickness(3);
                 pvpButton.setOutlineColor(sf::Color::Yellow);
                 pveButton.setOutlineThickness(0);
+                aivsaiButton.setOutlineThickness(0);
             }
             if (pveButton.getGlobalBounds().contains(mpos)) {
-                vsHuman = false;
+                gameMode = 1; // PvE
                 pveButton.setOutlineThickness(3);
                 pveButton.setOutlineColor(sf::Color::Yellow);
                 pvpButton.setOutlineThickness(0);
+                aivsaiButton.setOutlineThickness(0);
+            }
+            if (aivsaiButton.getGlobalBounds().contains(mpos)) {
+                gameMode = 2; // AIvAI
+                aivsaiButton.setOutlineThickness(3);
+                aivsaiButton.setOutlineColor(sf::Color::Yellow);
+                pvpButton.setOutlineThickness(0);
+                pveButton.setOutlineThickness(0);
             }
 
-            // Sélection type d'IA (seulement si PvE)
-            if (!vsHuman) {
+            // Sélection type d'IA Team 1 (seulement si AIvAI)
+            if (gameMode == 2) {
+                if (randomAI1Button.getGlobalBounds().contains(mpos)) {
+                    selectedAI1Type = 0;
+                    randomAI1Button.setOutlineThickness(2);
+                    randomAI1Button.setOutlineColor(sf::Color::Yellow);
+                    heuristicAI1Button.setOutlineThickness(0);
+                    advancedAI1Button.setOutlineThickness(0);
+                }
+                if (heuristicAI1Button.getGlobalBounds().contains(mpos)) {
+                    selectedAI1Type = 1;
+                    heuristicAI1Button.setOutlineThickness(2);
+                    heuristicAI1Button.setOutlineColor(sf::Color::Yellow);
+                    randomAI1Button.setOutlineThickness(0);
+                    advancedAI1Button.setOutlineThickness(0);
+                }
+                if (advancedAI1Button.getGlobalBounds().contains(mpos)) {
+                    selectedAI1Type = 2;
+                    advancedAI1Button.setOutlineThickness(2);
+                    advancedAI1Button.setOutlineColor(sf::Color::Yellow);
+                    randomAI1Button.setOutlineThickness(0);
+                    heuristicAI1Button.setOutlineThickness(0);
+                }
+            }
+
+            // Sélection type d'IA Team 2 (seulement si PvE ou AIvAI)
+            if (gameMode == 1 || gameMode == 2) {
                 if (randomAIButton.getGlobalBounds().contains(mpos)) {
                     selectedAIType = 0;
                     randomAIButton.setOutlineThickness(2);
@@ -407,10 +490,10 @@ namespace screen {
             // Récupérer un pointeur brut pour configurer l'IA avant de transférer la propriété
             engine::Engine* enginePtr = newEngine.get();
 
-            // Créer et configurer l'IA si mode PvE
-            if (!vsHuman) {
-                int aiTeamId = team2->getTeamId(); // L'IA contrôle l'équipe 2
-
+            // Créer et configurer l'IA selon le mode de jeu
+            if (gameMode == 1) {
+                // Mode PvE : Humain vs IA (team 2 est l'IA)
+                int aiTeamId = team2->getTeamId();
                 std::unique_ptr<ai::AI> aiInstance = nullptr;
 
                 switch (selectedAIType) {
@@ -432,7 +515,7 @@ namespace screen {
                         );
                         break;
 
-                    case 2:
+                    case 2: // Advanced AI
                         std::cout << "[MATCH CREATION] Creating AdvancedAI for team " << aiTeamId << "\n";
                         aiInstance = std::make_unique<ai::AdvancedAI>(
                             *enginePtr,
@@ -454,7 +537,62 @@ namespace screen {
                 if (aiInstance) {
                     enginePtr->setAI(std::move(aiInstance));
                 }
-            } else if (vsHuman) {
+            } else if (gameMode == 2) {
+                // Mode AIvAI : deux IAs jouent l'une contre l'autre
+
+                int ai1TeamId = team1->getTeamId();
+                int ai2TeamId = team2->getTeamId();
+
+                std::unique_ptr<ai::AI> ai1Instance = nullptr;
+                std::unique_ptr<ai::AI> ai2Instance = nullptr;
+
+                // Créer l'IA pour l'équipe 1
+                switch (selectedAI1Type) {
+                    case 0:
+                        std::cout << "[MATCH CREATION] Creating RandomAI for team " << ai1TeamId << "\n";
+                        ai1Instance = std::make_unique<ai::RandomAI>(*enginePtr, newGame, ai1TeamId);
+                        break;
+                    case 1:
+                        std::cout << "[MATCH CREATION] Creating HeuristicAI for team " << ai1TeamId << "\n";
+                        ai1Instance = std::make_unique<ai::HeuristicAI>(*enginePtr, newGame, ai1TeamId);
+                        break;
+                    case 2:
+                        std::cout << "[MATCH CREATION] Creating AdvancedAI for team " << ai1TeamId << "\n";
+                        ai1Instance = std::make_unique<ai::AdvancedAI>(*enginePtr, newGame, ai1TeamId);
+                        break;
+                    default:
+                        ai1Instance = std::make_unique<ai::RandomAI>(*enginePtr, newGame, ai1TeamId);
+                        break;
+                }
+
+                // Créer l'IA pour l'équipe 2
+                switch (selectedAIType) {
+                    case 0:
+                        std::cout << "[MATCH CREATION] Creating RandomAI for team " << ai2TeamId << "\n";
+                        ai2Instance = std::make_unique<ai::RandomAI>(*enginePtr, newGame, ai2TeamId);
+                        break;
+                    case 1:
+                        std::cout << "[MATCH CREATION] Creating HeuristicAI for team " << ai2TeamId << "\n";
+                        ai2Instance = std::make_unique<ai::HeuristicAI>(*enginePtr, newGame, ai2TeamId);
+                        break;
+                    case 2:
+                        std::cout << "[MATCH CREATION] Creating AdvancedAI for team " << ai2TeamId << "\n";
+                        ai2Instance = std::make_unique<ai::AdvancedAI>(*enginePtr, newGame, ai2TeamId);
+                        break;
+                    default:
+                        ai2Instance = std::make_unique<ai::RandomAI>(*enginePtr, newGame, ai2TeamId);
+                        break;
+                }
+
+                // Configurer les deux IAs dans l'Engine
+                if (ai1Instance) {
+                    enginePtr->setAI(std::move(ai1Instance));
+                }
+                if (ai2Instance) {
+                    enginePtr->setSecondAI(std::move(ai2Instance));
+                }
+
+            } else if (gameMode == 0) {
                 std::cout << "[MATCH CREATION] PvP mode - No AI\n";
             }
 
@@ -494,9 +632,22 @@ namespace screen {
         window.draw(pvpText);
         window.draw(pveButton);
         window.draw(pveText);
+        window.draw(aivsaiButton);
+        window.draw(aivsaiText);
 
-        // Type d'IA (seulement si PvE sélectionné)
-        if (!vsHuman) {
+        // Type d'IA Team 1 (seulement si AIvAI sélectionné)
+        if (gameMode == 2) {
+            window.draw(ai1TypeLabel);
+            window.draw(randomAI1Button);
+            window.draw(randomAI1Text);
+            window.draw(heuristicAI1Button);
+            window.draw(heuristicAI1Text);
+            window.draw(advancedAI1Button);
+            window.draw(advancedAI1Text);
+        }
+
+        // Type d'IA Team 2 (seulement si PvE ou AIvAI sélectionné)
+        if (gameMode == 1 || gameMode == 2) {
             window.draw(aiTypeLabel);
             window.draw(randomAIButton);
             window.draw(randomAIText);

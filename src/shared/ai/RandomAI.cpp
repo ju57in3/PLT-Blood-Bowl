@@ -29,10 +29,12 @@ namespace ai {
 
         state::Team *aiTeam = nullptr;
         state::Team *opponentTeam = nullptr;
+
+        // Determine which team this AI controls based on TeamA/TeamB, not hardcoded teamId
         if (game->getTeamA().getTeamId() == teamId) {
             aiTeam = &game->getTeamA();
             opponentTeam = &game->getTeamB();
-        } else {
+        } else if (game->getTeamB().getTeamId() == teamId) {
             aiTeam = &game->getTeamB();
             opponentTeam = &game->getTeamA();
         }

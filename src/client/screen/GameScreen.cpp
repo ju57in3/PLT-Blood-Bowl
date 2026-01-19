@@ -8,6 +8,7 @@
 #include "../client/InputHandler.h"
 #include <engine/Engine.h>
 #include <state/Setup.h>
+#include <state/Kickoff.h>
 #include <state/TeamManager.h>
 #include <state/GameStateManager.h>
 #include <utility/Constants.h>
@@ -92,7 +93,13 @@ namespace screen {
                 if (auto* setupState = dynamic_cast<state::Setup*>(currentState)) {
                     // L'IA place ses joueurs pendant le setup
                     manager->getEngine()->runAISetupIfNeeded(setupState);
-                } else {
+                }
+                // Détection de l'état Kickoff
+                else if (auto* kickoffState = dynamic_cast<state::Kickoff*>(currentState)) {
+                    // L'IA sélectionne une cible de kickoff
+                    manager->getEngine()->runAIKickoffIfNeeded(kickoffState);
+                }
+                else {
                     // Phase de jeu normale
                     manager->getEngine()->runAITurnIfNeeded();
                 }

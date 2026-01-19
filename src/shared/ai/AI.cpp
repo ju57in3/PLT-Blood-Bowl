@@ -43,9 +43,12 @@ namespace ai {
         if (!game) {
             return;
         }
+
+        // Determine if this AI controls TeamA or TeamB
+        bool isTeamA = (game->getTeamA().getTeamId() == teamId);
+
         // Reclaim the controlled team
-        state::Team& team =
-            (teamId == 1) ? game->getTeamA() : game->getTeamB();
+        state::Team& team = isTeamA ? game->getTeamA() : game->getTeamB();
 
         // Reclaim the team's characters
         auto& characters = team.getCharacters();
@@ -64,8 +67,9 @@ namespace ai {
         int topZoneCount = 0;
         int bottomZoneCount = 0;
 
-        // Determine the center line column for this team
-        const int midX = (teamId == 1) ? MID_X_LEFT : MID_X_RIGHT;
+        // Determine the center line column for this team based on which team it is (A or B)
+        // TeamA is always on the left (column 12), TeamB is on the right (column 13)
+        const int midX = isTeamA ? MID_X_LEFT : MID_X_RIGHT;
 
         // Place up to 3 players on the 3 squares of the center line
         std::vector<std::pair<int, int>> losPositions = {
@@ -93,8 +97,9 @@ namespace ai {
 
 
         // Define the half of the field allowed for random placement
+        // TeamA plays on the left half, TeamB plays on the right half
         int minX, maxX;
-        if (teamId == 1) {
+        if (isTeamA) {
             // left team : left half
             minX = 0;
             maxX = BOARD_WIDTH / 2 - 1;
