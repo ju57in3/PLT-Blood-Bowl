@@ -15,7 +15,7 @@ PickUpBall::PickUpBall(std::shared_ptr<state::Character> character)
 
 PickUpBall::~PickUpBall() = default;
 
-CommandTypeId PickUpBall::getCommandTypeId() {
+CommandTypeId PickUpBall::getCommandTypeId() const {
     return PickUpBallId;
 }
 

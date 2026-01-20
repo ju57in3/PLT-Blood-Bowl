@@ -17,6 +17,8 @@
 #include <bits/fs_fwd.h>
 
 #include "state/Kickoff.h"
+#include "network/NetworkClient.h"
+#include "network/NetworkCommand.h"
 
 namespace client {
 
@@ -38,7 +40,7 @@ namespace client {
     }
 
     InputHandler::InputHandler(std::shared_ptr<state::BloodBowlGame> game, engine::Engine* engine)
-        : currentMode(Idle), selectedCharacter(nullptr), game(std::move(game)), engine(engine), pendingBlock(nullptr), previewBoardPos({0,0}), previewCharacter(nullptr), previewIsLegal(false){
+        : currentMode(Idle), selectedCharacter(nullptr), game(std::move(game)), engine(engine), networkClient(nullptr), pendingBlock(nullptr), previewBoardPos({0,0}), previewCharacter(nullptr), previewIsLegal(false){
     }
 
     InputHandler::~InputHandler() = default;
@@ -593,6 +595,10 @@ namespace client {
 
         currentMovePath.clear();
         resetSelection();
+    }
+
+    void InputHandler::setNetworkClient(network::NetworkClient* client) {
+        networkClient = client;
     }
 
 } // namespace client

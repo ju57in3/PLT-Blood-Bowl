@@ -94,4 +94,12 @@ namespace screen {
     std::shared_ptr<state::BloodBowlGame> SceneManager::getGame() const {
         return game;
     }
+
+    void SceneManager::setNetworkClient(network::NetworkClient* client) {
+        networkClient = client;
+    }
+
+    network::NetworkClient* SceneManager::getNetworkClient() const {
+        return networkClient;
+    }
 } // namespace screen

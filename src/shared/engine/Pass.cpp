@@ -19,7 +19,7 @@ namespace engine {
 
     Pass::~Pass() = default;
 
-    CommandTypeId Pass::getCommandTypeId() {
+    CommandTypeId Pass::getCommandTypeId() const {
         return PassId;
     }
 

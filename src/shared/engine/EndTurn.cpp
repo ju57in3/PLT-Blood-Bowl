@@ -13,7 +13,7 @@ namespace engine {
 
     EndTurn::~EndTurn() {}
 
-    CommandTypeId EndTurn::getCommandTypeId() {
+    CommandTypeId EndTurn::getCommandTypeId() const {
         return EndTurnId;
     }
 

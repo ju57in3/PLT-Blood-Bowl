@@ -35,7 +35,7 @@ namespace engine {
         }
     }
 
-    CommandTypeId Block::getCommandTypeId() {
+    CommandTypeId Block::getCommandTypeId() const {
         return BlockId;
     }
 

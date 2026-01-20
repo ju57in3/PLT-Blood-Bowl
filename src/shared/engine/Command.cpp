@@ -11,7 +11,7 @@ namespace engine {
 
     Command::~Command() {}
 
-    CommandTypeId Command::getCommandTypeId() {
+    CommandTypeId Command::getCommandTypeId() const {
         return commandTypeId;
     }
 

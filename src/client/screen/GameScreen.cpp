@@ -47,6 +47,11 @@ namespace screen {
             engine::Engine* eng = manager->getEngine();
             if (game && eng) {
                 inputHandler = std::make_unique<client::InputHandler>(game, eng);
+
+                // Si on est en mode réseau, passer le NetworkClient à l'InputHandler
+                if (manager->getNetworkClient()) {
+                    inputHandler->setNetworkClient(manager->getNetworkClient());
+                }
             }
         }
     }
@@ -80,13 +85,37 @@ namespace screen {
     }
 
     void GameScreen::update() {
+        // Si on est en mode réseau, poll pour les mises à jour
+        if (manager && manager->getNetworkClient()) {
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastPollTime);
+
+            // Poll toutes les 500ms pour ne pas surcharger le serveur
+            if (elapsed.count() >= 500) {
+                lastPollTime = now;
+
+                std::shared_ptr<state::BloodBowlGame> updatedGame;
+                if (manager->getNetworkClient()->pollUpdates(updatedGame)) {
+                    // Mise à jour reçue du serveur
+                    game = updatedGame;
+                    manager->setGame(game);
+
+                    // Recréer la scène avec le nouvel état
+                    if (game) {
+                        scene = std::make_unique<render::Scene>(render::SceneId::GAME, game);
+                    }
+
+                    std::cout << "[Network] Game state updated from server\n";
+                }
+            }
+        }
 
         // update game or input-based logic if necessary
         if (game && game->getCurrentState()) {
             game->getCurrentState()->update();
 
-            // Gérer l'IA selon l'état actuel
-            if (manager && manager->getEngine()) {
+            // Gérer l'IA selon l'état actuel SEULEMENT en mode local (pas réseau)
+            if (manager && manager->getEngine() && !manager->getNetworkClient()) {
                 auto* currentState = game->getCurrentState();
 
                 // Détection de l'état Setup

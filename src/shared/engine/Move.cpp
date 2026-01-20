@@ -26,7 +26,7 @@ namespace engine {
 
     Move::~Move() = default;
 
-    CommandTypeId Move::getCommandTypeId() {
+    CommandTypeId Move::getCommandTypeId() const {
         return MoveId;
     }
 
