@@ -1,150 +1,339 @@
-//
-// Created by justine on 12/12/2025.
-//
 #include "HeuristicAI.h"
 
+#include <algorithm>
+#include <cmath>
+#include <limits>
+#include <memory>
+#include <utility>
+#include <vector>
 #include <iostream>
-#include <random>
-#include <thread>
-#include <chrono>
-#include <engine/Block.h>
-#include <engine/Move.h>
-#include <engine/EndTurn.h>
-#include <utility/GameUtils.h>
-#include <utility/Constants.h>
-#include <state/PlayerTurn.h>
+#include <iomanip>
+
+#include "engine/Engine.h"
+#include "engine/Move.h"
+#include "engine/Block.h"
+#include "utility/GameUtils.h"
+#include "utility/Constants.h"
+#include "state/Team.h"
+#include "state/Character.h"
+#include "state/CharacterStatus.h"
+#include "state/PlayerTurn.h"
+
+namespace {
+    using Pos = std::pair<int, int>;
+
+    static int chebyshev(const Pos &a, const Pos &b) {
+        return std::max(std::abs(a.first - b.first), std::abs(a.second - b.second));
+    }
+
+    static bool isPlayableForAction(const std::shared_ptr<state::Character> &c) {
+        if (!c) return false;
+        return c->getStatus() == state::CharacterStatus::playable;
+    }
+
+    static bool isStanding(const std::shared_ptr<state::Character> &c) {
+        return utility::GameUtils::isCharacterStanding(c);
+    }
+
+    static bool isOccupied(const std::shared_ptr<state::BloodBowlGame> &game, const Pos &p) {
+        return (utility::GameUtils::getCharacterAt(game, p) != nullptr);
+    }
+
+    static bool insideBoard(const std::shared_ptr<state::BloodBowlGame> &game, const Pos &p) {
+        return game && game->isInsideBoard(p);
+    }
+
+    static state::Team *getTeamById(const std::shared_ptr<state::BloodBowlGame> &game, int teamId) {
+        if (!game) return nullptr;
+        if (game->getTeamA().getTeamId() == teamId) return &game->getTeamA();
+        if (game->getTeamB().getTeamId() == teamId) return &game->getTeamB();
+        return nullptr;
+    }
+
+    static state::Team *getOpponentTeam(const std::shared_ptr<state::BloodBowlGame> &game, int teamId) {
+        if (!game) return nullptr;
+        if (game->getTeamA().getTeamId() == teamId) return &game->getTeamB();
+        if (game->getTeamB().getTeamId() == teamId) return &game->getTeamA();
+        return nullptr;
+    }
+
+    static int opponentTouchdownX(const std::shared_ptr<state::BloodBowlGame> &game, int myTeamId) {
+        const int w = utility::Constants::BOARD_WIDTH;
+        const bool iAmTeamA = (game && game->getTeamA().getTeamId() == myTeamId);
+        return iAmTeamA ? (w - 1) : 0;
+    }
+
+    static std::shared_ptr<state::Character> findBallCarrier(state::Team *team) {
+        if (!team) return nullptr;
+        for (auto &c: team->getCharacters()) {
+            if (c && c->getHasBall()) return c;
+        }
+        return nullptr;
+    }
+
+    static std::shared_ptr<state::Character> closestPlayableTo(state::Team *team, const Pos &target) {
+        if (!team) return nullptr;
+        std::shared_ptr<state::Character> best = nullptr;
+        int bestD = std::numeric_limits<int>::max();
+
+        for (auto &c: team->getCharacters()) {
+            if (!isPlayableForAction(c) || !isStanding(c)) continue;
+            int d = chebyshev(c->getPosition(), target);
+            if (d < bestD) {
+                bestD = d;
+                best = c;
+            }
+        }
+        return best;
+    }
+
+    static std::shared_ptr<state::Character> closestStandingOpponent(state::Team *opp, const Pos &from) {
+        if (!opp) return nullptr;
+        std::shared_ptr<state::Character> best = nullptr;
+        int bestD = std::numeric_limits<int>::max();
+
+        for (auto &c: opp->getCharacters()) {
+            if (!c) continue;
+            if (!isStanding(c)) continue;
+            auto st = c->getStatus();
+            if (st != state::CharacterStatus::playable && st != state::CharacterStatus::played) continue;
+
+            int d = chebyshev(c->getPosition(), from);
+            if (d < bestD) {
+                bestD = d;
+                best = c;
+            }
+        }
+        return best;
+    }
+
+    static Pos bestMoveToward(const std::shared_ptr<state::BloodBowlGame> &game,
+                              const std::shared_ptr<state::Character> &who,
+                              const Pos &target) {
+        if (!game || !who) return target;
+
+        const int mv = who->getMovement();
+        const Pos start = who->getPosition();
+
+        Pos best = start;
+        int bestD = chebyshev(start, target);
+
+        for (int dx = -mv; dx <= mv; ++dx) {
+            for (int dy = -mv; dy <= mv; ++dy) {
+                Pos p{start.first + dx, start.second + dy};
+                if (!insideBoard(game, p)) continue;
+                if (p != start && isOccupied(game, p)) continue;
+
+                int d = chebyshev(p, target);
+                if (d < bestD) {
+                    bestD = d;
+                    best = p;
+                }
+            }
+        }
+        return best;
+    }
+} // namespace
 
 namespace ai {
-    HeuristicAI::HeuristicAI(engine::Engine& engine, const std::shared_ptr<state::BloodBowlGame>& game, int teamId) : AI(engine, game, teamId){
-
+    HeuristicAI::HeuristicAI(engine::Engine &engine,
+                             const std::shared_ptr<state::BloodBowlGame> &game,
+                             int teamId)
+        : ai::AI(engine, game, teamId) {
     }
 
     HeuristicAI::~HeuristicAI() = default;
 
     bool HeuristicAI::runAI() {
-        state::Team* myTeam = nullptr;
-        state::Team* opponentTeam = nullptr;
-        if (game->getTeamA().getTeamId() == teamId) {
-            myTeam = &game->getTeamA();
-            opponentTeam = &game->getTeamB();
-        } else {
-            myTeam = &game->getTeamB();
-            opponentTeam = &game->getTeamA();
+        auto &eng = this->engine;
+        auto gs = this->game;
+        int myId = this->teamId;
+
+        if (!gs) {
+            std::cout << "[HEURISTIC AI] : Stop ! No game state.\n";
+            return false;
         }
 
-        if (!myTeam || !opponentTeam) return false;
+        std::cout << "\n--- [HEURISTIC AI] : My turn (team " << myId << ") ---\n";
 
-        std::cout << "\n[HEURISTIC AI] Team " << teamId << " is playing.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Pause avant de commencer
-
-        auto ballPos = game->getBallPosition();
-        std::cout << "[HEURISTIC AI] Ball position: (" << ballPos.first << ", " << ballPos.second << ")\n";
-
-        // Vérifier que la position de la balle est valide
-        if (ballPos.first < 0 || ballPos.first >= utility::Constants::BOARD_WIDTH ||
-            ballPos.second < 0 || ballPos.second >= utility::Constants::BOARD_HEIGHT) {
-            std::cerr << "[HEURISTIC AI] WARNING: Invalid ball position! Ball may not be initialized.\n";
-            // On continue quand même avec un comportement par défaut
+        if (!gs->getCurrentTeam() || gs->getCurrentTeam()->getTeamId() != myId) {
+            std::cout << "[HEURISTIC AI] : Stop ! Not my turn.\n";
+            return false;
         }
 
-        // Parcourir tous les personnages jouables et leur assigner une action
-        for (const auto& c : myTeam->getCharacters()) {
-            if (!c || c->getStatus() != state::playable) continue;
+        auto *pt = dynamic_cast<state::PlayerTurn *>(gs->getCurrentState());
+        if (!pt) {
+            std::cout << "[HEURISTIC AI] : Stop ! Not in PlayerTurn state.\n";
+            return false;
+        }
+        if (pt->getTurnOver()) {
+            std::cout << "[HEURISTIC AI] : Stop ! My turn already over.\n";
+            return false;
+        }
+        if (pt->getTouchDown()) {
+            std::cout << "[HEURISTIC AI] : Stop ! Touchdown already scored.\n";
+            return false;
+        }
 
-            // Priorité 1: Bloquer un adversaire adjacent
-            auto blockables = utility::GameUtils::blockableCharacters(c, *opponentTeam);
-            if (!blockables.empty()) {
-                std::cout << "[HEURISTIC AI] " << c->getName() << " blocking " << blockables.front()->getName() << "\n";
-                auto blockCmd = std::make_unique<engine::Block>(c, blockables.front());
-                engine.addCommand(std::move(blockCmd));
-                std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Pause après l'action
-                continue; // Passer au prochain personnage
+        state::Team *myTeam = getTeamById(gs, myId);
+        state::Team *oppTeam = getOpponentTeam(gs, myId);
+        if (!myTeam || !oppTeam) {
+            std::cout << "[HEURISTIC AI] : Stop ! Can't resolve teams.\n";
+            return false;
+        }
+
+        auto isOpponent = [&](const std::shared_ptr<state::Character> &c) -> bool {
+            if (!c) return false;
+            for (auto &oc: oppTeam->getCharacters()) {
+                if (oc.get() == c.get()) return true;
+            }
+            return false;
+        };
+
+        const int MAX_ACTIONS_PER_TURN = 11;
+        int actionsDone = 0;
+        bool didAnything = false;
+
+        // Petit header contexte
+        {
+            auto ball = gs->getBallPosition();
+            std::cout << "[HEURISTIC AI] : Ball at (" << ball.first << "," << ball.second << ")"
+                    << " | ballHeld=" << (gs->getBallIsHold() ? "true" : "false") << "\n";
+        }
+
+        while (actionsDone < MAX_ACTIONS_PER_TURN) {
+            // sécurité : si le tour a changé ou s'est fini
+            if (!gs->getCurrentTeam() || gs->getCurrentTeam()->getTeamId() != myId) {
+                std::cout << "[HEURISTIC AI] : Stop ! Not my turn anymore.\n";
+                break;
+            }
+            if (pt->getTurnOver()) {
+                std::cout << "[HEURISTIC AI] : Stop ! Turnover.\n";
+                break;
+            }
+            if (pt->getTouchDown()) {
+                std::cout << "[HEURISTIC AI] : Stop ! Touchdown scored.\n";
+                break;
             }
 
-            // Priorité 2: Se déplacer vers la balle en utilisant la capacité de mouvement complète
-            int maxMove = c->getMovement();
-            std::pair<int,int> currentPos = c->getPosition();
-            std::pair<int,int> targetPos = currentPos;
+            const Pos ballPos = gs->getBallPosition();
+            auto myCarrier = findBallCarrier(myTeam);
+            auto oppCarrier = findBallCarrier(oppTeam);
 
-            // Calculer la distance à la balle
-            int dx = ballPos.first - currentPos.first;
-            int dy = ballPos.second - currentPos.second;
-            int distToBall = std::abs(dx) + std::abs(dy); // Distance de Manhattan
-
-            if (distToBall > 2) {
-                // Si loin de la balle, aller vers elle
-                std::cout << "[HEURISTIC AI] " << c->getName() << " at (" << currentPos.first << ","
-                          << currentPos.second << ") moving towards ball at ("
-                          << ballPos.first << "," << ballPos.second << ")\n";
-
-                // Déplacer progressivement vers la balle
-                for (int step = 0; step < maxMove; ++step) {
-                    // Recalculer la direction depuis la position actuelle
-                    dx = ballPos.first - targetPos.first;
-                    dy = ballPos.second - targetPos.second;
-
-                    // Si on a atteint la balle, arrêter
-                    if (dx == 0 && dy == 0) {
-                        std::cout << "[HEURISTIC AI] Reached ball position!\n";
-                        break;
-                    }
-
-                    int nextX = targetPos.first;
-                    int nextY = targetPos.second;
-
-                    // Avancer d'une case vers la balle (priorité sur l'axe avec la plus grande distance)
-                    if (std::abs(dx) >= std::abs(dy) && dx != 0) {
-                        nextX += (dx > 0) ? 1 : -1;
-                    } else if (dy != 0) {
-                        nextY += (dy > 0) ? 1 : -1;
-                    }
-
-                    // Vérifier les limites du terrain
-                    if (nextX < 0 || nextX >= utility::Constants::BOARD_WIDTH ||
-                        nextY < 0 || nextY >= utility::Constants::BOARD_HEIGHT) {
-                        std::cout << "[HEURISTIC AI] Movement would go out of bounds, stopping.\n";
-                        break;
-                    }
-
-                    targetPos = {nextX, nextY};
-                }
-
-                std::cout << "[HEURISTIC AI] Final target position: (" << targetPos.first << ","
-                          << targetPos.second << ")\n";
-
-                auto moveCmd = std::make_unique<engine::Move>(c, targetPos);
-                engine.addCommand(std::move(moveCmd));
-                std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Pause après l'action
-                continue; // Passer au prochain personnage
-            }
-
-            // Priorité 3: Mouvement aléatoire si proche de la balle
-            std::uniform_int_distribution<int> dDist(1, maxMove);
-            int moveDistance = dDist(utility::GameUtils::getRNG());
-
-            for (int step = 0; step < moveDistance; ++step) {
-                std::pair<int,int> nextPos = utility::GameUtils::scatterOnce(targetPos);
-
-                if (nextPos.first < 0 || nextPos.first >= utility::Constants::BOARD_WIDTH ||
-                    nextPos.second < 0 || nextPos.second >= utility::Constants::BOARD_HEIGHT) {
+            // 0) S'il n'y a plus aucun joueur playable, on stop
+            bool anyPlayable = false;
+            for (auto &c: myTeam->getCharacters()) {
+                if (isPlayableForAction(c) && isStanding(c)) {
+                    anyPlayable = true;
                     break;
                 }
-
-                targetPos = nextPos;
+            }
+            if (!anyPlayable) {
+                std::cout << "[HEURISTIC AI] : No playable players left.\n";
+                break;
             }
 
-            std::cout << "[HEURISTIC AI] " << c->getName() << " random move\n";
-            auto moveCmd = std::make_unique<engine::Move>(c, targetPos);
-            engine.addCommand(std::move(moveCmd));
-            std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Pause après l'action
+            std::cout << "[HEURISTIC AI] : Thinking... (action #" << (actionsDone + 1) << ")\n";
+
+            // ==========================================================
+            // A) BLOCK PRIORITAIRE sur le porteur adverse si adjacent
+            // ==========================================================
+            bool didActionThisLoop = false;
+            if (oppCarrier) {
+                for (auto &me: myTeam->getCharacters()) {
+                    if (!isPlayableForAction(me) || !isStanding(me)) continue;
+                    if (chebyshev(me->getPosition(), oppCarrier->getPosition()) == 1) {
+                        std::cout << "[HEURISTIC AI] : Block ball carrier -> "
+                                << me->getName() << " blocks " << oppCarrier->getName()
+                                << " from (" << me->getPosition().first << "," << me->getPosition().second << ")\n";
+
+                        eng.addCommand(std::make_unique<engine::Block>(me, oppCarrier));
+                        eng.executeCommand();
+
+                        didAnything = true;
+                        actionsDone++;
+                        didActionThisLoop = true;
+                        break;
+                    }
+                }
+                if (didActionThisLoop) continue;
+            }
+
+            // ==========================================================
+            // B) SI JE PORTE : avancer vers TD
+            // ==========================================================
+            if (myCarrier && isPlayableForAction(myCarrier) && isStanding(myCarrier)) {
+                int tdX = opponentTouchdownX(gs, myId);
+                Pos tdTarget{tdX, myCarrier->getPosition().second};
+                Pos moveTo = bestMoveToward(gs, myCarrier, tdTarget);
+
+                std::cout << "[HEURISTIC AI] : Carry to TD (x=" << tdX << ") -> move "
+                        << myCarrier->getName()
+                        << " from (" << myCarrier->getPosition().first << "," << myCarrier->getPosition().second << ")"
+                        << " to (" << moveTo.first << "," << moveTo.second << ")\n";
+
+                eng.addCommand(std::make_unique<engine::Move>(myCarrier, moveTo));
+                eng.executeCommand();
+
+                didAnything = true;
+                actionsDone++;
+                continue;
+            }
+
+            // ==========================================================
+            // C) SINON : 1) ramasser la balle si au sol 2) sinon chasser porteur
+            // ==========================================================
+            Pos chaseTarget = ballPos;
+            if (oppCarrier) chaseTarget = oppCarrier->getPosition();
+
+            auto chaser = closestPlayableTo(myTeam, chaseTarget);
+
+            if (chaser) {
+                // Option : block opportuniste si adjacent à un adversaire (mais jamais soi-même)
+                auto nearestOpp = closestStandingOpponent(oppTeam, chaser->getPosition());
+                if (nearestOpp && isOpponent(nearestOpp) &&
+                    chebyshev(chaser->getPosition(), nearestOpp->getPosition()) == 1) {
+                    std::cout << "[HEURISTIC AI] : Opportunistic block -> "
+                            << chaser->getName() << " blocks " << nearestOpp->getName()
+                            << " from (" << chaser->getPosition().first << "," << chaser->getPosition().second << ")\n";
+
+                    eng.addCommand(std::make_unique<engine::Block>(chaser, nearestOpp));
+                    eng.executeCommand();
+
+                    didAnything = true;
+                    actionsDone++;
+                    continue;
+                }
+
+                // Sinon move vers cible
+                Pos moveTo = bestMoveToward(gs, chaser, chaseTarget);
+
+                std::cout << "[HEURISTIC AI] : Move toward target -> "
+                        << chaser->getName()
+                        << " from (" << chaser->getPosition().first << "," << chaser->getPosition().second << ")"
+                        << " to (" << moveTo.first << "," << moveTo.second << ")"
+                        << " toward (" << chaseTarget.first << "," << chaseTarget.second << ")\n";
+
+                eng.addCommand(std::make_unique<engine::Move>(chaser, moveTo));
+                eng.executeCommand();
+
+                didAnything = true;
+                actionsDone++;
+                continue;
+            }
+
+            // ==========================================================
+            // D) Aucun coup possible (devrait être rare)
+            // ==========================================================
+            std::cout << "[HEURISTIC AI] : No action found for this loop.\n";
+            break;
         }
 
-        std::cout << "[HEURISTIC AI] Turn complete, adding EndTurn command\n";
+        // Très important : rendre la main (sinon tu peux rester coincée)
+        std::cout << "[HEURISTIC AI] : End turn. actionsDone=" << actionsDone
+                << " didAnything=" << (didAnything ? "true" : "false") << "\n";
+        pt->setTurnOver(true);
 
-        // Ajouter la commande de fin de tour
-        auto endTurnCmd = std::make_unique<engine::EndTurn>();
-        engine.addCommand(std::move(endTurnCmd));
-
-        return false;
+        return didAnything;
     }
-}
+} // namespace ai

@@ -2,20 +2,24 @@
 // Created by matt-o on 1/15/26.
 //
 #include <boost/test/unit_test.hpp>
-#include "engine/Engine.h"
+
 #include "engine/Block.h"
-#include <cstdlib>
+#include "utility/GameUtils.h"
 
 using namespace engine;
 using namespace state;
+using namespace utility;
 
 BOOST_AUTO_TEST_CASE(TestEngine) {
+    //Set up RNG
+    GameUtils::getRNG().seed(42);
+
+    //Set up game, teams and characters
     Team teamA(1, "Humans", 3);
     Team teamB(2, "Orcs", 2);
 
     auto attacker = std::make_shared<Character>(1, "Attacker", "Human", 6, 3, 3, 8);
     attacker->setPosition({5, 5});
-    attacker->setHasBall(false); // No ball
     teamA.addCharacter(attacker);
 
     auto defender = std::make_shared<Character>(2, "Defender", "Human", 6, 3, 3, 5);

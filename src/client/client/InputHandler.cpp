@@ -19,6 +19,12 @@
 #include "state/Kickoff.h"
 
 namespace client {
+    bool isTileInTeamSide(std::pair<int,int> tile, state::Team* team, const std::shared_ptr<state::BloodBowlGame>& game) {
+        bool isTeamA = (team->getTeamId() == game->getTeamA().getTeamId());
+        if (isTeamA && tile.first > 12) return false;
+        if (!isTeamA && tile.first < 13) return false;
+        return true;
+    }
 
     bool isKnockdown(const std::shared_ptr<state::Character> character) {
         if (character->getStatus() == state::CharacterStatus::knockedDown) {
@@ -337,6 +343,10 @@ namespace client {
                 return;
             }
             auto* team = game->getCurrentTeam();
+            if (!isTileInTeamSide(boardPos, team, game)) {
+                std::cout << "Tile is in the opposite side, cannot place character here\n";
+                return;
+            }
             for (auto& cptr : team->getCharacters()) {
                 if (cptr && cptr->getStatus() == state::CharacterStatus::bench) {
                     cptr->setPosition(boardPos);

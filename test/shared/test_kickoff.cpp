@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(TestKickoff)
     // Test kickBall with invalid target (out of bounds for current team)
     // This should assign ball to closest player
     game.setCurrentTeam(&game.getTeamA());
-    kickoff->kickBall({20, 10}); // Invalid for team A (wrong half)
+    kickoff->kickBall({40, 10});
     auto posInvalid = game.getBallPosition();
     BOOST_CHECK(posInvalid.first >= 0 && posInvalid.first < 26);
     BOOST_CHECK(posInvalid.second >= 0 && posInvalid.second < 15);
@@ -207,4 +207,6 @@ BOOST_AUTO_TEST_CASE(TestKickoff)
         BOOST_CHECK(edgePos.first >= 0 && edgePos.first < 26);
         BOOST_CHECK(edgePos.second >= 0 && edgePos.second < 15);
     }
+
+
 }
