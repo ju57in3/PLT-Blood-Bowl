@@ -118,6 +118,10 @@ namespace screen {
                     // Revenir à l'état Setup
                     game->setCurrentState(game->getStateList().at(state::SETUP).get());
 
+                    // Reset le score
+                    game->getTeamA().setScore(0);
+                    game->getTeamB().setScore(0);
+
                     // Retourner à l'écran de jeu
                     if (manager) manager->switchTo(render::SceneId::GAME);
                 }
