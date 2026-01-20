@@ -177,7 +177,7 @@ namespace screen {
     }
 
     void LoadGameScreen::draw(sf::RenderWindow& window) {
-        window.clear(sf::Color(30, 30, 30));
+        window.clear(sf::Color(50, 50, 60)); // Uniform gray background
 
         window.draw(title);
         window.draw(backButton);

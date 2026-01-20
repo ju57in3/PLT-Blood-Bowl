@@ -60,7 +60,10 @@ namespace screen {
             auto diceOptions = inputHandler->getPendingBlockDiceOptions();
             if (!diceOptions.empty() && scene) {
                 auto diceBounds = scene->computeDiceBounds(diceOptions);
-                sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
+                // Convertir les coordonnées pixel en coordonnées de la vue (important en mode plein écran)
+                sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
+                sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
+                sf::Vector2i mousePos(static_cast<int>(worldPos.x), static_cast<int>(worldPos.y));
                 handleDiceClick(mousePos, diceBounds);
                 return; // Event consommé
             }

@@ -101,9 +101,10 @@ namespace screen {
 
         // === BOUTONS D'ACTION ===
         backButton.setSize({140, 40});
-        backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setOrigin(70, 20);
-        backButton.setPosition(90, windowHeight - 40);
+        backButton.setFillColor(sf::Color(80, 80, 100));
+        backButton.setOutlineColor(sf::Color(150, 150, 170));
+        backButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(backButton, 0.1f, 0.92f);  // Raised from bottom
 
         backText.setFont(font);
         backText.setString("Retour");
@@ -112,9 +113,10 @@ namespace screen {
         LayoutHelper::centerTextInRect(backText, backButton);
 
         validateButton.setSize({160, 40});
-        validateButton.setFillColor(sf::Color(50, 150, 50));
-        validateButton.setOrigin(80, 20);
-        validateButton.setPosition(windowWidth - 100, windowHeight - 40);
+        validateButton.setFillColor(sf::Color(70, 150, 70));
+        validateButton.setOutlineColor(sf::Color(150, 150, 170));
+        validateButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(validateButton, 0.9f, 0.92f);  // Raised from bottom
 
         validateText.setFont(font);
         validateText.setString("Valider");
@@ -137,7 +139,7 @@ namespace screen {
             playerTypes = {"Blitzer", "Black Orc", "Thrower", "Lineman"};
         }
 
-        float startY = 310;
+        float startY = 330;  // Adjusted to fit better with new spacing
         for (size_t i = 0; i < playerTypes.size(); ++i) {
             playerCounts.push_back(0);
 
@@ -385,7 +387,7 @@ namespace screen {
     }
 
     void TeamCreationScreen::draw(sf::RenderWindow &window) {
-        window.clear(sf::Color(30, 30, 30));
+        window.clear(sf::Color(50, 50, 60)); // Uniform gray background
 
         window.draw(title);
 

@@ -27,15 +27,16 @@ namespace screen {
         // Title
         title.setFont(font);
         title.setString("Gestion des Equipes");
-        title.setCharacterSize(32);
+        title.setCharacterSize(36);
         title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativePosition(title, 0.5f, 20.0f / windowHeight);
+        LayoutHelper::setRelativePosition(title, 0.5f, 0.05f);
 
         // Back button
         backButton.setSize({140, 40});
-        backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setOrigin(70, 20);
-        backButton.setPosition(90, windowHeight - 40);
+        backButton.setFillColor(sf::Color(80, 80, 100));
+        backButton.setOutlineColor(sf::Color(150, 150, 170));
+        backButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(backButton, 0.08f, 0.92f);  // Raised from bottom
 
         backText.setFont(font);
         backText.setString("Retour");
@@ -44,10 +45,11 @@ namespace screen {
         LayoutHelper::centerTextInRect(backText, backButton);
 
         // Create new team button
-        createNewButton.setSize({180, 40});
-        createNewButton.setFillColor(sf::Color(50, 100, 200));
-        createNewButton.setOrigin(90, 20);
-        createNewButton.setPosition(windowWidth / 2, windowHeight - 40);
+        createNewButton.setSize({200, 40});
+        createNewButton.setFillColor(sf::Color(70, 100, 150));
+        createNewButton.setOutlineColor(sf::Color(150, 150, 170));
+        createNewButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(createNewButton, 0.5f, 0.92f);  // Raised from bottom
 
         createNewText.setFont(font);
         createNewText.setString("Nouvelle Equipe");
@@ -60,30 +62,30 @@ namespace screen {
         editModeLabel.setString("Edition d'equipe");
         editModeLabel.setCharacterSize(24);
         editModeLabel.setFillColor(sf::Color::Yellow);
-        editModeLabel.setPosition(50, 80);
+        editModeLabel.setPosition(60, 100);  // More margin from top
 
         editNameBox.setSize({300, 35});
-        editNameBox.setFillColor(sf::Color(50, 50, 50));
-        editNameBox.setOutlineColor(sf::Color::White);
+        editNameBox.setFillColor(sf::Color(60, 60, 70));
+        editNameBox.setOutlineColor(sf::Color(150, 150, 170));
         editNameBox.setOutlineThickness(2);
         editNameBox.setOrigin(150, 17.5f);
-        editNameBox.setPosition(200, 137.5f);
+        editNameBox.setPosition(210, 157.5f);  // Adjusted
 
         editNameText.setFont(font);
         editNameText.setCharacterSize(18);
         editNameText.setFillColor(sf::Color::White);
-        editNameText.setPosition(55, 125);
+        editNameText.setPosition(65, 145);  // Adjusted
 
         rerollsLabel.setFont(font);
         rerollsLabel.setString("Relances:");
         rerollsLabel.setCharacterSize(20);
         rerollsLabel.setFillColor(sf::Color::White);
-        rerollsLabel.setPosition(50, 180);
+        rerollsLabel.setPosition(60, 200);  // Adjusted
 
         rerollsMinusButton.setSize({35, 35});
-        rerollsMinusButton.setFillColor(sf::Color(150, 50, 50));
+        rerollsMinusButton.setFillColor(sf::Color(150, 70, 70));
         rerollsMinusButton.setOrigin(17.5f, 17.5f);
-        rerollsMinusButton.setPosition(67.5f, 227.5f);
+        rerollsMinusButton.setPosition(77.5f, 247.5f);  // Adjusted
 
         rerollsMinusText.setFont(font);
         rerollsMinusText.setString("-");
@@ -94,12 +96,12 @@ namespace screen {
         rerollsCountText.setFont(font);
         rerollsCountText.setCharacterSize(20);
         rerollsCountText.setFillColor(sf::Color::Yellow);
-        rerollsCountText.setPosition(100, 215);
+        rerollsCountText.setPosition(110, 235);  // Adjusted
 
         rerollsPlusButton.setSize({35, 35});
-        rerollsPlusButton.setFillColor(sf::Color(50, 150, 50));
+        rerollsPlusButton.setFillColor(sf::Color(70, 150, 70));
         rerollsPlusButton.setOrigin(17.5f, 17.5f);
-        rerollsPlusButton.setPosition(157.5f, 227.5f);
+        rerollsPlusButton.setPosition(167.5f, 247.5f);  // Adjusted
 
         rerollsPlusText.setFont(font);
         rerollsPlusText.setString("+");
@@ -108,9 +110,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(rerollsPlusText, rerollsPlusButton);
 
         saveEditButton.setSize({140, 40});
-        saveEditButton.setFillColor(sf::Color(50, 150, 50));
+        saveEditButton.setFillColor(sf::Color(70, 150, 70));
         saveEditButton.setOrigin(70, 20);
-        saveEditButton.setPosition(120, 290);
+        saveEditButton.setPosition(130, 310);  // Adjusted
 
         saveEditText.setFont(font);
         saveEditText.setString("Sauvegarder");
@@ -119,9 +121,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(saveEditText, saveEditButton);
 
         cancelEditButton.setSize({120, 40});
-        cancelEditButton.setFillColor(sf::Color(150, 50, 50));
+        cancelEditButton.setFillColor(sf::Color(150, 70, 70));
         cancelEditButton.setOrigin(60, 20);
-        cancelEditButton.setPosition(260, 290);
+        cancelEditButton.setPosition(280, 310);  // Adjusted
 
         cancelEditText.setFont(font);
         cancelEditText.setString("Annuler");
@@ -155,7 +157,7 @@ namespace screen {
         // Get font from ResourceManager
         const sf::Font& font = resources->getFont("fonts/bloodbowl.ttf");
 
-        float startY = 80;
+        float startY = 100;  // More margin from top
         float itemHeight = 100;
 
         for (size_t i = 0; i < teams.size(); ++i) {
@@ -165,10 +167,10 @@ namespace screen {
             // Team box
             sf::RectangleShape box;
             box.setSize({1050, 90});
-            box.setFillColor(sf::Color(40, 40, 60));
-            box.setOutlineColor(sf::Color(100, 100, 150));
+            box.setFillColor(sf::Color(60, 70, 85));
+            box.setOutlineColor(sf::Color(120, 130, 150));
             box.setOutlineThickness(2);
-            box.setPosition(50, yPos);
+            box.setPosition(60, yPos);  // More margin from left
             teamBoxes.push_back(box);
 
             // Team name
@@ -384,7 +386,7 @@ namespace screen {
     }
 
     void TeamManagementScreen::draw(sf::RenderWindow& window) {
-        window.clear(sf::Color(30, 30, 30));
+        window.clear(sf::Color(50, 50, 60)); // Uniform gray background
 
         // Get font from ResourceManager for drawing
         const sf::Font& font = resources->getFont("fonts/bloodbowl.ttf");
