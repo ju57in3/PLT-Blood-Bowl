@@ -444,7 +444,7 @@ namespace client {
         auto character = utility::GameUtils::getCharacterAt(game, boardPos);
         if (!character) return;
 
-        if (isCharacterPlayable(character) || isKnockdown(character)) {
+        if ( (isCharacterPlayable(character) || isKnockdown(character)) && currentMovePath.empty() ) {
             selectedCharacter = character;
             currentMode = InputMode::Selected_Character;
             std::cout << "Selected character: " << character->getName() << "\n";
