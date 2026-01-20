@@ -96,8 +96,8 @@ namespace screen {
     }
 
     void HomeScreen::draw(sf::RenderWindow &window) {
-        // background
-        window.clear(sf::Color(30, 30, 30));
+        // background - uniform gray
+        window.clear(sf::Color(50, 50, 60));
         window.draw(title);
         for (size_t i = 0; i < buttonRects.size(); ++i) {
             window.draw(buttonRects[i]);

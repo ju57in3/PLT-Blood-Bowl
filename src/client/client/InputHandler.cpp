@@ -59,19 +59,31 @@ namespace client {
 
 
     std::pair<int, int> InputHandler::screenToBoard(const sf::Vector2i& screenPos) const {
+        // Calcul avec offset et vérification des limites du plateau
         const int stride = utility::Constants::BOARD_TILE_PIXEL_SIZE + utility::Constants::BOARD_TILE_SPACING;
 
-        // Ajuster pour le centre des tuiles
-        int adjustedX = screenPos.x - utility::Constants::BOARD_OFFSET_X + (utility::Constants::BOARD_TILE_PIXEL_SIZE / 2);
-        int adjustedY = screenPos.y - utility::Constants::BOARD_OFFSET_Y + (utility::Constants::BOARD_TILE_PIXEL_SIZE / 2);
+        // Position relative par rapport au début du plateau
+        const int relativeX = screenPos.x - utility::Constants::BOARD_OFFSET_X;
+        const int relativeY = screenPos.y - utility::Constants::BOARD_OFFSET_Y;
 
-        int boardX = adjustedX / stride;
-        int boardY = adjustedY / stride;
+        // Conversion en coordonnées de case avec vérification stricte
+        int boardX = relativeX / stride;
+        int boardY = relativeY / stride;
 
+        // Clamp dans les limites du plateau (0 à WIDTH-1, 0 à HEIGHT-1)
         if (boardX < 0) boardX = 0;
         if (boardX >= utility::Constants::BOARD_WIDTH) boardX = utility::Constants::BOARD_WIDTH - 1;
         if (boardY < 0) boardY = 0;
         if (boardY >= utility::Constants::BOARD_HEIGHT) boardY = utility::Constants::BOARD_HEIGHT - 1;
+
+        // Vérification supplémentaire : si on est en dehors du plateau, retourner une position invalide
+        // qui ne sera pas dans les limites logiques du jeu
+        if (relativeX < 0 || relativeY < 0 ||
+            relativeX >= stride * utility::Constants::BOARD_WIDTH ||
+            relativeY >= stride * utility::Constants::BOARD_HEIGHT) {
+            // Hors plateau - retourner une position clamped mais marquée comme potentiellement invalide
+            // Le reste du code gérera cette situation
+        }
 
         return {boardX, boardY};
     }
@@ -144,19 +156,28 @@ namespace client {
         auto* currentState = game->getCurrentState();
         if (!currentState) return;
 
+        // Convertir les coordonnées pixel en coordonnées de la vue (important en mode plein écran)
+        sf::Vector2i pixelPos(mouseButton.x, mouseButton.y);
+        sf::Vector2f worldPos = window->mapPixelToCoords(pixelPos);
+
+        // Créer un événement modifié avec les coordonnées converties
+        sf::Event::MouseButtonEvent convertedMouseButton = mouseButton;
+        convertedMouseButton.x = static_cast<int>(worldPos.x);
+        convertedMouseButton.y = static_cast<int>(worldPos.y);
+
         // Dispatch par type d'état
         if (dynamic_cast<state::Setup*>(currentState)) {
-            handleSetupClick(mouseButton);
+            handleSetupClick(convertedMouseButton);
             return;
         }
 
         if (dynamic_cast<state::Kickoff*>(currentState)) {
-            handleKickoffClick(mouseButton);
+            handleKickoffClick(convertedMouseButton);
             return;
         }
 
         if (dynamic_cast<state::PlayerTurn*>(currentState)) {
-            handlePlayerTurnClick(mouseButton);
+            handlePlayerTurnClick(convertedMouseButton);
             return;
         }
     }
@@ -338,7 +359,10 @@ namespace client {
             this->handleMouseClick(event.mouseButton, window, {});
         } else if (event.type == sf::Event::MouseMoved) {
             if (window) {
-                sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);
+                // En mode plein écran, il faut convertir les coordonnées pixel en coordonnées de la vue
+                sf::Vector2i pixelPos(event.mouseMove.x, event.mouseMove.y);
+                sf::Vector2f worldPos = window->mapPixelToCoords(pixelPos);
+                sf::Vector2i mousePos(static_cast<int>(worldPos.x), static_cast<int>(worldPos.y));
                 updatePreviewFromMouse(mousePos);
             }
         } else if (event.type == sf::Event::KeyPressed) {

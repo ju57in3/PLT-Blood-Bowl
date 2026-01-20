@@ -32,32 +32,32 @@ namespace screen {
         // Titre principal
         title.setFont(font);
         title.setString("Creation de match");
-        title.setCharacterSize(32);
+        title.setCharacterSize(36);
         title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativePosition(title, 0.5f, 20.0f / windowHeight);
+        LayoutHelper::setRelativePosition(title, 0.5f, 0.05f);
 
         // === ÉQUIPE 1 ===
         team1Label.setFont(font);
         team1Label.setString("Equipe 1:");
         team1Label.setCharacterSize(20);
         team1Label.setFillColor(sf::Color::White);
-        team1Label.setPosition(50, 80);
+        team1Label.setPosition(60, 100);  // More margin from top
 
         team1SelectBox.setSize({400, 40});
-        team1SelectBox.setFillColor(sf::Color(50, 50, 80));
-        team1SelectBox.setOutlineColor(sf::Color::White);
+        team1SelectBox.setFillColor(sf::Color(70, 80, 100));
+        team1SelectBox.setOutlineColor(sf::Color(150, 150, 170));
         team1SelectBox.setOutlineThickness(2);
-        team1SelectBox.setPosition(50, 110);
+        team1SelectBox.setPosition(60, 130);
 
         team1NameText.setFont(font);
         team1NameText.setCharacterSize(18);
         team1NameText.setFillColor(sf::Color::White);
-        team1NameText.setPosition(60, 118);
+        team1NameText.setPosition(70, 138);
 
         team1PrevButton.setSize({35, 35});
-        team1PrevButton.setFillColor(sf::Color(100, 100, 100));
+        team1PrevButton.setFillColor(sf::Color(80, 80, 100));
         team1PrevButton.setOrigin(17.5f, 17.5f);
-        team1PrevButton.setPosition(477.5f, 129.5f);
+        team1PrevButton.setPosition(487.5f, 149.5f);
 
         team1PrevText.setFont(font);
         team1PrevText.setString("<");
@@ -66,9 +66,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(team1PrevText, team1PrevButton);
 
         team1NextButton.setSize({35, 35});
-        team1NextButton.setFillColor(sf::Color(100, 100, 100));
+        team1NextButton.setFillColor(sf::Color(80, 80, 100));
         team1NextButton.setOrigin(17.5f, 17.5f);
-        team1NextButton.setPosition(517.5f, 129.5f);
+        team1NextButton.setPosition(527.5f, 149.5f);
 
         team1NextText.setFont(font);
         team1NextText.setString(">");
@@ -81,23 +81,23 @@ namespace screen {
         team2Label.setString("Equipe 2:");
         team2Label.setCharacterSize(20);
         team2Label.setFillColor(sf::Color::White);
-        team2Label.setPosition(50, 170);
+        team2Label.setPosition(60, 190);  // More spacing
 
         team2SelectBox.setSize({400, 40});
-        team2SelectBox.setFillColor(sf::Color(80, 50, 50));
-        team2SelectBox.setOutlineColor(sf::Color::White);
+        team2SelectBox.setFillColor(sf::Color(100, 70, 80));
+        team2SelectBox.setOutlineColor(sf::Color(150, 150, 170));
         team2SelectBox.setOutlineThickness(2);
-        team2SelectBox.setPosition(50, 200);
+        team2SelectBox.setPosition(60, 220);
 
         team2NameText.setFont(font);
         team2NameText.setCharacterSize(18);
         team2NameText.setFillColor(sf::Color::White);
-        team2NameText.setPosition(60, 208);
+        team2NameText.setPosition(70, 228);
 
         team2PrevButton.setSize({35, 35});
-        team2PrevButton.setFillColor(sf::Color(100, 100, 100));
+        team2PrevButton.setFillColor(sf::Color(80, 80, 100));
         team2PrevButton.setOrigin(17.5f, 17.5f);
-        team2PrevButton.setPosition(477.5f, 219.5f);
+        team2PrevButton.setPosition(487.5f, 239.5f);
 
         team2PrevText.setFont(font);
         team2PrevText.setString("<");
@@ -106,9 +106,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(team2PrevText, team2PrevButton);
 
         team2NextButton.setSize({35, 35});
-        team2NextButton.setFillColor(sf::Color(100, 100, 100));
+        team2NextButton.setFillColor(sf::Color(80, 80, 100));
         team2NextButton.setOrigin(17.5f, 17.5f);
-        team2NextButton.setPosition(517.5f, 219.5f);
+        team2NextButton.setPosition(527.5f, 239.5f);
 
         team2NextText.setFont(font);
         team2NextText.setString(">");
@@ -121,14 +121,14 @@ namespace screen {
         modeLabel.setString("Mode de jeu:");
         modeLabel.setCharacterSize(20);
         modeLabel.setFillColor(sf::Color::White);
-        modeLabel.setPosition(50, 260);
+        modeLabel.setPosition(60, 280);  // More spacing
 
         pvpButton.setSize({150, 40});
-        pvpButton.setFillColor(sf::Color(70, 120, 70));
+        pvpButton.setFillColor(sf::Color(70, 120, 90));
         pvpButton.setOutlineColor(sf::Color::Yellow);
         pvpButton.setOutlineThickness(3);
         pvpButton.setOrigin(75, 20);
-        pvpButton.setPosition(125, 310);
+        pvpButton.setPosition(135, 330);  // Adjusted position
 
         pvpText.setFont(font);
         pvpText.setString("Humain vs Humain");
@@ -137,9 +137,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(pvpText, pvpButton);
 
         pveButton.setSize({150, 40});
-        pveButton.setFillColor(sf::Color(120, 70, 70));
+        pveButton.setFillColor(sf::Color(120, 90, 70));
         pveButton.setOrigin(75, 20);
-        pveButton.setPosition(285, 310);
+        pveButton.setPosition(295, 330);  // Adjusted position
 
         pveText.setFont(font);
         pveText.setString("Humain vs IA");
@@ -148,9 +148,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(pveText, pveButton);
 
         aivsaiButton.setSize({150, 40});
-        aivsaiButton.setFillColor(sf::Color(70, 70, 120));
+        aivsaiButton.setFillColor(sf::Color(70, 90, 120));
         aivsaiButton.setOrigin(75, 20);
-        aivsaiButton.setPosition(445, 310);
+        aivsaiButton.setPosition(455, 330);  // Adjusted position
 
         aivsaiText.setFont(font);
         aivsaiText.setString("IA vs IA");
@@ -163,14 +163,14 @@ namespace screen {
         ai1TypeLabel.setString("IA Equipe 1:");
         ai1TypeLabel.setCharacterSize(20);
         ai1TypeLabel.setFillColor(sf::Color::White);
-        ai1TypeLabel.setPosition(50, 350);
+        ai1TypeLabel.setPosition(60, 380);  // Adjusted
 
         randomAI1Button.setSize({150, 35});
-        randomAI1Button.setFillColor(sf::Color(80, 80, 120));
+        randomAI1Button.setFillColor(sf::Color(80, 80, 100));
         randomAI1Button.setOutlineColor(sf::Color::Yellow);
         randomAI1Button.setOutlineThickness(2);
         randomAI1Button.setOrigin(75, 17.5f);
-        randomAI1Button.setPosition(125, 397.5f);
+        randomAI1Button.setPosition(135, 422.5f);  // Adjusted
 
         randomAI1Text.setFont(font);
         randomAI1Text.setString("Random");
@@ -179,9 +179,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(randomAI1Text, randomAI1Button);
 
         heuristicAI1Button.setSize({150, 35});
-        heuristicAI1Button.setFillColor(sf::Color(80, 80, 120));
+        heuristicAI1Button.setFillColor(sf::Color(80, 80, 100));
         heuristicAI1Button.setOrigin(75, 17.5f);
-        heuristicAI1Button.setPosition(285, 397.5f);
+        heuristicAI1Button.setPosition(295, 422.5f);  // Fixed: now matches randomAI1Button Y position
 
         heuristicAI1Text.setFont(font);
         heuristicAI1Text.setString("Heuristique");
@@ -190,9 +190,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(heuristicAI1Text, heuristicAI1Button);
 
         advancedAI1Button.setSize({150, 35});
-        advancedAI1Button.setFillColor(sf::Color(80, 80, 120));
+        advancedAI1Button.setFillColor(sf::Color(80, 80, 100));
         advancedAI1Button.setOrigin(75, 17.5f);
-        advancedAI1Button.setPosition(445, 397.5f);
+        advancedAI1Button.setPosition(455, 422.5f);  // Fixed: now matches randomAI1Button Y position
 
         advancedAI1Text.setFont(font);
         advancedAI1Text.setString("Avancee");
@@ -205,14 +205,14 @@ namespace screen {
         aiTypeLabel.setString("IA Equipe 2:");
         aiTypeLabel.setCharacterSize(20);
         aiTypeLabel.setFillColor(sf::Color::White);
-        aiTypeLabel.setPosition(50, 430);
+        aiTypeLabel.setPosition(60, 460);  // Updated for consistency
 
         randomAIButton.setSize({150, 35});
-        randomAIButton.setFillColor(sf::Color(80, 80, 120));
+        randomAIButton.setFillColor(sf::Color(80, 80, 100));
         randomAIButton.setOutlineColor(sf::Color::Yellow);
         randomAIButton.setOutlineThickness(2);
         randomAIButton.setOrigin(75, 17.5f);
-        randomAIButton.setPosition(125, 477.5f);
+        randomAIButton.setPosition(135, 502.5f);  // Updated for consistency
 
         randomAIText.setFont(font);
         randomAIText.setString("Random");
@@ -221,9 +221,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(randomAIText, randomAIButton);
 
         heuristicAIButton.setSize({150, 35});
-        heuristicAIButton.setFillColor(sf::Color(80, 80, 120));
+        heuristicAIButton.setFillColor(sf::Color(80, 80, 100));
         heuristicAIButton.setOrigin(75, 17.5f);
-        heuristicAIButton.setPosition(285, 477.5f);
+        heuristicAIButton.setPosition(295, 502.5f);  // Updated for consistency
 
         heuristicAIText.setFont(font);
         heuristicAIText.setString("Heuristique");
@@ -232,9 +232,9 @@ namespace screen {
         LayoutHelper::centerTextInRect(heuristicAIText, heuristicAIButton);
 
         advancedAIButton.setSize({150, 35});
-        advancedAIButton.setFillColor(sf::Color(80, 80, 120));
+        advancedAIButton.setFillColor(sf::Color(80, 80, 100));
         advancedAIButton.setOrigin(75, 17.5f);
-        advancedAIButton.setPosition(445, 477.5f);
+        advancedAIButton.setPosition(455, 502.5f);  // Updated for consistency
 
         advancedAIText.setFont(font);
         advancedAIText.setString("Avancee");
@@ -250,9 +250,10 @@ namespace screen {
 
         // === BOUTONS D'ACTION ===
         backButton.setSize({140, 40});
-        backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setOrigin(70, 20);
-        backButton.setPosition(90, windowHeight - 40);
+        backButton.setFillColor(sf::Color(80, 80, 100));
+        backButton.setOutlineColor(sf::Color(150, 150, 170));
+        backButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(backButton, 0.1f, 0.92f);  // Raised from bottom
 
         backText.setFont(font);
         backText.setString("Retour");
@@ -261,9 +262,10 @@ namespace screen {
         LayoutHelper::centerTextInRect(backText, backButton);
 
         startButton.setSize({200, 50});
-        startButton.setFillColor(sf::Color(50, 150, 50));
-        startButton.setOrigin(100, 25);
-        startButton.setPosition(windowWidth - 120, windowHeight - 40);
+        startButton.setFillColor(sf::Color(70, 150, 70));
+        startButton.setOutlineColor(sf::Color(150, 150, 170));
+        startButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(startButton, 0.9f, 0.92f);  // Raised from bottom
 
         startText.setFont(font);
         startText.setString("Demarrer le match");
@@ -620,7 +622,7 @@ namespace screen {
     }
 
     void MatchCreationScreen::draw(sf::RenderWindow &window) {
-        window.clear(sf::Color(30, 30, 30));
+        window.clear(sf::Color(50, 50, 60)); // Uniform gray background
 
         window.draw(title);
 

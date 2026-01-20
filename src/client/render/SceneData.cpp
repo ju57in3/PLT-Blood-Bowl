@@ -59,7 +59,7 @@ namespace render {
         // Team B (droite) : x > 160 + 26*32 = 992
 
         const float tileSize = static_cast<float>(Constants::BOARD_TILE_PIXEL_SIZE);
-        const float spacing = 4.0f; // Espacement entre les joueurs
+        const float spacing = 2.0f; // Espacement entre les joueurs (réduit car scale 0.7x)
 
         // Positions de base pour les zones
         float baseX = 0.0f;
@@ -87,12 +87,15 @@ namespace render {
             baseY = 910.0f;
         }
 
-        const int playersPerRow = 4;
+        const int playersPerRow = 6; // Augmenté de 4 à 5 car les joueurs sont plus petits
         const int row = index / playersPerRow;
         const int col = index % playersPerRow;
 
-        float x = baseX + col * (tileSize + spacing);
-        float y = baseY + row * (tileSize);
+        // Taille effective avec le scale de 0.7
+        const float effectiveSize = tileSize * 0.7f;
+
+        float x = baseX + col * (effectiveSize + spacing);
+        float y = baseY + row * (effectiveSize + spacing);
 
         return {x, y};
     }
@@ -159,7 +162,6 @@ namespace render {
                     position = getOffFieldCoords(state::injured, true, injuredCountA++);
                     playersSprites_TeamA.at(index).setScale(0.7f, 0.7f);
                 } else {
-                    // Joueur sur le terrain
                     position = pos2Coords(character->getPosition());
                     playersSprites_TeamA.at(index).setScale(1.0f, 1.0f);
                 }
@@ -349,7 +351,7 @@ namespace render {
                                        std::to_string(game->getTeamB().getScore());
                 sf::Text scoreDisplay(scoreText, defaultFont, 70);
                 scoreDisplay.setStyle(sf::Text::Bold);
-                scoreDisplay.setColor(sf::Color::Black);
+                scoreDisplay.setFillColor(sf::Color::Black);
                 screen::LayoutHelper::setRelativePosition(scoreDisplay,0.865f,0.19f);
                 window.draw(scoreDisplay);
 

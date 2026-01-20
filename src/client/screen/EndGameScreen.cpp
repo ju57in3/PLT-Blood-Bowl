@@ -136,7 +136,7 @@ namespace screen {
                 "  -  " +
                 game->getTeamB().getName() + ": " + std::to_string(scoreB)
             );
-            LayoutHelper::centerHorizontally(scoreText);
+            LayoutHelper::setRelativePosition(scoreText, 0.5f, 0.25f);
 
             // Déterminer le gagnant
             if (scoreA > scoreB) {
@@ -146,12 +146,12 @@ namespace screen {
             } else {
                 winnerText.setString("Match nul !");
             }
-            LayoutHelper::centerHorizontally(winnerText);
+            LayoutHelper::setRelativePosition(winnerText, 0.5f, 0.17f);
         }
     }
 
     void EndGameScreen::draw(sf::RenderWindow &window) {
-        window.clear(sf::Color(30, 30, 30));
+        window.clear(sf::Color(50, 50, 60)); // Uniform gray background
         window.draw(title);
         window.draw(winnerText);
         window.draw(scoreText);
