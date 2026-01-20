@@ -22,17 +22,14 @@ namespace screen {
             std::cerr << "Failed to load font" << std::endl;
         }
 
-        const float windowWidth = utility::Constants::WINDOW_WIDTH;
-        const float windowHeight = utility::Constants::WINDOW_HEIGHT;
-
         // Titre
         title.setFont(font);
         title.setString("PAUSE");
         title.setCharacterSize(48);
         title.setFillColor(sf::Color::White);
         title.setStyle(sf::Text::Bold);
-        LayoutHelper::setRelativeY(title, windowHeight, 0.15f);
-        LayoutHelper::centerHorizontally(title, windowWidth);
+        LayoutHelper::setRelativeY(title, 0.15f);
+        LayoutHelper::centerHorizontally(title);
 
         // Bouton Reprendre
         const float buttonWidth = 375.0f;
@@ -42,8 +39,8 @@ namespace screen {
         resumeButton.setFillColor(sf::Color(50, 100, 200));
         resumeButton.setOutlineColor(sf::Color::White);
         resumeButton.setOutlineThickness(2);
-        LayoutHelper::setRelativeY(resumeButton, windowHeight, 0.35f);
-        LayoutHelper::centerHorizontally(resumeButton, windowWidth);
+        LayoutHelper::setRelativeY(resumeButton, 0.35f);
+        LayoutHelper::centerHorizontally(resumeButton);
 
         resumeText.setFont(font);
         resumeText.setString("Reprendre la partie");
@@ -56,8 +53,8 @@ namespace screen {
         saveButton.setFillColor(sf::Color(50, 150, 50));
         saveButton.setOutlineColor(sf::Color::White);
         saveButton.setOutlineThickness(2);
-        LayoutHelper::setRelativeY(saveButton, windowHeight, 0.50f);
-        LayoutHelper::centerHorizontally(saveButton, windowWidth);
+        LayoutHelper::setRelativeY(saveButton, 0.50f);
+        LayoutHelper::centerHorizontally(saveButton);
 
         saveText.setFont(font);
         saveText.setString("Sauvegarder et quitter");
@@ -70,8 +67,8 @@ namespace screen {
         quitButton.setFillColor(sf::Color(150, 50, 50));
         quitButton.setOutlineColor(sf::Color::White);
         quitButton.setOutlineThickness(2);
-        LayoutHelper::setRelativeY(quitButton, windowHeight, 0.65f);
-        LayoutHelper::centerHorizontally(quitButton, windowWidth);
+        LayoutHelper::setRelativeY(quitButton, 0.65f);
+        LayoutHelper::centerHorizontally(quitButton);
 
         quitText.setFont(font);
         quitText.setString("Quitter sans sauvegarder");

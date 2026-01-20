@@ -59,10 +59,14 @@ namespace client {
 
 
     std::pair<int, int> InputHandler::screenToBoard(const sf::Vector2i& screenPos) const {
-
         const int stride = utility::Constants::BOARD_TILE_PIXEL_SIZE + utility::Constants::BOARD_TILE_SPACING;
-        int boardX = (screenPos.x - utility::Constants::BOARD_OFFSET_X) / stride;
-        int boardY = (screenPos.y - utility::Constants::BOARD_OFFSET_Y) / stride;
+
+        // Ajuster pour le centre des tuiles
+        int adjustedX = screenPos.x - utility::Constants::BOARD_OFFSET_X + (utility::Constants::BOARD_TILE_PIXEL_SIZE / 2);
+        int adjustedY = screenPos.y - utility::Constants::BOARD_OFFSET_Y + (utility::Constants::BOARD_TILE_PIXEL_SIZE / 2);
+
+        int boardX = adjustedX / stride;
+        int boardY = adjustedY / stride;
 
         if (boardX < 0) boardX = 0;
         if (boardX >= utility::Constants::BOARD_WIDTH) boardX = utility::Constants::BOARD_WIDTH - 1;

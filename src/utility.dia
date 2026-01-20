@@ -317,7 +317,7 @@
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#160#</dia:string>
+            <dia:string>#544#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -340,7 +340,7 @@
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#96#</dia:string>
+            <dia:string>#352#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -455,7 +455,7 @@
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#1152#</dia:string>
+            <dia:string>#1920#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -478,7 +478,7 @@
             <dia:string>#constexpr int#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
-            <dia:string>#672#</dia:string>
+            <dia:string>#1080#</dia:string>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
