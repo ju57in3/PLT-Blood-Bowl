@@ -1741,7 +1741,7 @@
             <dia:string>#void#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
-            <dia:enum val="1"/>
+            <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
@@ -1771,7 +1771,7 @@
             <dia:string>#void#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
-            <dia:enum val="1"/>
+            <dia:enum val="0"/>
           </dia:attribute>
           <dia:attribute name="comment">
             <dia:string>##</dia:string>
