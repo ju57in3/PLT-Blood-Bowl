@@ -79,6 +79,59 @@ namespace client {
         std::cout << "Selection reset. Mode: IDLE\n";
     }
 
+    std::vector<std::pair<int,int>> InputHandler::findPathBFS(const std::pair<int,int>& start,const std::pair<int,int>& goal) const
+    {
+        const int W = utility::Constants::BOARD_WIDTH;
+        const int H = utility::Constants::BOARD_HEIGHT;
+
+        std::vector<std::pair<int,int>> open;
+        std::map<std::pair<int,int>, std::pair<int,int>> parent;
+
+        open.push_back(start);
+        parent[start] = {-1, -1};
+
+        size_t index = 0;
+
+        const int dirs[8][2] = {
+            {1,0},{-1,0},{0,1},{0,-1},
+            {1,1},{1,-1},{-1,1},{-1,-1}
+        };
+
+        while (index < open.size()) {
+            auto cur = open[index++];
+
+            if (cur == goal)
+                break;
+
+            for (auto& d : dirs) {
+                std::pair<int,int> next = {cur.first + d[0], cur.second + d[1]};
+
+                if (next.first < 0 || next.first >= W ||
+                    next.second < 0 || next.second >= H)
+                    continue;
+
+                if (parent.count(next)) continue;
+
+                if (utility::GameUtils::getCharacterAt(game, next)) continue;
+
+                parent[next] = cur;
+                open.push_back(next);
+            }
+        }
+
+        if (!parent.count(goal))
+            return {};
+
+        std::vector<std::pair<int,int>> path;
+        for (auto p = goal; p != start; p = parent[p])
+            path.push_back(p);
+
+        std::reverse(path.begin(), path.end());
+        return path;
+    }
+
+
+
     void InputHandler::handleMouseClick(const sf::Event::MouseButtonEvent& mouseButton, sf::RenderWindow* window, const std::vector<sf::FloatRect>& diceBounds) {
         if (!window || !game || !engine) {
             return;
@@ -486,15 +539,26 @@ namespace client {
                 return;
         }
 
-        // Vérifier si c'est un pas adjacent
-        if (!isAdjacentStep(boardPos, last)) {
-            std::cout << "Invalid step: must be adjacent to previous step\n";
-            return;
-        }
-
         // Vérifier la limite de mouvement
         if (!canAddMoveStep()) {
             std::cout << "Movement limit reached\n";
+            return;
+        }
+
+        if (!isAdjacentStep(boardPos, last)) {
+
+            auto path = findPathBFS(last, boardPos);
+
+            if (path.empty()) {
+                std::cout << "No valid path found\n";
+                return;
+            }
+
+            for (auto& step : path) {
+                if (!canAddMoveStep()) break;
+                currentMovePath.push_back(step);
+            }
+
             return;
         }
 
