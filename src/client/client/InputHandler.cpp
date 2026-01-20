@@ -476,15 +476,15 @@ namespace client {
             return;
         }
 
+        // Vérifier si la case est occupée
+        if (utility::GameUtils::getCharacterAt(game, boardPos)) {
+                std::cout << "Cannot step onto occupied tile\n";
+                return;
+        }
+
         // Vérifier si c'est un pas adjacent
         if (!isAdjacentStep(boardPos, last)) {
             std::cout << "Invalid step: must be adjacent to previous step\n";
-            return;
-        }
-
-        // Vérifier si la case est occupée
-        if (utility::GameUtils::getCharacterAt(game, boardPos)) {
-            std::cout << "Cannot step onto occupied tile\n";
             return;
         }
 
@@ -534,7 +534,12 @@ namespace client {
             selectedCharacter->setStatus(state::CharacterStatus::played);
             resetSelection();
         } else {
-            std::cout << "Right-clicked the selected character; no action\n";
+            selectedCharacter = nullptr;
+            currentMode = InputMode::Idle;
+            currentMovePath.clear();
+            std::cout   << "Cancelling move\n"
+                        << "No character selected"
+                        << std::endl;
         }
     }
 
