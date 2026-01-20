@@ -1,3 +1,1 @@
-Kick off qui rate de temps en temps (>1/10)
-Set up qui s'enclenche sans raison, rare (<1/10)
-Choix de dé infinie tant qu'on click droit sur la cible
+Pas de bugs recensés
