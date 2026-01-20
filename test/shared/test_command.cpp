@@ -28,7 +28,6 @@ BOOST_AUTO_TEST_CASE(TestCommand) {
     auto orc = std::make_shared<Character>(1, "Orc1", "Orc", 6, 3, 3, 9);
     orc->setPosition({1, 5});
     orc->setStatus(playable);
-    orc->setHasBall(true);
     teamB.addCharacter(orc);
 
     auto gamePtr = std::make_shared<BloodBowlGame>(teamA, teamB);
@@ -41,20 +40,25 @@ BOOST_AUTO_TEST_CASE(TestCommand) {
     baseCmd.execute(gamePtr);
     BOOST_CHECK(true);
 
-    // Test touchdown
+    // Test touchdown both teams
     gamePtr->setCurrentState(gamePtr->getStateList().at(PLAYERTURN).get());
     gamePtr->setBallPosition({24, 5});
     baseCmd.checkAndHandleTouchdown(gamePtr);
     BOOST_CHECK_EQUAL(teamA.getScore(), 0);
 
+    hum->setHasBall(true);
+    gamePtr->setBallIsHold(true);
     std::pair<int, int> targetPos = {utility::Constants::BOARD_WIDTH - 1, 5};
     gamePtr->setBallPosition(targetPos);
 
     baseCmd.checkAndHandleTouchdown(gamePtr);
     BOOST_CHECK_EQUAL(teamA.getScore(), 1);
 
+    gamePtr->setCurrentTeam(&gamePtr->getTeamB());
+    hum->setHasBall(false);
     targetPos = {0, 5};
     gamePtr->setBallPosition(targetPos);
+    orc->setHasBall(true);
 
     baseCmd.checkAndHandleTouchdown(gamePtr);
     BOOST_CHECK_EQUAL(teamB.getScore(), 1);
