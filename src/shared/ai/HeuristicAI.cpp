@@ -197,12 +197,10 @@ namespace ai {
         // Petit header contexte
         {
             auto ball = gs->getBallPosition();
-            std::cout << "[HEURISTIC AI] : Ball at (" << ball.first << "," << ball.second << ")"
-                    << " | ballHeld=" << (gs->getBallIsHold() ? "true" : "false") << "\n";
+            std::cout << "[HEURISTIC AI] : Ball at (" << ball.first << "," << ball.second << ")\n";
         }
 
         while (actionsDone < MAX_ACTIONS_PER_TURN) {
-            // sécurité : si le tour a changé ou s'est fini
             if (!gs->getCurrentTeam() || gs->getCurrentTeam()->getTeamId() != myId) {
                 std::cout << "[HEURISTIC AI] : Stop ! Not my turn anymore.\n";
                 break;
@@ -220,7 +218,6 @@ namespace ai {
             auto myCarrier = findBallCarrier(myTeam);
             auto oppCarrier = findBallCarrier(oppTeam);
 
-            // 0) S'il n'y a plus aucun joueur playable, on stop
             bool anyPlayable = false;
             for (auto &c: myTeam->getCharacters()) {
                 if (isPlayableForAction(c) && isStanding(c)) {
@@ -233,18 +230,13 @@ namespace ai {
                 break;
             }
 
-            std::cout << "[HEURISTIC AI] : Thinking... (action #" << (actionsDone + 1) << ")\n";
-
-            // ==========================================================
-            // A) BLOCK PRIORITAIRE sur le porteur adverse si adjacent
-            // ==========================================================
             bool didActionThisLoop = false;
             if (oppCarrier) {
                 for (auto &me: myTeam->getCharacters()) {
                     if (!isPlayableForAction(me) || !isStanding(me)) continue;
                     if (chebyshev(me->getPosition(), oppCarrier->getPosition()) == 1) {
-                        std::cout << "[HEURISTIC AI] : Block ball carrier -> "
-                                << me->getName() << " blocks " << oppCarrier->getName()
+                        std::cout << "[HEURISTIC AI] : "
+                                << me->getName() << " blocks carrier " << oppCarrier->getName()
                                 << " from (" << me->getPosition().first << "," << me->getPosition().second << ")\n";
 
                         eng.addCommand(std::make_unique<engine::Block>(me, oppCarrier));
@@ -259,15 +251,12 @@ namespace ai {
                 if (didActionThisLoop) continue;
             }
 
-            // ==========================================================
-            // B) SI JE PORTE : avancer vers TD
-            // ==========================================================
             if (myCarrier && isPlayableForAction(myCarrier) && isStanding(myCarrier)) {
                 int tdX = opponentTouchdownX(gs, myId);
                 Pos tdTarget{tdX, myCarrier->getPosition().second};
                 Pos moveTo = bestMoveToward(gs, myCarrier, tdTarget);
 
-                std::cout << "[HEURISTIC AI] : Carry to TD (x=" << tdX << ") -> move "
+                std::cout << "[HEURISTIC AI] : AI carry ball to touchdown (x=" << tdX << ") and move "
                         << myCarrier->getName()
                         << " from (" << myCarrier->getPosition().first << "," << myCarrier->getPosition().second << ")"
                         << " to (" << moveTo.first << "," << moveTo.second << ")\n";
@@ -280,9 +269,6 @@ namespace ai {
                 continue;
             }
 
-            // ==========================================================
-            // C) SINON : 1) ramasser la balle si au sol 2) sinon chasser porteur
-            // ==========================================================
             Pos chaseTarget = ballPos;
             if (oppCarrier) chaseTarget = oppCarrier->getPosition();
 
@@ -293,7 +279,7 @@ namespace ai {
                 auto nearestOpp = closestStandingOpponent(oppTeam, chaser->getPosition());
                 if (nearestOpp && isOpponent(nearestOpp) &&
                     chebyshev(chaser->getPosition(), nearestOpp->getPosition()) == 1) {
-                    std::cout << "[HEURISTIC AI] : Opportunistic block -> "
+                    std::cout << "[HEURISTIC AI] : AI "
                             << chaser->getName() << " blocks " << nearestOpp->getName()
                             << " from (" << chaser->getPosition().first << "," << chaser->getPosition().second << ")\n";
 
@@ -305,10 +291,9 @@ namespace ai {
                     continue;
                 }
 
-                // Sinon move vers cible
                 Pos moveTo = bestMoveToward(gs, chaser, chaseTarget);
 
-                std::cout << "[HEURISTIC AI] : Move toward target -> "
+                std::cout << "[HEURISTIC AI] : AI move "
                         << chaser->getName()
                         << " from (" << chaser->getPosition().first << "," << chaser->getPosition().second << ")"
                         << " to (" << moveTo.first << "," << moveTo.second << ")"
@@ -322,16 +307,11 @@ namespace ai {
                 continue;
             }
 
-            // ==========================================================
-            // D) Aucun coup possible (devrait être rare)
-            // ==========================================================
             std::cout << "[HEURISTIC AI] : No action found for this loop.\n";
             break;
         }
 
-        // Très important : rendre la main (sinon tu peux rester coincée)
-        std::cout << "[HEURISTIC AI] : End turn. actionsDone=" << actionsDone
-                << " didAnything=" << (didAnything ? "true" : "false") << "\n";
+        std::cout << "[HEURISTIC AI] : End turn. \n";
         pt->setTurnOver(true);
 
         return didAnything;

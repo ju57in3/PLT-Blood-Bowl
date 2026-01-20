@@ -94,4 +94,22 @@ namespace screen {
     std::shared_ptr<state::BloodBowlGame> SceneManager::getGame() const {
         return game;
     }
+
+    void SceneManager::setAIStepModeEnabled(bool enabled) {
+        aiStepModeEnabled = enabled;
+    }
+
+    bool SceneManager::isAIStepModeEnabled() const {
+        return aiStepModeEnabled;
+    }
+
+    void SceneManager::requestAIStep() {
+        aiStepRequested = true;
+    }
+
+    bool SceneManager::consumeAIStepRequest() {
+        if (!aiStepRequested) return false;
+        aiStepRequested = false;
+        return true;
+    }
 } // namespace screen

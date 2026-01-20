@@ -168,6 +168,5 @@ namespace screen {
             manager->switchTo(render::SceneId::END_GAME);
         }
     }
-
 } // namespace screen
 

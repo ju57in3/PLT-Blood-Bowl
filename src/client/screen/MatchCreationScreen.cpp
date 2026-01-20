@@ -214,7 +214,7 @@ namespace screen {
         heuristicAIButton.setPosition(210, 460);
 
         heuristicAIText.setFont(font);
-        heuristicAIText.setString("Heuristique");
+        heuristicAIText.setString("Heuristic");
         heuristicAIText.setCharacterSize(16);
         heuristicAIText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(heuristicAIText, heuristicAIButton);
@@ -224,10 +224,22 @@ namespace screen {
         advancedAIButton.setPosition(370, 460);
 
         advancedAIText.setFont(font);
-        advancedAIText.setString("Avancee");
+        advancedAIText.setString("Avdanced");
         advancedAIText.setCharacterSize(16);
         advancedAIText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(advancedAIText, advancedAIButton);
+
+        // === STEP BY STEP MODE ===
+        aiStepModeButton.setSize({150, 35});
+        aiStepModeButton.setFillColor(sf::Color(80,80,120));
+        aiStepModeButton.setPosition(520, 460);
+
+        aiStepModeText.setFont(font);
+        aiStepModeText.setString("Step by Step : Off");
+        aiStepModeText.setCharacterSize(16);
+        aiStepModeText.setFillColor(sf::Color::White);
+        LayoutHelper::centerTextInRect(aiStepModeText, aiStepModeButton);
+
 
         // === MESSAGE D'ERREUR ===
         errorText.setFont(font);
@@ -241,7 +253,7 @@ namespace screen {
         backButton.setPosition(20, windowHeight - 60);
 
         backText.setFont(font);
-        backText.setString("Retour");
+        backText.setString("Back");
         backText.setCharacterSize(18);
         backText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(backText, backButton);
@@ -282,6 +294,11 @@ namespace screen {
             if (teamManager.getTeamCount() > 1) {
                 selectedTeam2Index = 1;
             }
+        }
+
+        if (manager) {
+            aiStepModeLocal = manager->isAIStepModeEnabled();
+            updateAIStepButtonText();
         }
     }
 
@@ -391,6 +408,14 @@ namespace screen {
                     randomAIButton.setOutlineThickness(0);
                     heuristicAIButton.setOutlineThickness(0);
                 }
+            }
+
+            // Toggle AI Step by Step
+            if (aiStepModeButton.getGlobalBounds().contains(mpos)) {
+                aiStepModeLocal = !aiStepModeLocal;
+                if (manager) manager->setAIStepModeEnabled(aiStepModeLocal);
+                updateAIStepButtonText();
+                return;
             }
         }
     }
@@ -665,9 +690,20 @@ namespace screen {
         window.draw(backText);
         window.draw(startButton);
         window.draw(startText);
+
+        // AI Step by Step Button
+        if (gameMode == 1 || gameMode == 2) {
+            window.draw(aiStepModeButton);
+            window.draw(aiStepModeText);
+        }
     }
 
     render::SceneId MatchCreationScreen::getId() const {
         return render::SceneId::MATCH_CREATION;
+    }
+
+    void MatchCreationScreen::updateAIStepButtonText() {
+        aiStepModeText.setString(aiStepModeLocal ? "AI Step by Step : On" : "AI Step by Step : Off");
+        LayoutHelper::centerTextInRect(aiStepModeText, aiStepModeButton);
     }
 } // namespace screen
