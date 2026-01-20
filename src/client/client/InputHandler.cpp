@@ -200,6 +200,7 @@ namespace client {
             if (pendingFollow)
             {
                 pendingFollow =false;
+                pendingPush = false;
                 auto followPath = std::make_unique<engine::Move>(selectedCharacter, pendingBlock->getHoldDefenderPosition());
                 engine->addCommand(std::move(followPath));
                 engine->executeCommand();
@@ -213,6 +214,7 @@ namespace client {
             if (pendingFollow)
             {
                 pendingFollow = false;
+                pendingPush = false;
 
                 engine->addCommand(std::move(pendingBlock));
                 engine->executeCommand();
@@ -231,6 +233,7 @@ namespace client {
         pendingPush = pendingBlock->getEnemyPushed();
         std::cout << "[DEBUG] applyPendingBlockChoice: pendingPush = " << pendingPush << "\n";
 
+        if (pendingFollow) return;
         if (!pendingPush)
         {
             engine->addCommand(std::move(pendingBlock));
@@ -400,7 +403,8 @@ namespace client {
     void InputHandler::handleLeftClick(const std::pair<int,int>& boardPos) {
         std::cout << "[DEBUG handleLeftClick] pendingBlock=" << (pendingBlock != nullptr)
                   << ", diceChosen=" << diceChosen
-                  << ", pendingPush=" << pendingPush << "\n";
+                  << ", pendingPush=" << pendingPush
+                  << ", pendingFollow=" << pendingFollow<< "\n";
 
         // Gestion du workflow de push
         if (pendingBlock && diceChosen && pendingPush) {
