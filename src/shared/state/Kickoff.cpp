@@ -228,4 +228,10 @@ namespace state {
         return true;
     }
 
-}
+    bool Kickoff::getTargetSelected() {
+        return targetSelected;
+    }
+
+
+    }
+
