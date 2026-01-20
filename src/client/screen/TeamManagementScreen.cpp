@@ -157,20 +157,24 @@ namespace screen {
         // Get font from ResourceManager
         const sf::Font& font = resources->getFont("fonts/bloodbowl.ttf");
 
-        float startY = 100;  // More margin from top
-        float itemHeight = 100;
+        const float windowWidth = utility::Constants::WINDOW_WIDTH;
+        const float startY = 170.0f;
+        const float itemHeight = 105.0f;
+        const float boxWidth = 800.0f;  // Réduit pour éviter le débordement
+        const float boxHeight = 90.0f;
 
         for (size_t i = 0; i < teams.size(); ++i) {
             const auto& team = teams[i];
             float yPos = startY + static_cast<float>(i) * itemHeight + scrollOffset;
 
-            // Team box
+            // Team box - centré
             sf::RectangleShape box;
-            box.setSize({1050, 90});
-            box.setFillColor(sf::Color(60, 70, 85));
-            box.setOutlineColor(sf::Color(120, 130, 150));
+            box.setSize({boxWidth, boxHeight});
+            box.setFillColor(sf::Color(70, 80, 100));
+            box.setOutlineColor(sf::Color(150, 150, 170));
             box.setOutlineThickness(2);
-            box.setPosition(60, yPos);  // More margin from left
+            box.setOrigin(boxWidth / 2, boxHeight / 2);
+            box.setPosition(windowWidth / 2, yPos + boxHeight / 2);
             teamBoxes.push_back(box);
 
             // Team name
@@ -179,7 +183,8 @@ namespace screen {
             nameText.setString(team->getName());
             nameText.setCharacterSize(24);
             nameText.setFillColor(sf::Color::White);
-            nameText.setPosition(60, yPos + 10);
+            nameText.setStyle(sf::Text::Bold);
+            nameText.setPosition(windowWidth / 2 - boxWidth / 2 + 15, yPos + 10);
             teamNameTexts.push_back(nameText);
 
             // Team info
@@ -190,39 +195,43 @@ namespace screen {
                << " | Relances: " << team->getRerolls()
                << " | Score: " << team->getScore();
             infoText.setString(ss.str());
-            infoText.setCharacterSize(16);
+            infoText.setCharacterSize(17);
             infoText.setFillColor(sf::Color(200, 200, 200));
-            infoText.setPosition(60, yPos + 45);
+            infoText.setPosition(windowWidth / 2 - boxWidth / 2 + 15, yPos + 45);
             teamInfoTexts.push_back(infoText);
 
-            // Edit button
+            // Edit button - décalé vers la gauche pour rester dans le cadre
             sf::RectangleShape editBtn;
-            editBtn.setSize({90, 30});
-            editBtn.setFillColor(sf::Color(50, 100, 200));
-            editBtn.setOrigin(45, 15);
-            editBtn.setPosition(895, yPos + 45);
+            editBtn.setSize({95, 35});
+            editBtn.setFillColor(sf::Color(70, 100, 150));
+            editBtn.setOutlineColor(sf::Color(150, 150, 170));
+            editBtn.setOutlineThickness(1);
+            editBtn.setOrigin(47.5f, 17.5f);
+            editBtn.setPosition(windowWidth / 2 + boxWidth / 2 - 180, yPos + boxHeight / 2);
             editButtons.push_back(editBtn);
 
             sf::Text editTxt;
             editTxt.setFont(font);
             editTxt.setString("Editer");
-            editTxt.setCharacterSize(16);
+            editTxt.setCharacterSize(17);
             editTxt.setFillColor(sf::Color::White);
             LayoutHelper::centerTextInRect(editTxt, editBtn);
             editTexts.push_back(editTxt);
 
-            // Delete button
+            // Delete button - décalé vers la gauche pour rester dans le cadre
             sf::RectangleShape delBtn;
-            delBtn.setSize({100, 30});
-            delBtn.setFillColor(sf::Color(200, 50, 50));
-            delBtn.setOrigin(50, 15);
-            delBtn.setPosition(1000, yPos + 45);
+            delBtn.setSize({105, 35});
+            delBtn.setFillColor(sf::Color(150, 70, 70));
+            delBtn.setOutlineColor(sf::Color(150, 150, 170));
+            delBtn.setOutlineThickness(1);
+            delBtn.setOrigin(52.5f, 17.5f);
+            delBtn.setPosition(windowWidth / 2 + boxWidth / 2 - 70, yPos + boxHeight / 2);
             deleteButtons.push_back(delBtn);
 
             sf::Text delTxt;
             delTxt.setFont(font);
             delTxt.setString("Supprimer");
-            delTxt.setCharacterSize(16);
+            delTxt.setCharacterSize(17);
             delTxt.setFillColor(sf::Color::White);
             LayoutHelper::centerTextInRect(delTxt, delBtn);
             deleteTexts.push_back(delTxt);

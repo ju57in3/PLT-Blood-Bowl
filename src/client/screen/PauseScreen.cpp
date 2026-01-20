@@ -25,54 +25,50 @@ namespace screen {
         // Titre
         title.setFont(font);
         title.setString("PAUSE");
-        title.setCharacterSize(48);
+        title.setCharacterSize(64);
         title.setFillColor(sf::Color::White);
         title.setStyle(sf::Text::Bold);
-        LayoutHelper::setRelativeY(title, 0.15f);
-        LayoutHelper::centerHorizontally(title);
+        LayoutHelper::setRelativePosition(title, 0.5f, 0.18f);
 
         // Bouton Reprendre
-        const float buttonWidth = 375.0f;
-        const float buttonHeight = 50.0f;
+        const float buttonWidth = 420.0f;
+        const float buttonHeight = 65.0f;
 
         resumeButton.setSize({buttonWidth, buttonHeight});
-        resumeButton.setFillColor(sf::Color(50, 100, 200));
-        resumeButton.setOutlineColor(sf::Color::White);
+        resumeButton.setFillColor(sf::Color(70, 100, 150));
+        resumeButton.setOutlineColor(sf::Color(150, 150, 170));
         resumeButton.setOutlineThickness(2);
-        LayoutHelper::setRelativeY(resumeButton, 0.35f);
-        LayoutHelper::centerHorizontally(resumeButton);
+        LayoutHelper::setRelativePosition(resumeButton, 0.5f, 0.38f);
 
         resumeText.setFont(font);
         resumeText.setString("Reprendre la partie");
-        resumeText.setCharacterSize(24);
+        resumeText.setCharacterSize(26);
         resumeText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(resumeText, resumeButton);
 
         // Bouton Sauvegarder
         saveButton.setSize({buttonWidth, buttonHeight});
-        saveButton.setFillColor(sf::Color(50, 150, 50));
-        saveButton.setOutlineColor(sf::Color::White);
+        saveButton.setFillColor(sf::Color(70, 150, 70));
+        saveButton.setOutlineColor(sf::Color(150, 150, 170));
         saveButton.setOutlineThickness(2);
-        LayoutHelper::setRelativeY(saveButton, 0.50f);
-        LayoutHelper::centerHorizontally(saveButton);
+        LayoutHelper::setRelativePosition(saveButton, 0.5f, 0.52f);
 
         saveText.setFont(font);
         saveText.setString("Sauvegarder et quitter");
-        saveText.setCharacterSize(24);
+        saveText.setCharacterSize(26);
         saveText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(saveText, saveButton);
 
         // Bouton Quitter sans sauvegarder
         quitButton.setSize({buttonWidth, buttonHeight});
-        quitButton.setFillColor(sf::Color(150, 50, 50));
-        quitButton.setOutlineColor(sf::Color::White);
+        quitButton.setFillColor(sf::Color(150, 70, 70));
+        quitButton.setOutlineColor(sf::Color(150, 150, 170));
         quitButton.setOutlineThickness(2);
-        LayoutHelper::setRelativeY(quitButton, 0.65f);
-        LayoutHelper::centerHorizontally(quitButton);
+        LayoutHelper::setRelativePosition(quitButton, 0.5f, 0.66f);
 
         quitText.setFont(font);
         quitText.setString("Quitter sans sauvegarder");
-        quitText.setCharacterSize(24);
+        quitText.setCharacterSize(26);
         quitText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(quitText, quitButton);
     }

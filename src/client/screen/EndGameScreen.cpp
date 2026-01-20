@@ -21,44 +21,45 @@ namespace screen {
         // Titre principal - centré
         title.setFont(font);
         title.setString("Fin de la partie !");
-        title.setCharacterSize(36);
+        title.setCharacterSize(48);
         title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(title, 0.05f);
-        LayoutHelper::centerHorizontally(title);
-
-        // Affichage des scores
-        scoreText.setFont(font);
-        scoreText.setCharacterSize(24);
-        scoreText.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(scoreText, 0.25f);
-        LayoutHelper::centerHorizontally(scoreText);
+        LayoutHelper::setRelativePosition(title, 0.5f, 0.10f);
 
         // Texte du gagnant
         winnerText.setFont(font);
-        winnerText.setCharacterSize(28);
+        winnerText.setCharacterSize(32);
         winnerText.setFillColor(sf::Color::Yellow);
-        LayoutHelper::setRelativeY(winnerText, 0.15f);
-        LayoutHelper::centerHorizontally(winnerText);
+        LayoutHelper::setRelativePosition(winnerText, 0.5f, 0.22f);
 
-        // Bouton Rejouer - centré au milieu
-        restartButton.setSize({200, 50});
-        restartButton.setFillColor(sf::Color(50, 150, 50));
-        restartButton.setPosition(utility::Constants::WINDOW_WIDTH / 2. - 220, utility::Constants::WINDOW_HEIGHT / 2. + 50);
+        // Affichage des scores
+        scoreText.setFont(font);
+        scoreText.setCharacterSize(28);
+        scoreText.setFillColor(sf::Color::White);
+        LayoutHelper::setRelativePosition(scoreText, 0.5f, 0.32f);
+
+        // Bouton Rejouer - centré
+        restartButton.setSize({240, 65});
+        restartButton.setFillColor(sf::Color(70, 150, 70));
+        restartButton.setOutlineColor(sf::Color(150, 150, 170));
+        restartButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(restartButton, 0.35f, 0.55f);
 
         restartText.setFont(font);
         restartText.setString("Rejouer");
-        restartText.setCharacterSize(22);
+        restartText.setCharacterSize(26);
         restartText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(restartText, restartButton);
 
         // Bouton retour au menu - à côté du bouton Rejouer
-        backButton.setSize({200, 50});
-        backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setPosition(utility::Constants::WINDOW_WIDTH / 2. + 20, utility::Constants::WINDOW_HEIGHT / 2. + 50);
+        backButton.setSize({240, 65});
+        backButton.setFillColor(sf::Color(80, 80, 100));
+        backButton.setOutlineColor(sf::Color(150, 150, 170));
+        backButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(backButton, 0.65f, 0.55f);
 
         backText.setFont(font);
         backText.setString("Menu");
-        backText.setCharacterSize(22);
+        backText.setCharacterSize(26);
         backText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(backText, backButton);
     }

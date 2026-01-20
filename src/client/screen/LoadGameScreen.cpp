@@ -22,20 +22,20 @@ namespace screen {
         // Titre
         title.setFont(font);
         title.setString("Charger une partie");
-        title.setCharacterSize(36);
+        title.setCharacterSize(48);
         title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(title, 0.05f);
-        LayoutHelper::centerHorizontally(title);
+        LayoutHelper::setRelativePosition(title, 0.5f, 0.08f);
 
         // Bouton Retour
-        backButton.setSize({200, 50});
-        backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setOrigin(100, 25);
-        backButton.setPosition(150, utility::Constants::WINDOW_HEIGHT - 75);
+        backButton.setSize({220, 55});
+        backButton.setFillColor(sf::Color(80, 80, 100));
+        backButton.setOutlineColor(sf::Color(150, 150, 170));
+        backButton.setOutlineThickness(2);
+        LayoutHelper::setRelativePosition(backButton, 0.15f, 0.92f);
 
         backText.setFont(font);
         backText.setString("Retour");
-        backText.setCharacterSize(22);
+        backText.setCharacterSize(24);
         backText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(backText, backButton);
     }
@@ -64,19 +64,19 @@ namespace screen {
         deleteTexts.clear();
 
         const float windowWidth = utility::Constants::WINDOW_WIDTH;
-        const float startY = 150.0f;
-        const float spacing = 100.0f;
-        const float buttonWidth = 600.0f;
-        const float buttonHeight = 80.0f;
+        const float startY = 170.0f;  // Plus de marge en haut
+        const float spacing = 105.0f;
+        const float buttonWidth = 650.0f;
+        const float buttonHeight = 85.0f;
 
         for (size_t i = 0; i < savedGames.size(); ++i) {
-            float y = startY + i * spacing;
+            float y = startY + static_cast<float>(i) * spacing;
 
             // Bouton principal
             sf::RectangleShape button;
             button.setSize({buttonWidth, buttonHeight});
-            button.setFillColor(sf::Color(50, 50, 100));
-            button.setOutlineColor(sf::Color::White);
+            button.setFillColor(sf::Color(70, 80, 100));
+            button.setOutlineColor(sf::Color(150, 150, 170));
             button.setOutlineThickness(2);
             button.setOrigin(buttonWidth / 2, buttonHeight / 2);
             button.setPosition(windowWidth / 2, y + buttonHeight / 2);
@@ -86,10 +86,10 @@ namespace screen {
             sf::Text text;
             text.setFont(font);
             text.setString(savedGames[i].displayName);
-            text.setCharacterSize(22);
+            text.setCharacterSize(24);
             text.setFillColor(sf::Color::White);
             text.setStyle(sf::Text::Bold);
-            text.setPosition(windowWidth / 2 - buttonWidth / 2 + 10, y + 5);
+            text.setPosition(windowWidth / 2 - buttonWidth / 2 + 15, y + 5);
             saveTexts.push_back(text);
 
             // Infos (équipes, score, tour, date)
@@ -102,23 +102,25 @@ namespace screen {
             sf::Text infoText;
             infoText.setFont(font);
             infoText.setString(info);
-            infoText.setCharacterSize(14);
+            infoText.setCharacterSize(15);
             infoText.setFillColor(sf::Color(200, 200, 200));
-            infoText.setPosition(windowWidth / 2 - buttonWidth / 2 + 10, y + 30);
+            infoText.setPosition(windowWidth / 2 - buttonWidth / 2 + 15, y + 32);
             saveInfoTexts.push_back(infoText);
 
-            // Bouton supprimer
+            // Bouton supprimer - décalé vers la gauche pour rester dans le cadre
             sf::RectangleShape deleteBtn;
-            deleteBtn.setSize({80, 40});
-            deleteBtn.setFillColor(sf::Color(150, 50, 50));
-            deleteBtn.setOrigin(40, 20);
-            deleteBtn.setPosition(windowWidth / 2 + buttonWidth / 2 - 50, y + buttonHeight / 2);
+            deleteBtn.setSize({105, 35});
+            deleteBtn.setFillColor(sf::Color(150, 70, 70));
+            deleteBtn.setOutlineColor(sf::Color(150, 150, 170));
+            deleteBtn.setOutlineThickness(1);
+            deleteBtn.setOrigin(52.5f, 17.5f);
+            deleteBtn.setPosition(windowWidth / 2 + buttonWidth / 2 - 70, y + buttonHeight / 2);
             deleteButtons.push_back(deleteBtn);
 
             sf::Text deleteText;
             deleteText.setFont(font);
-            deleteText.setString("Suppr");
-            deleteText.setCharacterSize(16);
+            deleteText.setString("Supprimer");
+            deleteText.setCharacterSize(17);
             deleteText.setFillColor(sf::Color::White);
             LayoutHelper::centerTextInRect(deleteText, deleteBtn);
             deleteTexts.push_back(deleteText);
@@ -152,22 +154,22 @@ namespace screen {
             }
         }
 
-        // Hover effect
+        // Hover effect - couleurs uniformisées
         if (event.type == sf::Event::MouseMoved) {
             sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseMove.x, event.mouseMove.y});
 
             for (size_t i = 0; i < saveButtons.size(); ++i) {
                 if (saveButtons[i].getGlobalBounds().contains(mousePos)) {
-                    saveButtons[i].setFillColor(sf::Color(70, 70, 120));
+                    saveButtons[i].setFillColor(sf::Color(85, 95, 115)); // Légèrement plus clair
                 } else {
-                    saveButtons[i].setFillColor(sf::Color(50, 50, 100));
+                    saveButtons[i].setFillColor(sf::Color(70, 80, 100)); // Couleur uniforme
                 }
             }
 
             if (backButton.getGlobalBounds().contains(mousePos)) {
-                backButton.setFillColor(sf::Color(90, 90, 90));
+                backButton.setFillColor(sf::Color(95, 95, 115)); // Légèrement plus clair
             } else {
-                backButton.setFillColor(sf::Color(70, 70, 70));
+                backButton.setFillColor(sf::Color(80, 80, 100)); // Couleur uniforme
             }
         }
     }
