@@ -439,7 +439,7 @@ namespace client {
         else if (belongsToCurrentTeam(targetCharacter, game)) {
             handlePassAction(targetCharacter);
         }
-        else {
+        else if (!pendingBlock) {
             handleBlockAction(targetCharacter);
         }
     }
