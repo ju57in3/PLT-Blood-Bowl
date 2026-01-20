@@ -34,7 +34,7 @@ namespace screen {
         title.setString("Creating Game");
         title.setCharacterSize(32);
         title.setFillColor(sf::Color::White);
-        title.setPosition(windowWidth / 2 - 150, 20);
+        LayoutHelper::setRelativePosition(title, 0.5f, 20.0f / windowHeight);
 
         // === ÉQUIPE 1 ===
         team1Label.setFont(font);
@@ -56,7 +56,8 @@ namespace screen {
 
         team1PrevButton.setSize({35, 35});
         team1PrevButton.setFillColor(sf::Color(100, 100, 100));
-        team1PrevButton.setPosition(460, 112);
+        team1PrevButton.setOrigin(17.5f, 17.5f);
+        team1PrevButton.setPosition(477.5f, 129.5f);
 
         team1PrevText.setFont(font);
         team1PrevText.setString("<");
@@ -66,7 +67,8 @@ namespace screen {
 
         team1NextButton.setSize({35, 35});
         team1NextButton.setFillColor(sf::Color(100, 100, 100));
-        team1NextButton.setPosition(500, 112);
+        team1NextButton.setOrigin(17.5f, 17.5f);
+        team1NextButton.setPosition(517.5f, 129.5f);
 
         team1NextText.setFont(font);
         team1NextText.setString(">");
@@ -94,7 +96,8 @@ namespace screen {
 
         team2PrevButton.setSize({35, 35});
         team2PrevButton.setFillColor(sf::Color(100, 100, 100));
-        team2PrevButton.setPosition(460, 202);
+        team2PrevButton.setOrigin(17.5f, 17.5f);
+        team2PrevButton.setPosition(477.5f, 219.5f);
 
         team2PrevText.setFont(font);
         team2PrevText.setString("<");
@@ -104,7 +107,8 @@ namespace screen {
 
         team2NextButton.setSize({35, 35});
         team2NextButton.setFillColor(sf::Color(100, 100, 100));
-        team2NextButton.setPosition(500, 202);
+        team2NextButton.setOrigin(17.5f, 17.5f);
+        team2NextButton.setPosition(517.5f, 219.5f);
 
         team2NextText.setFont(font);
         team2NextText.setString(">");
@@ -123,7 +127,8 @@ namespace screen {
         pvpButton.setFillColor(sf::Color(70, 120, 70));
         pvpButton.setOutlineColor(sf::Color::Yellow);
         pvpButton.setOutlineThickness(3);
-        pvpButton.setPosition(50, 290);
+        pvpButton.setOrigin(75, 20);
+        pvpButton.setPosition(125, 310);
 
         pvpText.setFont(font);
         pvpText.setString("Human vs Human");
@@ -133,7 +138,8 @@ namespace screen {
 
         pveButton.setSize({150, 40});
         pveButton.setFillColor(sf::Color(120, 70, 70));
-        pveButton.setPosition(210, 290);
+        pveButton.setOrigin(75, 20);
+        pveButton.setPosition(285, 310);
 
         pveText.setFont(font);
         pveText.setString("Human vs AI");
@@ -143,7 +149,8 @@ namespace screen {
 
         aivsaiButton.setSize({150, 40});
         aivsaiButton.setFillColor(sf::Color(70, 70, 120));
-        aivsaiButton.setPosition(370, 290);
+        aivsaiButton.setOrigin(75, 20);
+        aivsaiButton.setPosition(445, 310);
 
         aivsaiText.setFont(font);
         aivsaiText.setString("AI vs AI");
@@ -162,7 +169,8 @@ namespace screen {
         randomAI1Button.setFillColor(sf::Color(80, 80, 120));
         randomAI1Button.setOutlineColor(sf::Color::Yellow);
         randomAI1Button.setOutlineThickness(2);
-        randomAI1Button.setPosition(50, 380);
+        randomAI1Button.setOrigin(75, 17.5f);
+        randomAI1Button.setPosition(125, 397.5f);
 
         randomAI1Text.setFont(font);
         randomAI1Text.setString("Random");
@@ -172,7 +180,8 @@ namespace screen {
 
         heuristicAI1Button.setSize({150, 35});
         heuristicAI1Button.setFillColor(sf::Color(80, 80, 120));
-        heuristicAI1Button.setPosition(210, 380);
+        heuristicAI1Button.setOrigin(75, 17.5f);
+        heuristicAI1Button.setPosition(285, 397.5f);
 
         heuristicAI1Text.setFont(font);
         heuristicAI1Text.setString("Heuristic");
@@ -182,7 +191,8 @@ namespace screen {
 
         advancedAI1Button.setSize({150, 35});
         advancedAI1Button.setFillColor(sf::Color(80, 80, 120));
-        advancedAI1Button.setPosition(370, 380);
+        advancedAI1Button.setOrigin(75, 17.5f);
+        advancedAI1Button.setPosition(445, 397.5f);
 
         advancedAI1Text.setFont(font);
         advancedAI1Text.setString("Advanced");
@@ -201,7 +211,8 @@ namespace screen {
         randomAIButton.setFillColor(sf::Color(80, 80, 120));
         randomAIButton.setOutlineColor(sf::Color::Yellow);
         randomAIButton.setOutlineThickness(2);
-        randomAIButton.setPosition(50, 460);
+        randomAIButton.setOrigin(75, 17.5f);
+        randomAIButton.setPosition(125, 477.5f);
 
         randomAIText.setFont(font);
         randomAIText.setString("Random");
@@ -211,7 +222,8 @@ namespace screen {
 
         heuristicAIButton.setSize({150, 35});
         heuristicAIButton.setFillColor(sf::Color(80, 80, 120));
-        heuristicAIButton.setPosition(210, 460);
+        heuristicAIButton.setOrigin(75, 17.5f);
+        heuristicAIButton.setPosition(285, 477.5f);
 
         heuristicAIText.setFont(font);
         heuristicAIText.setString("Heuristic");
@@ -221,7 +233,8 @@ namespace screen {
 
         advancedAIButton.setSize({150, 35});
         advancedAIButton.setFillColor(sf::Color(80, 80, 120));
-        advancedAIButton.setPosition(370, 460);
+        advancedAIButton.setOrigin(75, 17.5f);
+        advancedAIButton.setPosition(445, 477.5f);
 
         advancedAIText.setFont(font);
         advancedAIText.setString("Advanced");
@@ -250,7 +263,8 @@ namespace screen {
         // === BOUTONS D'ACTION ===
         backButton.setSize({140, 40});
         backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setPosition(20, windowHeight - 60);
+        backButton.setOrigin(70, 20);
+        backButton.setPosition(90, windowHeight - 40);
 
         backText.setFont(font);
         backText.setString("Back");
@@ -260,7 +274,8 @@ namespace screen {
 
         startButton.setSize({200, 50});
         startButton.setFillColor(sf::Color(50, 150, 50));
-        startButton.setPosition(windowWidth - 220, windowHeight - 65);
+        startButton.setOrigin(100, 25);
+        startButton.setPosition(windowWidth - 120, windowHeight - 40);
 
         startText.setFont(font);
         startText.setString("Start");

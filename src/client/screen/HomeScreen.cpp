@@ -24,16 +24,14 @@ namespace screen {
     void HomeScreen::setManager(SceneManager *mgr) { this->manager = mgr; }
 
     void HomeScreen::setupUI() {
-        const float windowWidth = utility::Constants::WINDOW_WIDTH;
-        const float windowHeight = utility::Constants::WINDOW_HEIGHT;
 
         // Titre principal - centré en haut
         title.setFont(font);
         title.setString("BloodBowl");
         title.setCharacterSize(48);
         title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(title, windowHeight, 0.05f);
-        LayoutHelper::centerHorizontally(title, windowWidth);
+        LayoutHelper::setRelativeY(title, 0.05f);
+        LayoutHelper::centerHorizontally(title);
 
         buttonTexts.clear();
         buttonRects.clear();
@@ -50,8 +48,8 @@ namespace screen {
             // Create button rectangle
             sf::RectangleShape rect({buttonWidth, buttonHeight});
             rect.setFillColor(sf::Color(70, 70, 70));
-            LayoutHelper::setRelativeY(rect, windowHeight, startY + i * buttonSpacing);
-            LayoutHelper::centerHorizontally(rect, windowWidth);
+            LayoutHelper::setRelativeY(rect, startY + i * buttonSpacing);
+            LayoutHelper::centerHorizontally(rect);
             buttonRects.push_back(rect);
 
             // Create button text - centré dans le bouton

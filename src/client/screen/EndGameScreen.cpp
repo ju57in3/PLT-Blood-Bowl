@@ -14,8 +14,6 @@ namespace screen {
     void EndGameScreen::init(const std::shared_ptr<state::BloodBowlGame> &gamePtr, ResourceManager *resourcesPtr) {
         this->resources = resourcesPtr;
         this->game = gamePtr;
-        const float windowWidth = utility::Constants::WINDOW_WIDTH;
-        const float windowHeight = utility::Constants::WINDOW_HEIGHT;
 
         try { font = resources->getFont("fonts/bloodbowl.ttf"); } catch (...) {
         }
@@ -25,27 +23,27 @@ namespace screen {
         title.setString("Fin de la partie !");
         title.setCharacterSize(36);
         title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(title, windowHeight, 0.05f);
-        LayoutHelper::centerHorizontally(title, windowWidth);
+        LayoutHelper::setRelativeY(title, 0.05f);
+        LayoutHelper::centerHorizontally(title);
 
         // Affichage des scores
         scoreText.setFont(font);
         scoreText.setCharacterSize(24);
         scoreText.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(scoreText, windowHeight, 0.25f);
-        LayoutHelper::centerHorizontally(scoreText, windowWidth);
+        LayoutHelper::setRelativeY(scoreText, 0.25f);
+        LayoutHelper::centerHorizontally(scoreText);
 
         // Texte du gagnant
         winnerText.setFont(font);
         winnerText.setCharacterSize(28);
         winnerText.setFillColor(sf::Color::Yellow);
-        LayoutHelper::setRelativeY(winnerText, windowHeight, 0.15f);
-        LayoutHelper::centerHorizontally(winnerText, windowWidth);
+        LayoutHelper::setRelativeY(winnerText, 0.15f);
+        LayoutHelper::centerHorizontally(winnerText);
 
         // Bouton Rejouer - centré au milieu
         restartButton.setSize({200, 50});
         restartButton.setFillColor(sf::Color(50, 150, 50));
-        restartButton.setPosition(windowWidth / 2 - 220, windowHeight / 2 + 50);
+        restartButton.setPosition(utility::Constants::WINDOW_WIDTH / 2. - 220, utility::Constants::WINDOW_HEIGHT / 2. + 50);
 
         restartText.setFont(font);
         restartText.setString("Rejouer");
@@ -56,7 +54,7 @@ namespace screen {
         // Bouton retour au menu - à côté du bouton Rejouer
         backButton.setSize({200, 50});
         backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setPosition(windowWidth / 2 + 20, windowHeight / 2 + 50);
+        backButton.setPosition(utility::Constants::WINDOW_WIDTH / 2. + 20, utility::Constants::WINDOW_HEIGHT / 2. + 50);
 
         backText.setFont(font);
         backText.setString("Menu");
@@ -120,6 +118,10 @@ namespace screen {
                     // Revenir à l'état Setup
                     game->setCurrentState(game->getStateList().at(state::SETUP).get());
 
+                    // Reset le score
+                    game->getTeamA().setScore(0);
+                    game->getTeamB().setScore(0);
+
                     // Retourner à l'écran de jeu
                     if (manager) manager->switchTo(render::SceneId::GAME);
                 }
@@ -138,7 +140,7 @@ namespace screen {
                 "  -  " +
                 game->getTeamB().getName() + ": " + std::to_string(scoreB)
             );
-            LayoutHelper::centerHorizontally(scoreText, utility::Constants::WINDOW_WIDTH);
+            LayoutHelper::centerHorizontally(scoreText);
 
             // Déterminer le gagnant
             if (scoreA > scoreB) {
@@ -148,7 +150,7 @@ namespace screen {
             } else {
                 winnerText.setString("Match nul !");
             }
-            LayoutHelper::centerHorizontally(winnerText, utility::Constants::WINDOW_WIDTH);
+            LayoutHelper::centerHorizontally(winnerText);
         }
     }
 

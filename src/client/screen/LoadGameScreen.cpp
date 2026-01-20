@@ -19,21 +19,19 @@ namespace screen {
         try { font = resources->getFont("fonts/bloodbowl.ttf"); } catch (...) {
         }
 
-        const float windowWidth = utility::Constants::WINDOW_WIDTH;
-        const float windowHeight = utility::Constants::WINDOW_HEIGHT;
-
         // Titre
         title.setFont(font);
         title.setString("Charger une partie");
         title.setCharacterSize(36);
         title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativeY(title, windowHeight, 0.05f);
-        LayoutHelper::centerHorizontally(title, windowWidth);
+        LayoutHelper::setRelativeY(title, 0.05f);
+        LayoutHelper::centerHorizontally(title);
 
         // Bouton Retour
         backButton.setSize({200, 50});
         backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setPosition(50, windowHeight - 100);
+        backButton.setOrigin(100, 25);
+        backButton.setPosition(150, utility::Constants::WINDOW_HEIGHT - 75);
 
         backText.setFont(font);
         backText.setString("Retour");
@@ -80,7 +78,8 @@ namespace screen {
             button.setFillColor(sf::Color(50, 50, 100));
             button.setOutlineColor(sf::Color::White);
             button.setOutlineThickness(2);
-            button.setPosition(windowWidth / 2 - buttonWidth / 2, y);
+            button.setOrigin(buttonWidth / 2, buttonHeight / 2);
+            button.setPosition(windowWidth / 2, y + buttonHeight / 2);
             saveButtons.push_back(button);
 
             // Texte principal (nom de la sauvegarde)
@@ -90,7 +89,7 @@ namespace screen {
             text.setCharacterSize(22);
             text.setFillColor(sf::Color::White);
             text.setStyle(sf::Text::Bold);
-            text.setPosition(button.getPosition().x + 10, button.getPosition().y + 5);
+            text.setPosition(windowWidth / 2 - buttonWidth / 2 + 10, y + 5);
             saveTexts.push_back(text);
 
             // Infos (équipes, score, tour, date)
@@ -105,14 +104,15 @@ namespace screen {
             infoText.setString(info);
             infoText.setCharacterSize(14);
             infoText.setFillColor(sf::Color(200, 200, 200));
-            infoText.setPosition(button.getPosition().x + 10, button.getPosition().y + 30);
+            infoText.setPosition(windowWidth / 2 - buttonWidth / 2 + 10, y + 30);
             saveInfoTexts.push_back(infoText);
 
             // Bouton supprimer
             sf::RectangleShape deleteBtn;
             deleteBtn.setSize({80, 40});
             deleteBtn.setFillColor(sf::Color(150, 50, 50));
-            deleteBtn.setPosition(button.getPosition().x + buttonWidth - 90, button.getPosition().y + 20);
+            deleteBtn.setOrigin(40, 20);
+            deleteBtn.setPosition(windowWidth / 2 + buttonWidth / 2 - 50, y + buttonHeight / 2);
             deleteButtons.push_back(deleteBtn);
 
             sf::Text deleteText;
@@ -199,8 +199,7 @@ namespace screen {
             noSavesText.setString("Aucune partie sauvegardee");
             noSavesText.setCharacterSize(24);
             noSavesText.setFillColor(sf::Color(150, 150, 150));
-            LayoutHelper::centerHorizontally(noSavesText, utility::Constants::WINDOW_WIDTH);
-            noSavesText.setPosition(noSavesText.getPosition().x, 300);
+            LayoutHelper::setRelativePosition(noSavesText, 0.5f, 300.0f / utility::Constants::WINDOW_HEIGHT);
             window.draw(noSavesText);
         }
     }

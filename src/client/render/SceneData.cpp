@@ -67,13 +67,13 @@ namespace render {
 
         switch (status) {
             case state::bench:
-                baseX = 165; // En haut
+                baseX = 1165; // En haut
                 break;
             case state::ko:
-                baseX = 452; // Au milieu
+                baseX = 880; // Au milieu
                 break;
             case state::injured:
-                baseX = 740; // En bas
+                baseX = 600; // En bas
                 break;
             default:
                 baseX = Constants::BOARD_OFFSET_Y;
@@ -81,13 +81,13 @@ namespace render {
         }
 
         if (isTeamA) {
-            baseY = 12.0f;
+            baseY = 220.0f;
 
         } else {
-            baseY = 592.0f;
+            baseY = 910.0f;
         }
 
-        const int playersPerRow = 7;
+        const int playersPerRow = 4;
         const int row = index / playersPerRow;
         const int col = index % playersPerRow;
 
@@ -120,10 +120,10 @@ namespace render {
         playersSprites_TeamA.resize(Constants::MAX_PLAYERS_PER_TEAM);
         playersSprites_TeamB.resize(Constants::MAX_PLAYERS_PER_TEAM);
 
-        if (loadTextureFromFile("../res/Board2.0.png", boardTexture)) {
+        if (loadTextureFromFile("../res/Board3.0.png", boardTexture)) {
             board.setTexture(boardTexture);
         } else {
-            std::cerr << "Error loading res/Board2.0.png" << std::endl;
+            std::cerr << "Error loading res/Board3.0.png" << std::endl;
         }
 
         const std::string charactersDir = "../res/characters/";
@@ -151,13 +151,17 @@ namespace render {
 
                 if (status == state::bench) {
                     position = getOffFieldCoords(state::bench, true, benchCountA++);
+                    playersSprites_TeamA.at(index).setScale(0.7f, 0.7f);
                 } else if (status == state::ko) {
                     position = getOffFieldCoords(state::ko, true, koCountA++);
+                    playersSprites_TeamA.at(index).setScale(0.7f, 0.7f);
                 } else if (status == state::injured) {
                     position = getOffFieldCoords(state::injured, true, injuredCountA++);
+                    playersSprites_TeamA.at(index).setScale(0.7f, 0.7f);
                 } else {
                     // Joueur sur le terrain
                     position = pos2Coords(character->getPosition());
+                    playersSprites_TeamA.at(index).setScale(1.0f, 1.0f);
                 }
 
                 playersSprites_TeamA.at(index).setPosition(position);
@@ -182,13 +186,17 @@ namespace render {
 
                 if (status == state::bench) {
                     position = getOffFieldCoords(state::bench, false, benchCountB++);
+                    playersSprites_TeamB.at(index).setScale(0.7f, 0.7f);
                 } else if (status == state::ko) {
                     position = getOffFieldCoords(state::ko, false, koCountB++);
+                    playersSprites_TeamB.at(index).setScale(0.7f, 0.7f);
                 } else if (status == state::injured) {
                     position = getOffFieldCoords(state::injured, false, injuredCountB++);
+                    playersSprites_TeamB.at(index).setScale(0.7f, 0.7f);
                 } else {
                     // Joueur sur le terrain
                     position = pos2Coords(character->getPosition());
+                    playersSprites_TeamB.at(index).setScale(1.0f, 1.0f);
                 }
 
                 playersSprites_TeamB.at(index).setPosition(position);
@@ -330,19 +338,34 @@ namespace render {
             header.setPosition(8.0f, 4.0f);
             window.draw(header);
 
-            // Score en haut à droite
             if (game) {
+                sf::Text boxTitleDisplay("Score", defaultFont, 24);
+                boxTitleDisplay.setFillColor(sf::Color::White);
+                screen::LayoutHelper::setRelativePosition(boxTitleDisplay,0.865f,0.072f);
+                window.draw(boxTitleDisplay);
+
                 std::string scoreText = std::to_string(game->getTeamA().getScore()) +
-                                       "  -  " +
+                                       " - " +
                                        std::to_string(game->getTeamB().getScore());
-
-                sf::Text scoreDisplay(scoreText, defaultFont, 24);
-                scoreDisplay.setFillColor(sf::Color::Yellow);
+                sf::Text scoreDisplay(scoreText, defaultFont, 70);
                 scoreDisplay.setStyle(sf::Text::Bold);
-
-                auto scoreBounds = scoreDisplay.getLocalBounds();
-                scoreDisplay.setPosition(Constants::WINDOW_WIDTH - scoreBounds.width - 30.0f, 35.0f);
+                scoreDisplay.setColor(sf::Color::Black);
+                screen::LayoutHelper::setRelativePosition(scoreDisplay,0.865f,0.19f);
                 window.draw(scoreDisplay);
+
+                // Turn Counter
+                std::string turnText = "Turn " + std::to_string(game->getTurnCounter()) + " / 32";
+                sf::Text turnDisplay(turnText, defaultFont, 18);
+                turnDisplay.setFillColor(sf::Color::White);
+                screen::LayoutHelper::setRelativePosition(turnDisplay,0.865f,0.122f);
+                window.draw(turnDisplay);
+
+                // Team Names
+                std::string teamNamesText = game->getTeamA().getName() + " vs " + game->getTeamB().getName();
+                sf::Text teamNamesDisplay(teamNamesText, defaultFont, 16);
+                teamNamesDisplay.setFillColor(sf::Color::Black);
+                screen::LayoutHelper::setRelativePosition(teamNamesDisplay,0.5f,0.112f);
+                window.draw(teamNamesDisplay);
             }
         }
 
@@ -419,13 +442,17 @@ namespace render {
 
                 if (status == state::bench) {
                     position = getOffFieldCoords(state::bench, true, benchCountA++);
+                    sprite.setScale(0.7f, 0.7f);
                 } else if (status == state::ko) {
                     position = getOffFieldCoords(state::ko, true, koCountA++);
+                    sprite.setScale(0.7f, 0.7f);
                 } else if (status == state::injured) {
                     position = getOffFieldCoords(state::injured, true, injuredCountA++);
+                    sprite.setScale(0.7f, 0.7f);
                 } else {
                     // Joueur sur le terrain (playable, played, knockedDown, stunned)
                     position = pos2Coords(character->getPosition());
+                    sprite.setScale(1.0f, 1.0f);
                 }
 
                 sprite.setPosition(position);
@@ -451,13 +478,17 @@ namespace render {
 
                 if (status == state::bench) {
                     position = getOffFieldCoords(state::bench, false, benchCountB++);
+                    sprite.setScale(0.7f, 0.7f);
                 } else if (status == state::ko) {
                     position = getOffFieldCoords(state::ko, false, koCountB++);
+                    sprite.setScale(0.7f, 0.7f);
                 } else if (status == state::injured) {
                     position = getOffFieldCoords(state::injured, false, injuredCountB++);
+                    sprite.setScale(0.7f, 0.7f);
                 } else {
                     // Joueur sur le terrain (playable, played, knockedDown, stunned)
                     position = pos2Coords(character->getPosition());
+                    sprite.setScale(1.0f, 1.0f);
                 }
 
                 sprite.setPosition(position);

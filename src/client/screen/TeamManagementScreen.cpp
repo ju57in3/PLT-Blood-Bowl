@@ -29,12 +29,13 @@ namespace screen {
         title.setString("Gestion des Equipes");
         title.setCharacterSize(32);
         title.setFillColor(sf::Color::White);
-        title.setPosition(windowWidth / 2 - 180, 20);
+        LayoutHelper::setRelativePosition(title, 0.5f, 20.0f / windowHeight);
 
         // Back button
         backButton.setSize({140, 40});
         backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setPosition(20, windowHeight - 60);
+        backButton.setOrigin(70, 20);
+        backButton.setPosition(90, windowHeight - 40);
 
         backText.setFont(font);
         backText.setString("Retour");
@@ -45,7 +46,8 @@ namespace screen {
         // Create new team button
         createNewButton.setSize({180, 40});
         createNewButton.setFillColor(sf::Color(50, 100, 200));
-        createNewButton.setPosition(windowWidth / 2 - 90, windowHeight - 60);
+        createNewButton.setOrigin(90, 20);
+        createNewButton.setPosition(windowWidth / 2, windowHeight - 40);
 
         createNewText.setFont(font);
         createNewText.setString("Nouvelle Equipe");
@@ -64,7 +66,8 @@ namespace screen {
         editNameBox.setFillColor(sf::Color(50, 50, 50));
         editNameBox.setOutlineColor(sf::Color::White);
         editNameBox.setOutlineThickness(2);
-        editNameBox.setPosition(50, 120);
+        editNameBox.setOrigin(150, 17.5f);
+        editNameBox.setPosition(200, 137.5f);
 
         editNameText.setFont(font);
         editNameText.setCharacterSize(18);
@@ -79,7 +82,8 @@ namespace screen {
 
         rerollsMinusButton.setSize({35, 35});
         rerollsMinusButton.setFillColor(sf::Color(150, 50, 50));
-        rerollsMinusButton.setPosition(50, 210);
+        rerollsMinusButton.setOrigin(17.5f, 17.5f);
+        rerollsMinusButton.setPosition(67.5f, 227.5f);
 
         rerollsMinusText.setFont(font);
         rerollsMinusText.setString("-");
@@ -94,7 +98,8 @@ namespace screen {
 
         rerollsPlusButton.setSize({35, 35});
         rerollsPlusButton.setFillColor(sf::Color(50, 150, 50));
-        rerollsPlusButton.setPosition(140, 210);
+        rerollsPlusButton.setOrigin(17.5f, 17.5f);
+        rerollsPlusButton.setPosition(157.5f, 227.5f);
 
         rerollsPlusText.setFont(font);
         rerollsPlusText.setString("+");
@@ -104,7 +109,8 @@ namespace screen {
 
         saveEditButton.setSize({140, 40});
         saveEditButton.setFillColor(sf::Color(50, 150, 50));
-        saveEditButton.setPosition(50, 270);
+        saveEditButton.setOrigin(70, 20);
+        saveEditButton.setPosition(120, 290);
 
         saveEditText.setFont(font);
         saveEditText.setString("Sauvegarder");
@@ -114,7 +120,8 @@ namespace screen {
 
         cancelEditButton.setSize({120, 40});
         cancelEditButton.setFillColor(sf::Color(150, 50, 50));
-        cancelEditButton.setPosition(200, 270);
+        cancelEditButton.setOrigin(60, 20);
+        cancelEditButton.setPosition(260, 290);
 
         cancelEditText.setFont(font);
         cancelEditText.setString("Annuler");
@@ -190,7 +197,8 @@ namespace screen {
             sf::RectangleShape editBtn;
             editBtn.setSize({90, 30});
             editBtn.setFillColor(sf::Color(50, 100, 200));
-            editBtn.setPosition(850, yPos + 30);
+            editBtn.setOrigin(45, 15);
+            editBtn.setPosition(895, yPos + 45);
             editButtons.push_back(editBtn);
 
             sf::Text editTxt;
@@ -205,7 +213,8 @@ namespace screen {
             sf::RectangleShape delBtn;
             delBtn.setSize({100, 30});
             delBtn.setFillColor(sf::Color(200, 50, 50));
-            delBtn.setPosition(950, yPos + 30);
+            delBtn.setOrigin(50, 15);
+            delBtn.setPosition(1000, yPos + 45);
             deleteButtons.push_back(delBtn);
 
             sf::Text delTxt;

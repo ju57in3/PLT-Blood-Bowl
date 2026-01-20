@@ -30,7 +30,7 @@ namespace screen {
         title.setString("Creation d'equipe");
         title.setCharacterSize(32);
         title.setFillColor(sf::Color::White);
-        title.setPosition(windowWidth / 2 - 150, 20);
+        LayoutHelper::setRelativePosition(title, 0.5f, 20.0f / windowHeight);
 
         // === NOM DE L'ÉQUIPE ===
         teamNameLabel.setFont(font);
@@ -61,7 +61,8 @@ namespace screen {
 
         humanRaceButton.setSize({120, 40});
         humanRaceButton.setFillColor(sf::Color(70, 100, 150));
-        humanRaceButton.setPosition(50, 190);
+        humanRaceButton.setOrigin(60, 20);
+        humanRaceButton.setPosition(110, 210);
 
         humanRaceText.setFont(font);
         humanRaceText.setString("Humains");
@@ -71,7 +72,8 @@ namespace screen {
 
         orcRaceButton.setSize({120, 40});
         orcRaceButton.setFillColor(sf::Color(100, 150, 70));
-        orcRaceButton.setPosition(180, 190);
+        orcRaceButton.setOrigin(60, 20);
+        orcRaceButton.setPosition(240, 210);
 
         orcRaceText.setFont(font);
         orcRaceText.setString("Orcs");
@@ -100,7 +102,8 @@ namespace screen {
         // === BOUTONS D'ACTION ===
         backButton.setSize({140, 40});
         backButton.setFillColor(sf::Color(70, 70, 70));
-        backButton.setPosition(20, windowHeight - 60);
+        backButton.setOrigin(70, 20);
+        backButton.setPosition(90, windowHeight - 40);
 
         backText.setFont(font);
         backText.setString("Retour");
@@ -110,7 +113,8 @@ namespace screen {
 
         validateButton.setSize({160, 40});
         validateButton.setFillColor(sf::Color(50, 150, 50));
-        validateButton.setPosition(windowWidth - 180, windowHeight - 60);
+        validateButton.setOrigin(80, 20);
+        validateButton.setPosition(windowWidth - 100, windowHeight - 40);
 
         validateText.setFont(font);
         validateText.setString("Valider");
@@ -141,7 +145,8 @@ namespace screen {
             sf::RectangleShape minusBtn;
             minusBtn.setSize({35, 35});
             minusBtn.setFillColor(sf::Color(150, 50, 50));
-            minusBtn.setPosition(50, startY + i * 45);
+            minusBtn.setOrigin(17.5f, 17.5f);
+            minusBtn.setPosition(67.5f, startY + i * 45 + 17.5f);
             playerButtons.push_back(minusBtn);
 
             sf::Text minusText;
@@ -174,7 +179,8 @@ namespace screen {
             sf::RectangleShape plusBtn;
             plusBtn.setSize({35, 35});
             plusBtn.setFillColor(sf::Color(50, 150, 50));
-            plusBtn.setPosition(260, startY + i * 45);
+            plusBtn.setOrigin(17.5f, 17.5f);
+            plusBtn.setPosition(277.5f, startY + i * 45 + 17.5f);
             playerButtons.push_back(plusBtn);
 
             sf::Text plusText;

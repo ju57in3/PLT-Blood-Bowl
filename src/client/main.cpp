@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
     // For now, we just initialize with nullptr to avoid requiring teams at startup
     std::shared_ptr<BloodBowlGame> gamePtr = nullptr;
 
-    sf::RenderWindow window(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl");
+    sf::RenderWindow window(sf::VideoMode(utility::Constants::WINDOW_WIDTH,utility::Constants::WINDOW_HEIGHT),"BloodBowl", sf::Style::Fullscreen);
 
     // NEW: screen manager + resources
     screen::ResourceManager resources("../res/");
