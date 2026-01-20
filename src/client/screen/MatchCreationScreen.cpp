@@ -31,14 +31,14 @@ namespace screen {
 
         // Titre principal
         title.setFont(font);
-        title.setString("Creation de match");
+        title.setString("Creating Game");
         title.setCharacterSize(32);
         title.setFillColor(sf::Color::White);
         title.setPosition(windowWidth / 2 - 150, 20);
 
         // === ÉQUIPE 1 ===
         team1Label.setFont(font);
-        team1Label.setString("Equipe 1:");
+        team1Label.setString("Team 1:");
         team1Label.setCharacterSize(20);
         team1Label.setFillColor(sf::Color::White);
         team1Label.setPosition(50, 80);
@@ -76,7 +76,7 @@ namespace screen {
 
         // === ÉQUIPE 2 ===
         team2Label.setFont(font);
-        team2Label.setString("Equipe 2:");
+        team2Label.setString("Team 2:");
         team2Label.setCharacterSize(20);
         team2Label.setFillColor(sf::Color::White);
         team2Label.setPosition(50, 170);
@@ -114,7 +114,7 @@ namespace screen {
 
         // === MODE DE JEU ===
         modeLabel.setFont(font);
-        modeLabel.setString("Mode de jeu:");
+        modeLabel.setString("Game Mode :");
         modeLabel.setCharacterSize(20);
         modeLabel.setFillColor(sf::Color::White);
         modeLabel.setPosition(50, 260);
@@ -126,7 +126,7 @@ namespace screen {
         pvpButton.setPosition(50, 290);
 
         pvpText.setFont(font);
-        pvpText.setString("Humain vs Humain");
+        pvpText.setString("Human vs Human");
         pvpText.setCharacterSize(14);
         pvpText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(pvpText, pvpButton);
@@ -136,7 +136,7 @@ namespace screen {
         pveButton.setPosition(210, 290);
 
         pveText.setFont(font);
-        pveText.setString("Humain vs IA");
+        pveText.setString("Human vs AI");
         pveText.setCharacterSize(14);
         pveText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(pveText, pveButton);
@@ -146,14 +146,14 @@ namespace screen {
         aivsaiButton.setPosition(370, 290);
 
         aivsaiText.setFont(font);
-        aivsaiText.setString("IA vs IA");
+        aivsaiText.setString("AI vs AI");
         aivsaiText.setCharacterSize(14);
         aivsaiText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(aivsaiText, aivsaiButton);
 
         // === TYPE D'IA EQUIPE 1 (AIvAI mode only) ===
         ai1TypeLabel.setFont(font);
-        ai1TypeLabel.setString("IA Equipe 1:");
+        ai1TypeLabel.setString("AI Team 1 :");
         ai1TypeLabel.setCharacterSize(20);
         ai1TypeLabel.setFillColor(sf::Color::White);
         ai1TypeLabel.setPosition(50, 350);
@@ -175,7 +175,7 @@ namespace screen {
         heuristicAI1Button.setPosition(210, 380);
 
         heuristicAI1Text.setFont(font);
-        heuristicAI1Text.setString("Heuristique");
+        heuristicAI1Text.setString("Heuristic");
         heuristicAI1Text.setCharacterSize(16);
         heuristicAI1Text.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(heuristicAI1Text, heuristicAI1Button);
@@ -185,14 +185,14 @@ namespace screen {
         advancedAI1Button.setPosition(370, 380);
 
         advancedAI1Text.setFont(font);
-        advancedAI1Text.setString("Avancee");
+        advancedAI1Text.setString("Advanced");
         advancedAI1Text.setCharacterSize(16);
         advancedAI1Text.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(advancedAI1Text, advancedAI1Button);
 
         // === TYPE D'IA EQUIPE 2 (PvE and AIvAI modes) ===
         aiTypeLabel.setFont(font);
-        aiTypeLabel.setString("IA Equipe 2:");
+        aiTypeLabel.setString("AI Team 2:");
         aiTypeLabel.setCharacterSize(20);
         aiTypeLabel.setFillColor(sf::Color::White);
         aiTypeLabel.setPosition(50, 430);
@@ -224,15 +224,15 @@ namespace screen {
         advancedAIButton.setPosition(370, 460);
 
         advancedAIText.setFont(font);
-        advancedAIText.setString("Avdanced");
+        advancedAIText.setString("Advanced");
         advancedAIText.setCharacterSize(16);
         advancedAIText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(advancedAIText, advancedAIButton);
 
         // === STEP BY STEP MODE ===
-        aiStepModeButton.setSize({150, 35});
-        aiStepModeButton.setFillColor(sf::Color(80,80,120));
-        aiStepModeButton.setPosition(520, 460);
+        aiStepModeButton.setSize({470, 35});
+        aiStepModeButton.setFillColor(sf::Color(128,128,128));
+        aiStepModeButton.setPosition(50, 520);
 
         aiStepModeText.setFont(font);
         aiStepModeText.setString("Step by Step : Off");
@@ -263,7 +263,7 @@ namespace screen {
         startButton.setPosition(windowWidth - 220, windowHeight - 65);
 
         startText.setFont(font);
-        startText.setString("Demarrer le match");
+        startText.setString("Start");
         startText.setCharacterSize(18);
         startText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(startText, startButton);
@@ -439,21 +439,21 @@ namespace screen {
         const auto& teams = teamManager.getSavedTeams();
 
         if (teams.empty()) {
-            team1NameText.setString("Aucune equipe disponible");
-            team2NameText.setString("Aucune equipe disponible");
+            team1NameText.setString("No Team available");
+            team2NameText.setString("No Team available");
             return;
         }
 
         // Équipe 1
         if (selectedTeam1Index >= 0 && selectedTeam1Index < static_cast<int>(teams.size())) {
             team1NameText.setString(teams[selectedTeam1Index]->getName() +
-                                   " (" + std::to_string(teams[selectedTeam1Index]->getCharacters().size()) + " joueurs)");
+                                   " (" + std::to_string(teams[selectedTeam1Index]->getCharacters().size()) + " players)");
         }
 
         // Équipe 2
         if (selectedTeam2Index >= 0 && selectedTeam2Index < static_cast<int>(teams.size())) {
             team2NameText.setString(teams[selectedTeam2Index]->getName() +
-                                   " (" + std::to_string(teams[selectedTeam2Index]->getCharacters().size()) + " joueurs)");
+                                   " (" + std::to_string(teams[selectedTeam2Index]->getCharacters().size()) + " players)");
         }
     }
 
@@ -476,13 +476,13 @@ namespace screen {
         auto& teamManager = state::TeamManager::getInstance();
 
         if (teamManager.getTeamCount() == 0) {
-            return "Veuillez creer au moins 2 equipes";
+            return "Please create at least two teams";
         }
         if (teamManager.getTeamCount() == 1) {
-            return "Veuillez creer une deuxieme equipe";
+            return "Please create a second team";
         }
         if (selectedTeam1Index == selectedTeam2Index) {
-            return "Veuillez selectionner deux equipes differentes";
+            return "Please select two different teams";
         }
         return "";
     }
