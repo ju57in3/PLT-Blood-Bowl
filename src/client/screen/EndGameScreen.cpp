@@ -145,11 +145,11 @@ namespace screen {
 
             // Déterminer le gagnant
             if (scoreA > scoreB) {
-                winnerText.setString(game->getTeamA().getName() + " remporte la victoire !");
+                winnerText.setString(game->getTeamA().getName() + " wins!");
             } else if (scoreB > scoreA) {
-                winnerText.setString(game->getTeamB().getName() + " remporte la victoire !");
+                winnerText.setString(game->getTeamB().getName() + " wins!");
             } else {
-                winnerText.setString("Match nul !");
+                winnerText.setString("Draw!");
             }
             LayoutHelper::setRelativePosition(winnerText, 0.5f, 0.17f);
         }

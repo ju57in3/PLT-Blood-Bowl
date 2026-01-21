@@ -18,6 +18,18 @@ namespace screen {
         } catch (...) {
             // leave font default if load fails
         }
+
+        // Load background image
+        if (!backgroundTexture.loadFromFile("res/home_display.jpg")) {
+            // If loading fails, we'll just use a solid color background
+        } else {
+            backgroundSprite.setTexture(backgroundTexture);
+            // Scale the sprite to fill the window
+            float scaleX = static_cast<float>(utility::Constants::WINDOW_WIDTH) / backgroundTexture.getSize().x;
+            float scaleY = static_cast<float>(utility::Constants::WINDOW_HEIGHT) / backgroundTexture.getSize().y;
+            backgroundSprite.setScale(scaleX, scaleY);
+        }
+
         setupUI();
     }
 
@@ -35,7 +47,7 @@ namespace screen {
         buttonTexts.clear();
         buttonRects.clear();
 
-        std::vector<std::string> labels = {"Gerer equipes", "Creer match", "Charger partie", "Quitter"};
+        std::vector<std::string> labels = {"Manage Teams", "Create Match", "Load Game", "Quit"};
 
         // Positions relatives pour les boutons (centrés verticalement)
         const float buttonWidth = 380.f;
@@ -96,8 +108,13 @@ namespace screen {
     }
 
     void HomeScreen::draw(sf::RenderWindow &window) {
-        // background - uniform gray
-        window.clear(sf::Color(50, 50, 60));
+        // Draw background image if loaded, otherwise use gray
+        if (backgroundTexture.getSize().x > 0) {
+            window.draw(backgroundSprite);
+        } else {
+            window.clear(sf::Color(50, 50, 60));
+        }
+
         window.draw(title);
         for (size_t i = 0; i < buttonRects.size(); ++i) {
             window.draw(buttonRects[i]);

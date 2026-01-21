@@ -31,7 +31,7 @@ namespace screen {
 
         // Titre principal
         title.setFont(font);
-        title.setString("Creer un match");
+        title.setString("Create a Match");
         title.setCharacterSize(48);
         title.setFillColor(sf::Color::White);
         LayoutHelper::setRelativePosition(title, 0.5f, 0.08f);
@@ -278,7 +278,7 @@ namespace screen {
         LayoutHelper::setRelativePosition(backButton, 0.1f, 0.92f);
 
         backText.setFont(font);
-        backText.setString("Retour");
+        backText.setString("Back");
         backText.setCharacterSize(22);
         backText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(backText, backButton);
@@ -290,7 +290,7 @@ namespace screen {
         LayoutHelper::setRelativePosition(startButton, 0.9f, 0.92f);
 
         startText.setFont(font);
-        startText.setString("Demarrer");
+        startText.setString("Start");
         startText.setCharacterSize(22);
         startText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(startText, startButton);
@@ -730,7 +730,7 @@ namespace screen {
     }
 
     void MatchCreationScreen::updateAIStepButtonText() {
-        aiStepModeText.setString(aiStepModeLocal ? "IA Pas a pas : Oui" : "IA Pas a pas : Non");
+        aiStepModeText.setString(aiStepModeLocal ? "AI Step by Step: Yes" : "AI Step by Step: No");
         LayoutHelper::centerTextInRect(aiStepModeText, aiStepModeButton);
     }
 } // namespace screen

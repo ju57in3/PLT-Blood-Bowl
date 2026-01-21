@@ -52,14 +52,14 @@ namespace screen {
         LayoutHelper::setRelativePosition(createNewButton, 0.5f, 0.92f);  // Raised from bottom
 
         createNewText.setFont(font);
-        createNewText.setString("Nouvelle Equipe");
+        createNewText.setString("New Team");
         createNewText.setCharacterSize(18);
         createNewText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(createNewText, createNewButton);
 
         // Edit mode UI elements
         editModeLabel.setFont(font);
-        editModeLabel.setString("Edition d'equipe");
+        editModeLabel.setString("Team Editing");
         editModeLabel.setCharacterSize(24);
         editModeLabel.setFillColor(sf::Color::Yellow);
         editModeLabel.setPosition(60, 100);  // More margin from top
@@ -191,8 +191,8 @@ namespace screen {
             sf::Text infoText;
             infoText.setFont(font);
             std::stringstream ss;
-            ss << "Joueurs: " << team->getCharacters().size()
-               << " | Relances: " << team->getRerolls()
+            ss << "Players: " << team->getCharacters().size()
+               << " | Rerolls: " << team->getRerolls()
                << " | Score: " << team->getScore();
             infoText.setString(ss.str());
             infoText.setCharacterSize(17);
@@ -212,7 +212,7 @@ namespace screen {
 
             sf::Text editTxt;
             editTxt.setFont(font);
-            editTxt.setString("Editer");
+            editTxt.setString("Edit");
             editTxt.setCharacterSize(17);
             editTxt.setFillColor(sf::Color::White);
             LayoutHelper::centerTextInRect(editTxt, editBtn);
@@ -230,7 +230,7 @@ namespace screen {
 
             sf::Text delTxt;
             delTxt.setFont(font);
-            delTxt.setString("Supprimer");
+            delTxt.setString("Delete");
             delTxt.setCharacterSize(17);
             delTxt.setFillColor(sf::Color::White);
             LayoutHelper::centerTextInRect(delTxt, delBtn);

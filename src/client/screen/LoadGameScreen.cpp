@@ -21,7 +21,7 @@ namespace screen {
 
         // Titre
         title.setFont(font);
-        title.setString("Charger une partie");
+        title.setString("Load Game");
         title.setCharacterSize(48);
         title.setFillColor(sf::Color::White);
         LayoutHelper::setRelativePosition(title, 0.5f, 0.08f);
@@ -34,7 +34,7 @@ namespace screen {
         LayoutHelper::setRelativePosition(backButton, 0.15f, 0.92f);
 
         backText.setFont(font);
-        backText.setString("Retour");
+        backText.setString("Back");
         backText.setCharacterSize(24);
         backText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(backText, backButton);
@@ -198,7 +198,7 @@ namespace screen {
         if (savedGames.empty()) {
             sf::Text noSavesText;
             noSavesText.setFont(font);
-            noSavesText.setString("Aucune partie sauvegardee");
+            noSavesText.setString("No saved games");
             noSavesText.setCharacterSize(24);
             noSavesText.setFillColor(sf::Color(150, 150, 150));
             LayoutHelper::setRelativePosition(noSavesText, 0.5f, 300.0f / utility::Constants::WINDOW_HEIGHT);
