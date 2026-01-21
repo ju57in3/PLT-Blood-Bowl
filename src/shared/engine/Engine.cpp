@@ -97,18 +97,41 @@ namespace engine {
 
         int currentTeamId = currentTeam->getTeamId();
 
-        // Essayer avec la première IA
+        auto runFullTurnAuto = [&](ai::AI* activeAI) {
+            if (!activeAI) return;
+
+            std::cout << "[ENGINE] Running AI (full turn) for team " << activeAI->teamId << "\n";
+
+            // Sécurité anti-boucle infinie
+            const int MAX_AI_ACTIONS = 30;
+
+            for (int i = 0; i < MAX_AI_ACTIONS; ++i) {
+                // Stop si l'état n'est plus un PlayerTurn ou si turnover/TD
+                auto* pt = dynamic_cast<state::PlayerTurn*>(game->getCurrentState());
+                if (pt) {
+                    if (pt->getTurnOver()) break;
+                    if (pt->getTouchDown()) break;
+                }
+
+                // Stop si l'équipe a changé
+                auto* ct = game->getCurrentTeam();
+                if (!ct || ct->getTeamId() != activeAI->teamId) break;
+
+                // runAI() joue 1 action et renvoie true si une action a été jouée
+                bool played = activeAI->runAI();
+                if (!played) break;
+            }
+        };
+
         if (currentAI && currentTeamId == currentAI->teamId && lastAITeamTurn != currentTeamId) {
-            std::cout << "[ENGINE] Running AI for team " << currentAI->teamId << "\n";
-            currentAI->runAI();
-            lastAITeamTurn = currentTeamId; // Marquer que l'IA a joué ce tour
+            runFullTurnAuto(currentAI.get());
+            lastAITeamTurn = currentTeamId;
         }
-        // Essayer avec la deuxième IA
         else if (secondAI && currentTeamId == secondAI->teamId && lastAITeamTurn != currentTeamId) {
-            std::cout << "[ENGINE] Running second AI for team " << secondAI->teamId << "\n";
-            secondAI->runAI();
-            lastAITeamTurn = currentTeamId; // Marquer que l'IA a joué ce tour
+            runFullTurnAuto(secondAI.get());
+            lastAITeamTurn = currentTeamId;
         }
+
 
         // Réinitialiser le flag si on a changé d'équipe
         if (lastAITeamTurn != -1 && currentTeamId != lastAITeamTurn) {
