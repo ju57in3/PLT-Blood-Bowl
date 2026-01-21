@@ -31,7 +31,7 @@ namespace screen {
         backButton.setFillColor(sf::Color(80, 80, 100));
         backButton.setOutlineColor(sf::Color(150, 150, 170));
         backButton.setOutlineThickness(2);
-        LayoutHelper::setRelativePosition(backButton, 0.15f, 0.92f);
+        LayoutHelper::setRelativePosition(backButton, 0.15f, 0.88f);  // Adjusted from 0.92f
 
         backText.setFont(font);
         backText.setString("Back");

@@ -36,10 +36,10 @@ namespace screen {
         backButton.setFillColor(sf::Color(80, 80, 100));
         backButton.setOutlineColor(sf::Color(150, 150, 170));
         backButton.setOutlineThickness(2);
-        LayoutHelper::setRelativePosition(backButton, 0.08f, 0.92f);  // Raised from bottom
+        LayoutHelper::setRelativePosition(backButton, 0.08f, 0.88f);  // Adjusted from 0.92f
 
         backText.setFont(font);
-        backText.setString("Retour");
+        backText.setString("Back");
         backText.setCharacterSize(18);
         backText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(backText, backButton);
@@ -49,7 +49,7 @@ namespace screen {
         createNewButton.setFillColor(sf::Color(70, 100, 150));
         createNewButton.setOutlineColor(sf::Color(150, 150, 170));
         createNewButton.setOutlineThickness(2);
-        LayoutHelper::setRelativePosition(createNewButton, 0.5f, 0.92f);  // Raised from bottom
+        LayoutHelper::setRelativePosition(createNewButton, 0.5f, 0.88f);  // Adjusted from 0.92f
 
         createNewText.setFont(font);
         createNewText.setString("New Team");
