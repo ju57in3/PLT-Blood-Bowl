@@ -98,9 +98,14 @@ namespace ai {
         if (!ch) return -1e9f;
         if (!isInside(dest)) return -1e9f;
 
-        if (utility::GameUtils::getCharacterAt(game, dest)) {
-            if (dest == ch->getPosition()) return -1e9f;
+        if (auto occ = utility::GameUtils::getCharacterAt(game, dest)) {
+            // si la case est occupée par quelqu'un d'autre, move interdit
+            if (occ.get() != ch.get()) return -1e9f;
+
+            // si c'est la même case (dest == position actuelle), on peut autoriser mais score faible
+            return -1e9f;
         }
+
 
         state::Team& me = myTeam();
         state::Team& opp = oppTeam();
@@ -389,12 +394,14 @@ namespace ai {
         // LOGS NARRATIFS
         if (!best.a) {
             std::cout << "[ADVANCED AI] : AI can't make a move on this turn.\n";
+            if (pt) pt->setTurnOver(true);
             return false;
         }
 
         // LOGS NARRATIFS
         if (best.score < MIN_SCORE_TO_PLAY) {
             std::cout << "[ADVANCED AI] : AI sees no more actions interesting and end its turn.\n";
+            if (pt) pt->setTurnOver(true);
             return false;
         }
 
