@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "LayoutHelper.h"
 #include "../../shared/utility/Constants.h"
+#include <iostream>
 
 namespace screen {
     HomeScreen::HomeScreen() = default;
@@ -20,7 +21,7 @@ namespace screen {
         }
 
         // Load background image
-        if (!backgroundTexture.loadFromFile("res/home_display.jpg")) {
+        if (!backgroundTexture.loadFromFile("../res/home_display.jpg")) {
             // If loading fails, we'll just use a solid color background
         } else {
             backgroundSprite.setTexture(backgroundTexture);
@@ -108,11 +109,12 @@ namespace screen {
     }
 
     void HomeScreen::draw(sf::RenderWindow &window) {
-        // Draw background image if loaded, otherwise use gray
+        // Always clear the window first
+        window.clear(sf::Color(50, 50, 60));
+
+        // Draw background image if loaded
         if (backgroundTexture.getSize().x > 0) {
             window.draw(backgroundSprite);
-        } else {
-            window.clear(sf::Color(50, 50, 60));
         }
 
         window.draw(title);
