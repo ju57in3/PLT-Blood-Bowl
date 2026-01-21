@@ -41,7 +41,7 @@ namespace screen {
         LayoutHelper::setRelativePosition(resumeButton, 0.5f, 0.38f);
 
         resumeText.setFont(font);
-        resumeText.setString("Reprendre la partie");
+        resumeText.setString("Resume Game");
         resumeText.setCharacterSize(26);
         resumeText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(resumeText, resumeButton);
@@ -54,7 +54,7 @@ namespace screen {
         LayoutHelper::setRelativePosition(saveButton, 0.5f, 0.52f);
 
         saveText.setFont(font);
-        saveText.setString("Sauvegarder et quitter");
+        saveText.setString("Save and Quit");
         saveText.setCharacterSize(26);
         saveText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(saveText, saveButton);
@@ -67,7 +67,7 @@ namespace screen {
         LayoutHelper::setRelativePosition(quitButton, 0.5f, 0.66f);
 
         quitText.setFont(font);
-        quitText.setString("Quitter sans sauvegarder");
+        quitText.setString("Quit without Saving");
         quitText.setCharacterSize(26);
         quitText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(quitText, quitButton);

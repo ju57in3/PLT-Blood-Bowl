@@ -27,14 +27,14 @@ namespace screen {
 
         // Titre principal
         title.setFont(font);
-        title.setString("Creation d'equipe");
+        title.setString("Team Creation");
         title.setCharacterSize(32);
         title.setFillColor(sf::Color::White);
         LayoutHelper::setRelativePosition(title, 0.5f, 20.0f / windowHeight);
 
         // === NOM DE L'ÉQUIPE ===
         teamNameLabel.setFont(font);
-        teamNameLabel.setString("Nom de l'equipe:");
+        teamNameLabel.setString("Team name:");
         teamNameLabel.setCharacterSize(20);
         teamNameLabel.setFillColor(sf::Color::White);
         teamNameLabel.setPosition(50, 80);
@@ -46,11 +46,11 @@ namespace screen {
         teamNameBox.setPosition(50, 110);
 
         teamNameText.setFont(font);
-        teamNameText.setString("Mon Equipe");
+        teamNameText.setString("My Team");
         teamNameText.setCharacterSize(18);
         teamNameText.setFillColor(sf::Color::White);
         teamNameText.setPosition(55, 115);
-        teamName = "Mon Equipe";
+        teamName = "My Team";
 
         // === SÉLECTION DE RACE ===
         raceLabel.setFont(font);
@@ -65,7 +65,7 @@ namespace screen {
         humanRaceButton.setPosition(110, 210);
 
         humanRaceText.setFont(font);
-        humanRaceText.setString("Humains");
+        humanRaceText.setString("Humans");
         humanRaceText.setCharacterSize(18);
         humanRaceText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(humanRaceText, humanRaceButton);
@@ -83,7 +83,7 @@ namespace screen {
 
         // === JOUEURS ===
         playersLabel.setFont(font);
-        playersLabel.setString("Joueurs (11-16):");
+        playersLabel.setString("Players (11-16):");
         playersLabel.setCharacterSize(20);
         playersLabel.setFillColor(sf::Color::White);
         playersLabel.setPosition(50, 250);
@@ -310,20 +310,20 @@ namespace screen {
 
     void TeamCreationScreen::updateSummary() {
         std::stringstream ss;
-        ss << "=== Resume ===\n\n";
-        ss << "Nom: " << teamName << "\n\n";
+        ss << "=== Summary ===\n\n";
+        ss << "Name: " << teamName << "\n\n";
 
         if (!selectedRace.empty()) {
-            ss << "Race: " << (selectedRace == "human" ? "Humains" : "Orcs") << "\n\n";
+            ss << "Race: " << (selectedRace == "human" ? "Humans" : "Orcs") << "\n\n";
             ss << "Composition:\n";
             for (size_t i = 0; i < playerTypes.size(); ++i) {
                 if (playerCounts[i] > 0) {
                     ss << "  " << playerTypes[i] << ": " << playerCounts[i] << "\n";
                 }
             }
-            ss << "\nTotal: " << totalPlayers << " joueurs";
+            ss << "\nTotal: " << totalPlayers << " players";
         } else {
-            ss << "Choisissez une race";
+            ss << "Choose a race";
         }
 
         summaryText.setString(ss.str());
