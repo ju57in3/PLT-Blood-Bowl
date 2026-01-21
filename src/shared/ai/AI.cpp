@@ -40,9 +40,7 @@ namespace ai {
 
 
     void AI::placePlayers() {
-        if (!game) {
-            return;
-        }
+        if (!game) return;
 
         // Determine if this AI controls TeamA or TeamB
         bool isTeamA = (game->getTeamA().getTeamId() == teamId);
@@ -53,9 +51,7 @@ namespace ai {
         // Reclaim the team's characters
         auto& characters = team.getCharacters();
 
-        if (characters.empty()) {
-            return;
-        }
+        if (characters.empty()) return;
 
         // We never place more than 11 players
         const std::size_t maxPlayers = std::min<std::size_t>(11, characters.size());
