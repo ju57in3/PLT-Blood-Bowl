@@ -38,13 +38,6 @@ namespace screen {
 
     void HomeScreen::setupUI() {
 
-        // Titre principal - centré en haut avec marge
-        title.setFont(font);
-        title.setString("BloodBowl");
-        title.setCharacterSize(56);
-        title.setFillColor(sf::Color::White);
-        LayoutHelper::setRelativePosition(title, 0.5f, 0.12f);
-
         buttonTexts.clear();
         buttonRects.clear();
 
