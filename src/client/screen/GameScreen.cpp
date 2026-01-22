@@ -80,13 +80,6 @@ namespace screen {
                 manager->push(render::SceneId::PAUSE); // push pour pouvoir revenir avec pop()
             }
         }
-
-        // Touche A pour forcer un tour de l'IA (debug)
-        if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::A) {
-            if (manager && manager->isAIStepModeEnabled()) {
-                manager->requestAIStep();
-            }
-        }
     }
 
     void GameScreen::update() {
@@ -110,18 +103,10 @@ namespace screen {
                     manager->getEngine()->runAIKickoffIfNeeded(kickoffState);
                 }
                 else {
-                    engine::Engine* eng = manager->getEngine();
-
-                    if (manager->isAIStepModeEnabled()) {
-                        if (manager->consumeAIStepRequest()) {
-                            eng->runAITurnStep();
-                            eng->executeCommand();
-                        }
-                    } else {
-                        eng->runAITurnIfNeeded();
-                        eng->executeCommand();
-                    }
+                    manager->getEngine()->runAITurnIfNeeded();
                 }
+
+                manager->getEngine()->executeCommand();
             }
 
             // Vérifier si on est passé à l'état EndGame

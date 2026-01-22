@@ -250,20 +250,6 @@ namespace screen {
         advancedAIText.setFillColor(sf::Color::White);
         LayoutHelper::centerTextInRect(advancedAIText, advancedAIButton);
 
-        // === STEP BY STEP MODE ===
-        aiStepModeButton.setSize({485, 38});
-        aiStepModeButton.setFillColor(sf::Color(90, 90, 105));
-        aiStepModeButton.setOutlineColor(sf::Color(150, 150, 170));
-        aiStepModeButton.setOutlineThickness(2);
-        aiStepModeButton.setPosition(60, 585);
-
-        aiStepModeText.setFont(font);
-        aiStepModeText.setString("IA Pas a pas : Non");
-        aiStepModeText.setCharacterSize(17);
-        aiStepModeText.setFillColor(sf::Color::White);
-        LayoutHelper::centerTextInRect(aiStepModeText, aiStepModeButton);
-
-
         // === MESSAGE D'ERREUR ===
         errorText.setFont(font);
         errorText.setCharacterSize(18);
@@ -321,11 +307,6 @@ namespace screen {
             if (teamManager.getTeamCount() > 1) {
                 selectedTeam2Index = 1;
             }
-        }
-
-        if (manager) {
-            aiStepModeLocal = manager->isAIStepModeEnabled();
-            updateAIStepButtonText();
         }
     }
 
@@ -435,14 +416,6 @@ namespace screen {
                     randomAIButton.setOutlineThickness(0);
                     heuristicAIButton.setOutlineThickness(0);
                 }
-            }
-
-            // Toggle AI Step by Step
-            if (aiStepModeButton.getGlobalBounds().contains(mpos)) {
-                aiStepModeLocal = !aiStepModeLocal;
-                if (manager) manager->setAIStepModeEnabled(aiStepModeLocal);
-                updateAIStepButtonText();
-                return;
             }
         }
     }
@@ -717,20 +690,9 @@ namespace screen {
         window.draw(backText);
         window.draw(startButton);
         window.draw(startText);
-
-        // AI Step by Step Button
-        if (gameMode == 1 || gameMode == 2) {
-            window.draw(aiStepModeButton);
-            window.draw(aiStepModeText);
-        }
     }
 
     render::SceneId MatchCreationScreen::getId() const {
         return render::SceneId::MATCH_CREATION;
-    }
-
-    void MatchCreationScreen::updateAIStepButtonText() {
-        aiStepModeText.setString(aiStepModeLocal ? "AI Step by Step: Yes" : "AI Step by Step: No");
-        LayoutHelper::centerTextInRect(aiStepModeText, aiStepModeButton);
     }
 } // namespace screen

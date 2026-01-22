@@ -293,16 +293,103 @@ Le moteur les lit dans un **thread unique**, assurant l’ordre.
 ![Diagramme de l'engine](res/diaEngine.png)
 
 ## 5 Intelligence Artificielle
-Cette section décrit les stratégies et outils utilisés pour créer un joueur artificiel. 
-L'objectif est de proposer des comportements qui utilisent exactement les mêmes commandes qu'un joueur humain : déplacement, blocage, passe, fin de tour, etc.
-L'IA ne connaît pas plus d'informations que le joueur. Elle s'appuie uniquement sur l'état du jeu accessible via BloodBowlGame, et elle envoie ses ordres en utilisant les commandes du moteur, comme le ferait un utilisateur avec sa souris ou son clavier.
 
-### 5.1 Stratégies
-#### 5.1.1 Intelligence minimale
-Pour ce premier niveau, l'objectif est de fournir une IA très simple, capable de jouer sans prise de décision complexe.
-Cette IA doit pouvoir agir seule pendant son tour, tout en respectant les règles du jeu et les contraintes imposées par le moteur.
-L'IA minimale fonctionne exclusivement sur le hasard. A chaque fois que c'est son tour, elle récupère la liste de toutes les commandes possibles à cet instant, sélectionne une de ces commandes au hasard et l'envoie au moteur.
-La particularité importante est que l'IA ne fait aucun calcul.
-Cette straégie offre une base fonctionnelle solide, suffisante pour valider le moteur et tester la cohérence du jeu.
+Cette section présente la mise en œuvre d’un joueur artificiel pour le jeu Blood Bowl.  
+L’IA doit respecter les mêmes règles qu’un joueur humain : elle utilise uniquement les commandes fournies par le moteur de jeu et n’a accès à aucune information supplémentaire sur l’état interne du jeu.
 
-"Le diagramme UML de l'IA est disponible sur Github dans la branche IA. Pour le moment l'IA n'est pas totalement fonctionnelle."
+## 5.1 Stratégies
+
+### 5.1.1 Intelligence minimale
+
+L’IA aléatoire implémente une stratégie d’intelligence minimale.  
+Elle ne cherche pas à optimiser une situation de jeu, à marquer ou à protéger le ballon. Son objectif principal est de produire un tour de jeu valide en prenant des décisions aléatoires tout en respectant les règles de base du moteur.
+
+Cette IA sert de référence simple :
+- elle permet de tester la stabilité du moteur,
+- elle fournit un comportement de base face auquel comparer des IA plus avancées,
+- elle garantit que les commandes envoyées au moteur sont les mêmes que celles d’un joueur humain.
+
+Le déroulement général d’un tour est le suivant :
+1. l’IA identifie l’équipe qu’elle contrôle à partir de son identifiant,
+2. elle parcourt tous les joueurs de cette équipe,
+3. pour chaque joueur jouable, elle décide aléatoirement de le jouer ou non,
+4. si le joueur est sélectionné, elle choisit une action aléatoire parmi déplacement, blocage ou passe,
+5. une fois tous les joueurs traités, l’IA termine son tour.
+
+Aucune anticipation ni évaluation stratégique n’est effectuée. Chaque décision est indépendante des précédentes.
+
+## 5.2 Conception logicielle
+
+### 5.2.1 Intégration au moteur de jeu
+
+La classe `RandomAI` hérite de la classe abstraite `AI` et redéfinit la méthode principale `runAI()`.  
+Cette méthode est appelée par le moteur lorsque c’est au tour de l’équipe contrôlée par l’IA.
+
+L’IA n’agit jamais directement sur l’état du jeu. Elle génère uniquement des commandes du moteur :
+- `Move` pour les déplacements,
+- `Block` pour les blocages,
+- `EndTurn` pour la fin de tour.
+
+Ces commandes sont ajoutées à la file du moteur via `engine.addCommand(...)`, exactement comme celles produites par les entrées clavier ou souris d’un joueur humain.
+
+### 5.2.2 Sélection des équipes
+
+Au début du tour, l’IA détermine dynamiquement quelle équipe elle contrôle.  
+Elle compare son `teamId` avec les identifiants de `TeamA` et `TeamB` afin d’identifier :
+- son équipe,
+- l’équipe adverse.
+
+Cette approche permet de réutiliser la même IA quelle que soit la position de l’équipe dans la partie.
+
+### 5.2.3 Sélection des joueurs jouables
+
+L’IA parcourt la liste des personnages de son équipe.  
+Un joueur est ignoré si :
+- le pointeur est nul,
+- son statut n’est pas `playable`.
+
+Ce filtrage empêche l’IA de tenter des actions illégales avec des joueurs déjà utilisés ou indisponibles.
+
+### 5.2.4 Décision aléatoire d’activation
+
+Pour chaque joueur jouable, l’IA tire une décision aléatoire avec une probabilité de 50 % :
+- jouer le personnage,
+- ou passer au suivant sans effectuer d’action.
+
+Ce mécanisme introduit une forte variabilité dans le nombre d’actions réalisées par tour.
+
+### 5.2.5 Choix et exécution des actions
+
+Si un joueur est sélectionné, l’IA choisit une action aléatoire parmi trois possibilités.
+
+#### Déplacement
+
+L’IA :
+- récupère la capacité de mouvement maximale du joueur,
+- tire une distance aléatoire comprise entre 1 et cette valeur,
+- calcule une position cible en effectuant des déplacements successifs aléatoires.
+
+À chaque étape, elle vérifie que la position reste dans les limites du terrain.  
+Une commande `Move` est ensuite envoyée au moteur avec la position finale calculée.
+
+#### Blocage
+
+L’IA récupère la liste des adversaires blocables à l’aide d’une fonction utilitaire.  
+Si aucun adversaire n’est disponible, l’action est abandonnée.
+
+Sinon, un adversaire est choisi aléatoirement et une commande `Block` est envoyée au moteur.
+
+#### Passe
+
+L’action de passe n’est pas implémentée dans cette IA.  
+Lorsque cette action est tirée, l’IA affiche un message de débogage et n’envoie aucune commande.
+
+### 5.2.6 Fin de tour
+
+Après avoir parcouru tous les joueurs de l’équipe, l’IA ajoute systématiquement une commande `EndTurn`.  
+Cela garantit que le tour se termine correctement, même si aucune action n’a été réalisée.
+
+### 5.2.7 Journalisation et temporisation
+
+L’IA produit de nombreux messages de log afin de rendre son comportement lisible lors de l’exécution.  
+Des pauses artificielles sont également introduites entre les actions pour ralentir le déroulement du tour et faciliter l’observation du comportement de l’IA.

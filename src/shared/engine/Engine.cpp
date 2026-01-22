@@ -124,11 +124,11 @@ namespace engine {
         };
 
         if (currentAI && currentTeamId == currentAI->teamId && lastAITeamTurn != currentTeamId) {
-            runFullTurnAuto(currentAI.get());
+            currentAI->runAI();
             lastAITeamTurn = currentTeamId;
         }
         else if (secondAI && currentTeamId == secondAI->teamId && lastAITeamTurn != currentTeamId) {
-            runFullTurnAuto(secondAI.get());
+            secondAI->runAI();
             lastAITeamTurn = currentTeamId;
         }
 
@@ -226,27 +226,6 @@ namespace engine {
             } else {
                 std::cerr << "[ENGINE] AI kickoff target invalid!\n";
             }
-        }
-    }
-
-    void Engine::runAITurnStep() {
-        if (!game) return;
-
-        auto* currentTeam = game->getCurrentTeam();
-        if (!currentTeam) return;
-
-        int currentTeamId = currentTeam->getTeamId();
-
-        if (currentAI && currentTeamId == currentAI->teamId) {
-            std::cout << "[ENGINE] Manuel step AI for team " << currentAI->teamId << "\n";
-            currentAI->runAI();
-            return;
-        }
-
-        if (secondAI && currentTeamId == secondAI->teamId) {
-            std::cout << "[ENGINE] Manuel step second AI for team " << secondAI->teamId << "\n";
-            secondAI->runAI();
-            return;
         }
     }
 } // namespace engine
